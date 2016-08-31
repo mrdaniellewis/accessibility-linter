@@ -1,0 +1,33 @@
+{
+  "name": "accessibility-linter",
+  "version": "1.0.0",
+  "description": "Accessibility test a web page or web application",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "mkdir -p build && browserify lib/index.js | uglifyjs > build/index.min.js"
+  },
+  "author": "Daniel Lewis",
+  "license": "ISC",
+  "devDependencies": {
+    "browserify": "^13.1.0",
+    "eslint": "^3.4.0",
+    "eslint-config-airbnb-base": "^5.0.3",
+    "eslint-plugin-import": "^1.14.0",
+    "expect": "^1.20.2",
+    "mocha": "^3.0.2",
+    "uglify-js-harmony": "^2.6.2"
+  },
+  "eslintConfig": {
+    "extends": [
+      "airbnb-base"
+    ],
+    "env": {
+      "browser": true,
+      "node": true
+    },
+    "rules": {
+      "no-console": 0
+    }
+  }
+}
