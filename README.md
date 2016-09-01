@@ -5,10 +5,10 @@ outputs errors to the JavaScript console.
 
 ## Roadmap
 
-- Test runner
-- Reporter
-- Setup the tests
-- doc with explanations
+- Build script
+- Test specs
+- Configuration
+- Documentation
 - customisable config
 - customisable config via `<script>` tag
 - Integrate instanbul for code coverage:
