@@ -1,5 +1,5 @@
-describe('test', function () {
-  it('runs a test', function () {
-    expect(true).toBe(true);
+describe('AccessibilityLinter', () => {
+  it('is a property of window', () => {
+    expect(window.AccessibilityLinter).toBeA(Function);
   });
 });

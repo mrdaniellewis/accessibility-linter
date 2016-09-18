@@ -3,9 +3,19 @@
   "version": "1.0.0",
   "description": "Accessibility test a web page or web application",
   "main": "lib/index.js",
+  "config": {
+    "uglify": "-m -c --screw-ie8"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "mkdir -p build && browserify lib/index.js | uglifyjs > build/index.min.js"
+    "lint": "eslint . --ext .js",
+    "clean": "rm build/*",
+    "build:standalone": "node lib/build/standalone | exorcist build/linter.js.map > build/linter.js",
+    "postbuild:standalone": "uglifyjs build/linter.js $npm_package_config_uglify > build/linter.min.js",
+    "build:umd": "node lib/build/umd | exorcist build/umd.js.map > build/umd.js",
+    "postbuild:umd": "uglifyjs build/umd.js $npm_package_config_uglify > build/umd.min.js",
+    "build:specs": "node lib/build/specs > test/test-specs.js",
+    "prebuild": "npm run clean; npm run lint",
+    "build": "npm run build:standalone && npm run build:umd && npm run build:specs"
   },
   "author": "Daniel Lewis",
   "license": "ISC",
@@ -14,20 +24,10 @@
     "eslint": "^3.4.0",
     "eslint-config-airbnb-base": "^5.0.3",
     "eslint-plugin-import": "^1.14.0",
+    "exorcist": "^0.4.0",
     "expect": "^1.20.2",
     "mocha": "^3.0.2",
+    "strictify": "^0.2.0",
     "uglify-js-harmony": "^2.6.2"
-  },
-  "eslintConfig": {
-    "extends": [
-      "airbnb-base"
-    ],
-    "env": {
-      "browser": true,
-      "node": true
-    },
-    "rules": {
-      "no-console": 0
-    }
   }
 }

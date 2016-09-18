@@ -1,0 +1,3 @@
+**/*.min.js
+test/test-specs.js
+node_modules

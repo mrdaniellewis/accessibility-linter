@@ -3,7 +3,8 @@
     "mocha": true
   },
   "globals": {
-    "expect": false
+    "expect": false,
+    "AccessibilityLinter": false
   },
   "rules": {
     "prefer-arrow-callback": 0,
