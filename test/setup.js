@@ -6,27 +6,35 @@
    *
    * @param {Function} fn A function that amends the DOM
    */
-  function whenDomChanges(fn, before, after) {
-    const additions = [];
-
-    before(() => new Promise(resolve => {
+  const whenDomChanges = window.whenDomChanges = function whenDomChanges(fn) {
+    return new Promise(resolve => {
       const observer = new MutationObserver(mutations => {
-        additions.concat(mutations.map(mutation => Array.from(mutation.addedNodes)));
         observer.disconnect();
-        resolve();
+        resolve(mutations);
       });
       observer.observe(document, { subtree: true, childList: true });
       fn();
-    }));
+    });
+  };
+
+  function setupDomChange(fn, before, after) {
+    const additions = [];
+
+    before(() => (
+      whenDomChanges(fn)
+        .then(mutations => {
+          mutations.forEach(mutation => mutation.addedNodes.forEach(node => additions.push(node)));
+          return mutations;
+        })
+    ));
 
     after(() => {
-      // Remove added DOM nodes
-      additions.splice(0).forEach(node => node.remove());
+      additions.forEach(el => el.remove());
     });
   }
 
-  window.changeDomBeforeAll = fn => whenDomChanges(fn, before, after);
-  window.changeDomBeforeEach = fn => whenDomChanges(fn, beforeEach, afterEach);
+  window.setupDomChangeBeforeAll = fn => setupDomChange(fn, before, after);
+  window.changeDomBeforeEach = fn => setupDomChange(fn, beforeEach, afterEach);
 
   expect.extend({
     toBeEmpty() {

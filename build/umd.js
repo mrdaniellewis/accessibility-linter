@@ -15,7 +15,7 @@ const Logger = require('./logger');
 const tests = require('./tests');
 const utils = require('./utils');
 
-module.exports = class AccessibilityLinter extends Runner {
+const Linter = module.exports = class AccessibilityLinter extends Runner {
   constructor(options) {
     options = options || {};
     options.logger = options.logger || new Logger();
@@ -37,17 +37,29 @@ module.exports = class AccessibilityLinter extends Runner {
    * Stop looking for issues
    */
   stopObserving() {
-    this.observer.disconnect();
-    this.observer = null;
+    if (this.observer) {
+      this.observer.disconnect();
+      this.observer = null;
+    }
   }
 };
+
+Linter.Logger = Logger;
+Linter.tests = tests;
 
 },{"./logger":2,"./runner":3,"./tests":"./tests","./utils":4}],2:[function(require,module,exports){
 "use strict";
 /* eslint-disable no-console */
 module.exports = class Logger {
+  message(message, el) {
+    if (typeof message === 'string') {
+      return message;
+    }
+    return message(el);
+  }
+
   error(test, el) {
-    console.error(test.name, el, test.docHref);
+    console.error(this.message(test.message, el), el);
   }
 };
 
@@ -55,16 +67,24 @@ module.exports = class Logger {
 "use strict";
 const select = require('./utils').select;
 
+const dataAttr = 'allylint';
+
+const addToSetArray = (set, key, value) => set.set(key, (set.get(key) || []).concat(value));
+const isInSetArray = (set, key, value) => (set.get(key) || []).includes(value);
+const cssEscape = value => value.replace(/"/g, '\\"');
+
 module.exports = class Runner {
   constructor(config) {
     this.tests = config.tests;
-    this.whitelist = config.whitelist || [];
+    this.whitelist = config.whitelist || {};
     this.logger = config.logger;
 
     // Elements and issues already reported
     this.reported = new WeakMap();
     // Elements that are whitelisted
-    this.whitelisted = new WeakSet();
+    this.whitelisted = new WeakMap();
+    // Elements with ignore attributes
+    this.ignored = new WeakMap();
   }
 
   /**
@@ -84,26 +104,55 @@ module.exports = class Runner {
    */
   runTest(test, context) {
     select(test.selector, context)
-      .filter(this.filterWhitelist, this)
-      .filter(el => !(this.reported.get(el) || []).includes(test.name))
-      .filter(test.filter || Boolean)
+      .filter(el => this.filterIgnoreAttribute(el, test.name))
+      .filter(el => this.filterWhitelist(el, test.name))
+      .filter(el => !isInSetArray(this.reported, el, test.name))
+      .filter(el => (test.filter ? !test.filter(el) : true))
       .forEach(el => {
         this.logger.error(test, el);
-        this.reported.set(el, (this.reported.get(el) || []).concat(test.name));
+        addToSetArray(this.reported, el, test.name);
       });
   }
 
   /**
    * Filter elements on the whitelist
    */
-  filterWhitelist(el) {
-    if (this.whitelisted.has(el)) {
+  filterWhitelist(el, testName) {
+    const whitelist = this.whitelist;
+
+    if (isInSetArray(this.whitelisted, el, testName)) {
       return false;
     }
-    if (this.whitelist.some(test => el.matches(test))) {
-      this.whitelisted.add(el);
+
+    const isWhitelisted = Object.keys(whitelist).some(selector => {
+      const testList = whitelist[selector];
+      if (testList && !testList.includes(testName)) {
+        return false;
+      }
+      return el.matches(selector);
+    });
+
+    if (isWhitelisted) {
+      addToSetArray(this.whitelisted, el, testName);
       return false;
     }
+    return true;
+  }
+
+  filterIgnoreAttribute(el, testName) {
+    if (isInSetArray(this.ignored, el, testName)) {
+      return false;
+    }
+
+    const ignore = el.matches(
+      `[data-${dataAttr}-ignore=""],[data-${dataAttr}-ignore~="${cssEscape(testName)}"]`
+    );
+
+    if (ignore) {
+      addToSetArray(this.ignored, el, testName);
+      return false;
+    }
+
     return true;
   }
 };
@@ -111,17 +160,17 @@ module.exports = class Runner {
 },{"./utils":4}],4:[function(require,module,exports){
 "use strict";
 /**
- * Find DOM nodes from a selector or NodeList
+ * Find DOM nodes from a selector.  The found node can include the supplied context
  * @param {String|NodeList} selector
  * @param {HTMLElement} [context]
  */
 exports.select = function select(selector, context) {
-  let els = selector;
-  if (typeof selector === 'string') {
-    const root = context || document;
-    els = root.querySelectorAll(selector);
+  const root = context || document;
+  const els = Array.from(root.querySelectorAll(selector));
+  if (context && context instanceof Element && context.matches(selector)) {
+    els.push(context);
   }
-  return Array.from(els);
+  return els;
 };
 
 /**
@@ -131,7 +180,9 @@ exports.select = function select(selector, context) {
 exports.observe = function mutationObserver(fn, root) {
   const observer = new MutationObserver(mutations => {
     mutations.forEach(mutation => {
-      Array.from(mutation.addedNodes).forEach(node => fn(node));
+      Array.from(mutation.addedNodes)
+        .filter(node => node.nodeType === Node.ELEMENT_NODE)
+        .forEach(node => fn(node));
     });
   });
   observer.observe(root, { subtree: true, childList: true });
