@@ -84,6 +84,10 @@ module.exports = class Logger {
   error(test, el) {
     console.error(this.message(test.message, el), el);
   }
+
+  warn(test, el) {
+    console.warn(this.message(test.message, el), el);
+  }
 };
 
 },{}],4:[function(require,module,exports){

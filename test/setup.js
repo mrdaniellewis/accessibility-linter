@@ -36,19 +36,37 @@
   window.setupDomChangeBeforeAll = fn => setupDomChange(fn, before, after);
   window.changeDomBeforeEach = fn => setupDomChange(fn, beforeEach, afterEach);
 
+  window.TestLogger = class {
+    constructor() {
+      this.errors = [];
+    }
+
+    error() {
+      this.errors.push(Array.from(arguments));
+    }
+  };
+
   expect.extend({
-    toBeEmpty() {
+    toNotHaveEntries() {
       expect.assert(
-        this.length === 0,
+        this.actual.errors.length === 0,
         'expected %s to have no logged entries',
-        this.length
+        this.actual.errors.length
       );
       return this;
     },
 
-    toHaveEntries(entries) {
-      const array = Array.from(this);
-      return expect(array).toEqual(entries);
+    toHaveEntries() {
+      if (arguments.length === 0) {
+        expect.assert(
+          this.actual.errors.length > 0,
+          'expected %s to have logged entries',
+          this.actual.errors.length
+        );
+        return this;
+      }
+      expect(this.actual.errors).toEqual(Array.from(arguments));
+      return this;
     },
   });
 }());

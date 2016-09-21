@@ -1,7 +1,4 @@
 describe('AccessibilityLinter', () => {
-  class Logger {
-    error() {}
-  }
 
   const test = {
     name: 'test',
@@ -13,15 +10,19 @@ describe('AccessibilityLinter', () => {
     expect(window.AccessibilityLinter).toBeA(Function);
   });
 
+  let logger;
+
+  beforeEach(() => {
+    logger = new TestLogger();
+  });
+
   context('running a test', () => {
-    let linter, logger, el, spy;
+    let linter, el, spy;
 
     beforeEach(() => {
-      logger = new Logger();
       linter = new AccessibilityLinter({ tests: [test], logger });
       el = document.createElement('accessibility-linter');
       document.body.appendChild(el);
-      spy = expect.spyOn(logger, 'error');
     });
 
     afterEach(() => {
@@ -30,15 +31,13 @@ describe('AccessibilityLinter', () => {
 
     it('calls the logger with the test and element', () => {
       linter.run();
-      expect(spy.calls.length).toEqual(1);
-      expect(spy).toHaveBeenCalledWith(test, el);
+      expect(logger).toHaveEntries([test, el]);
     });
 
     it('does not add the same error twice', () => {
       linter.run();
-      spy.reset();
       linter.run();
-      expect(spy).toNotHaveBeenCalled();
+      expect(logger).toHaveEntries([test, el]);
     });
 
     context('limiting scope', () => {
@@ -57,14 +56,13 @@ describe('AccessibilityLinter', () => {
 
       it('limits the tests to the provided scope', () => {
         linter.run(div);
-        expect(spy.calls.length).toEqual(1);
-        expect(spy).toHaveBeenCalledWith(test, el2);
+        expect(logger).toHaveEntries([test, el2]);
       });
     });
   });
 
   describe('filter', () => {
-    let linter, logger, el, el2, spy;
+    let linter, el, el2, spy;
     const filterTest = {
       name: 'test',
       selector: 'accessibility-linter',
@@ -72,14 +70,12 @@ describe('AccessibilityLinter', () => {
     };
 
     beforeEach(() => {
-      logger = new Logger();
       linter = new AccessibilityLinter({ tests: [filterTest], logger });
       el = document.createElement('accessibility-linter');
       document.body.appendChild(el);
       el2 = document.createElement('accessibility-linter');
       el2.setAttribute('data-test', '');
       document.body.appendChild(el2);
-      spy = expect.spyOn(logger, 'error');
     });
 
     afterEach(() => {
@@ -89,19 +85,16 @@ describe('AccessibilityLinter', () => {
 
     it('filters out elements', () => {
       linter.run();
-      expect(spy.calls.length).toEqual(1);
-      expect(spy).toHaveBeenCalledWith(filterTest, el2);
+      expect(logger).toHaveEntries([filterTest, el2]);
     });
   });
 
   context('whitelist', () => {
-    let logger, el, spy;
+    let el, spy;
 
     beforeEach(() => {
-      logger = new Logger();
       el = document.createElement('accessibility-linter');
       document.body.appendChild(el);
-      spy = expect.spyOn(logger, 'error');
     });
 
     afterEach(() => {
@@ -117,7 +110,7 @@ describe('AccessibilityLinter', () => {
 
       linter.run();
       linter.run(); // run twice as whitelist matching is cached
-      expect(spy).toNotHaveBeenCalled();
+      expect(logger.errors).toEqual([]);
     });
 
     it('does not add named errors to elements on a whitelist with test names', () => {
@@ -128,7 +121,7 @@ describe('AccessibilityLinter', () => {
       });
 
       linter.run();
-      expect(spy).toNotHaveBeenCalled();
+      expect(logger).toNotHaveEntries();
     });
 
     it('adds unnamed errors to elements on a whitelist', () => {
@@ -139,19 +132,17 @@ describe('AccessibilityLinter', () => {
       });
 
       linter.run();
-      expect(spy).toHaveBeenCalled();
+      expect(logger).toHaveEntries();
     });
   });
 
   context('data-ignore attributes', () => {
-    let linter, logger, el, spy;
+    let linter, el, spy;
 
     beforeEach(() => {
-      logger = new Logger();
       linter = new AccessibilityLinter({ tests: [test], logger });
       el = document.createElement('accessibility-linter');
       document.body.appendChild(el);
-      spy = expect.spyOn(logger, 'error');
     });
 
     afterEach(() => {
@@ -162,27 +153,26 @@ describe('AccessibilityLinter', () => {
       el.setAttribute('data-allylint-ignore', '');
       linter.run();
       linter.run(); // Run twice as ignore matching is cached
-      expect(spy).toNotHaveBeenCalled();
+      expect(logger).toNotHaveEntries();
     });
 
     it('ignores named errors where there is a data-ignore attribute', () => {
       el.setAttribute('data-allylint-ignore', 'test foo');
       linter.run();
-      expect(spy).toNotHaveBeenCalled();
+      expect(logger).toNotHaveEntries();
     });
 
     it('does not ignore unnamed errors where there is a data-ignore attribute', () => {
       el.setAttribute('data-allylint-ignore', 'foo');
       linter.run();
-      expect(spy).toHaveBeenCalled();
+      expect(logger).toHaveEntries();
     });
   });
 
   describe('#observe', () => {
-    let linter, logger, el;
+    let linter, el;
 
     beforeEach(() => {
-      logger = new Logger();
       linter = new AccessibilityLinter({ tests: [test], logger });
       linter.observe();
     });
@@ -193,33 +183,30 @@ describe('AccessibilityLinter', () => {
     });
 
     it('finds errors when DOM modifications occur', () => {
-      const spy = expect.spyOn(logger, 'error');
       return whenDomChanges(() => {
         el = document.createElement('accessibility-linter');
         document.body.appendChild(el);
       })
       .then(() => {
-        expect(spy).toHaveBeenCalled();
+        expect(logger).toHaveEntries();
         el.remove();
       });
     });
 
     describe('#stopObserving', () => {
       it('stops finding errors when DOM modifications occur', () => {
-        const spy = expect.spyOn(logger, 'error');
         linter.stopObserving();
         return whenDomChanges(() => {
           el = document.createElement('accessibility-linter');
           document.body.appendChild(el);
         })
         .then(() => {
-          expect(spy).toNotHaveBeenCalled();
+          expect(logger).toNotHaveEntries();
           el.remove();
         });
       });
 
       it('resumes finding errors if #observe is called again', () => {
-        const spy = expect.spyOn(logger, 'error');
         linter.stopObserving();
         linter.observe();
         return whenDomChanges(() => {
@@ -227,7 +214,7 @@ describe('AccessibilityLinter', () => {
           document.body.appendChild(el);
         })
         .then(() => {
-          expect(spy).toHaveBeenCalled();
+          expect(logger).toHaveEntries();
           el.remove();
         });
       });
@@ -236,15 +223,55 @@ describe('AccessibilityLinter', () => {
 });
 
 describe('Logger', () => {
-  context('error', () => {
-    it('generates an error where message is a string');
-    it('generates an error where message is a function');
-    it('logs errors to the console');
+  let logger, el;
+
+  beforeEach(() => {
+    el = document.createElement('b');
+    el.setAttribute('data-foo', 'bar');
+    logger = new AccessibilityLinter.Logger();
   });
 
-  context('warning', () => {
-    it('generates a warning where message is a string');
-    it('generates a warning where message is a function');
-    it('logs warnings to the console');
+  context('error', () => {
+    let spy;
+
+    beforeEach(() => {
+      spy = expect.spyOn(console, 'error');
+    });
+
+    afterEach(() => {
+      spy.restore();
+    });
+
+    it('generates an error where message is a string', () => {
+      logger.error({ message: 'bar' }, el);
+      expect(spy).toHaveBeenCalledWith('bar', el);
+    });
+
+    it('generates an error where message is a function', () => {
+      logger.error({ message: elm => elm.getAttribute('data-foo') }, el);
+      expect(spy).toHaveBeenCalledWith('bar', el);
+    });
+  });
+
+  context('warn', () => {
+    let spy;
+
+    beforeEach(() => {
+      spy = expect.spyOn(console, 'warn');
+    });
+
+    afterEach(() => {
+      spy.restore();
+    });
+
+    it('generates an error where message is a string', () => {
+      logger.warn({ message: 'bar' }, el);
+      expect(spy).toHaveBeenCalledWith('bar', el);
+    });
+
+    it('generates an error where message is a function', () => {
+      logger.warn({ message: elm => elm.getAttribute('data-foo') }, el);
+      expect(spy).toHaveBeenCalledWith('bar', el);
+    });
   });
 });
