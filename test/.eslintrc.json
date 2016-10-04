@@ -9,6 +9,7 @@
     "setupDomChangeBefore": false,
     "AccessibilityLinter": false,
     "TestLogger": false,
+    "testSpecs": false
   },
   "rules": {
     "prefer-arrow-callback": 0,

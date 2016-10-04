@@ -1,14 +1,97 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.AccessibilityLinter = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"./tests":[function(require,module,exports){
 "use strict";
 const tests = module.exports = [];
-    const defineTest = test => tests.push(test);
-    defineTest({
-  name: 'missing alt attribute',
+    let name;
+    const { $, $$ } = require('./utils');
+    const defineTest = test => tests.push(Object.assign(test, { name }));
+    name = "alt";
+defineTest({
+  message: 'missing alt attribute',
   selector: 'img:not([alt])',
 });
+name = "fieldset-legend";
+defineTest({
+  message: 'All fieldsets must have a legend',
+  selector: 'fieldset',
+  filter: el => {
+    const first = el.firstElementChild;
+    return first && first.matches('legend') && first.textContent.trim();
+  },
+});
+name = "headings";
+defineTest({
+  message: 'Headings must be nested correctly',
+  selector: 'h2,h3,h4,h5,h6',
+  allowed: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
+  filter: el => {
+    let cursor;
+    const level = +el.nodeName[1];
+    do {
+      cursor = el.previousElementSibling || el.parentElement;
+      if (cursor.matches(this.allowed.join())) {
+        return cursor.matches(this.allowed.slice(level - 1));
+      }
+    } while (cursor);
+    return false;
+  },
+});
+name = "label";
+defineTest({
+  message: 'all form elements must have a label',
+  selector: 'input,select,textarea',
+  filter: el => {
+    if (/^(?:submit|reset|button|image|hidden)$/.test(el.type)) {
+      return true;
+    }
 
+    let label;
+
+    if (el.hasAttribute('aria-labelledby')) {
+      label = $(`#${el.getAttribute('aria-labelledby')}`);
+    }
+
+    if (!label && el.hasAttribute('aria-label')) {
+      label = { textContent: el.getAttribute('aria-label') };
+    }
+
+    if (!label) {
+      if (el.id) {
+        label = $(`label[for="${el.id}"]`);
+      }
+      if (!label) {
+        label = el.closest('label');
+      }
+    }
+
+    return label && label.textContent.trim();
+  },
+});
+name = "label-associated";
+defineTest({
+  message: 'all labels must be linked to a control',
+  selector: 'label',
+  filter: el => el.htmlFor && document.getElementById(el.htmlFor),
+});
+name = "legend";
+defineTest({
+  message: 'All legends must be the first child of a fieldset',
+  selector: 'legend',
+  filter: el => el === el.parentNode.firstElementChild,
+});
+name = "radio-fieldset";
+defineTest({
+  message: 'All radio inputs must be within a fieldset',
+  selector: 'input[type=radio]',
+  filter: el => el.closest('fieldset'),
+});
+name = "unique-id";
+defineTest({
+  message: 'id is not unique',
+  selector: '[id]',
+  filter: el => !el.id || $$(`#${el.id}`).length === 1,
+});
   
-},{}],1:[function(require,module,exports){
+},{"./utils":4}],1:[function(require,module,exports){
 "use strict";
 const Runner = require('./runner');
 const Logger = require('./logger');
@@ -69,7 +152,7 @@ module.exports = class Logger {
 
 },{}],3:[function(require,module,exports){
 "use strict";
-const select = require('./utils').select;
+const { $$ } = require('./utils');
 
 const dataAttr = 'allylint';
 
@@ -107,7 +190,7 @@ module.exports = class Runner {
    * @param {HTMLElement} [context] A context to run the tests within
    */
   runTest(test, context) {
-    select(test.selector, context)
+    $$(test.selector, context)
       .filter(el => this.filterIgnoreAttribute(el, test.name))
       .filter(el => this.filterWhitelist(el, test.name))
       .filter(el => !isInSetArray(this.reported, el, test.name))
@@ -168,13 +251,17 @@ module.exports = class Runner {
  * @param {String|NodeList} selector
  * @param {HTMLElement} [context]
  */
-exports.select = function select(selector, context) {
+exports.$$ = function $$(selector, context) {
   const root = context || document;
   const els = Array.from(root.querySelectorAll(selector));
   if (context && context instanceof Element && context.matches(selector)) {
     els.push(context);
   }
   return els;
+};
+
+exports.$ = function $(selector, context) {
+  return exports.$$(selector, context)[0];
 };
 
 /**
