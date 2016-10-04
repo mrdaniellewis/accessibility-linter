@@ -1,0 +1,552 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Screen reader test</title>
+
+    <style>
+      body {
+        font: 1em/1.5 sans-serif;
+        margin: 1em;
+      }
+
+      .sr-only {
+        border: 0;
+        clip: rect(0 0 0 0);
+        height: 1px;
+        margin: -1px;
+        overflow: hidden;
+        padding: 0;
+        position: absolute;
+        width: 1px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Tests for how screen readers react to various elements</h1>
+
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+
+    <section>
+      <h2>Images</h2>
+
+      <section>
+        <h3>Image without alt</h3>
+        <img width="20" height="20" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA1BMVEX/TQBcNTh/AAAAAXRSTlPM0jRW/QAAAApJREFUeJxjYgAAAAYAAzY3fKgAAAAASUVORK5CYII=" />
+      </section>
+      
+      <section>
+        <h3>Image with alt</h3>
+        <img alt="alt" width="20" height="20" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA1BMVEX/TQBcNTh/AAAAAXRSTlPM0jRW/QAAAApJREFUeJxjYgAAAAYAAzY3fKgAAAAASUVORK5CYII=" />
+      </section>
+
+      <section>
+        <h3>Image with empty alt</h3>
+        <img alt="" width="20" height="20" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA1BMVEX/TQBcNTh/AAAAAXRSTlPM0jRW/QAAAApJREFUeJxjYgAAAAYAAzY3fKgAAAAASUVORK5CYII=" />
+      </section>
+
+      <section>
+        <h3>Image in figure</h3>
+        <figure>
+          <img alt="" width="20" height="20" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA1BMVEX/TQBcNTh/AAAAAXRSTlPM0jRW/QAAAApJREFUeJxjYgAAAAYAAzY3fKgAAAAASUVORK5CYII=" />
+          figure
+        </figure>
+      </section>
+
+      <section>
+        <h3>Image in figure with figcaption</h3>
+        <figure>
+          <img alt="" width="20" height="20" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA1BMVEX/TQBcNTh/AAAAAXRSTlPM0jRW/QAAAApJREFUeJxjYgAAAAYAAzY3fKgAAAAASUVORK5CYII=" />
+          figure
+          <figcaption>figcaption</figcaption>
+        </figure>
+      </section>
+
+      <section>
+        <h3>Image with aria-label</h3>
+        <img aria-label="label" width="20" height="20" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA1BMVEX/TQBcNTh/AAAAAXRSTlPM0jRW/QAAAApJREFUeJxjYgAAAAYAAzY3fKgAAAAASUVORK5CYII=" />
+      </section>
+    </section>
+
+    <section>
+      <h2>Control labels</h2>
+
+      <section>
+        <h3>No label</h3>
+        <input />
+      </section>
+
+      <section>
+        <h3>aria-label</h3>
+        <input aria-label="aria-label" />
+      </section>
+
+      <section>
+        <h3>Explicit label</h3>
+        <label for="explicitly-labelled">Explicit label</label>
+        <input id="explicitly-labelled" />
+      </section>
+
+      <section>
+        <h3>Implicit label</h3>
+        <label>
+          <input />
+          Implicit label
+        </label>
+      </section>
+
+      <section>
+        <h3>aria-labelledby</h3>
+        <p id="labelledby-label">aria-labelledby</p>
+        <input aria-labelledby="labelledby-label" />
+      </section>
+
+      <section>
+        <h3>Multiple conventional labels</h3>
+        <label for="has-multiple-labels">Label 1</label>
+        <label for="has-multiple-labels">Label 2</label>
+        <input id="has-multiple-labels" />
+      </section>
+
+      <section>
+        <h3>Multiple conventional labels - first is empty</h3>
+        <label for="has-multiple-labels-empty"></label>
+        <label for="has-multiple-labels-empty">Label 2</label>
+        <input id="has-multiple-labels-empty" />
+      </section>
+
+      <section>
+        <h3>multiple aria-labelledby</h3>
+        <p id="labelledby-label1">Label 1</p>
+        <p id="labelledby-label2">Label 2</p>
+        <input aria-labelledby="labelledby-label1 labelledby-label2" />
+      </section>
+
+      <section>
+        <h3>Multiple techniques - all</h3>
+        <p id="multiple-aria-labelledby">aria-labelledby</p>
+        <label for="multiple-techniques">Explicit label</label>
+        <label>
+          <input id="multiple-techniques" aria-label="aria-label" aria-labelledby="multiple-aria-labelledby" />
+          Implicit label
+        </label>
+      </section>
+
+      <section>
+        <h3>Multiple techniques - empty aria-labelledby</h3>
+        <p id="multiple-aria-labelledby-empty"></p>
+        <label>
+          <input aria-labelledby="multiple-aria-labelledby-empty" />
+          Implicit label
+        </label>
+      </section>
+
+      <section>
+        <h3>Multiple techniques - aria-label vs label</h3>
+        <label>
+          <input aria-label="aria-label" />
+          Implicit label
+        </label>
+      </section>
+
+      <section>
+        <h3>Implicit vs explict</h3>
+        <label for="implicit-vs-explicit">Explicit label</label>
+        <label>
+          <input id="implicit-vs-explicit" />
+          Implicit label
+        </label>
+      </section>
+
+      <section>
+        <h3>Implicit vs empty explict</h3>
+        <label for="implicit-vs-empty-explicit"></label>
+        <label>
+          <input id="implicit-vs-empty-explicit" />
+          Implicit label
+        </label>
+      </section>
+    </section>
+
+    <section>
+      <h2>Control descriptions</h2>
+
+      <section>
+        <h2>Additional control descriptions</h2>
+        <p id="describedby1">My description 1</p>
+        <p id="describedby2">My description 2</p>
+        <label for="has-described-by">label</label>
+        <input id="has-described-by" aria-describedby="describedby1 describedby2" />
+      </section>
+
+      <section>
+        <h2>Description with title</h2>
+        <p id="describedby1-title">Describbedby</p>
+        <label>
+          <input aria-describedby="describedby1-title" title="title">
+          label
+        </label>
+      </section>
+    </section>
+
+    <section>
+      <h2>Fieldsets</h2>
+
+      <section>
+        <h3>Inputs in a fieldset with a legend</h3>
+        <fieldset>
+          <legend>Legend</legend>
+          <label for="fieldset-legend-input-1">Input 1</label>
+          <input id="fieldset-legend-input-1" />
+          <label for="fieldset-legend-input-2">Input 2</label>
+          <input id="fieldset-legend-input-2" />
+        </fieldset>
+      </section>
+
+      <section>
+        <h3>Inputs in a fieldset with a heading</h3>
+        <fieldset>
+          <h4>Heading</h4>
+          <label for="fieldset-legend-heading-input-1">Input 1</label>
+          <input id="fieldset-legend-heading-input-1" />
+          <label for="fieldset-legend-heading-input-2">Input 2</label>
+          <input id="fieldset-legend-heading-input-2" />
+        </fieldset>
+      </section>
+
+      <section>
+        <h3>Inputs in a fieldset without a legend</h3>
+        <fieldset>
+          <label for="fieldset-no-legend-input-1">Input 1</label>
+          <input id="fieldset-no-legend-input-1" />
+          <label for="fieldset-no-legend-input-2">Input 2</label>
+          <input id="fieldset-no-legend-input-2" />
+        </fieldset>
+      </section>
+
+      <section>
+        <h3>Inputs in nested fieldset with legends</h3>
+
+        <fieldset>
+          <legend>Legend 1</legend>
+          <fieldset>
+            <legend>Legend 2</legend>
+            <label for="fieldset-multi-legend-input-1">Input 1</label>
+            <input id="fieldset-multi-legend-input-1" />
+            <label for="fieldset-multi-legend-input-2">Input 2</label>
+            <input id="fieldset-multi-legend-input-2" />
+          </fieldset>
+        </fieldset>
+      </section>
+    </section>
+
+    <section>
+      <h2>Hidden tests</h2>
+
+      <section>
+        <h2>Display none</h2>
+        <p style="display: none">display none</p>
+      </section>
+
+      <section>
+        <h2>aria-hidden</h2>
+        <p aria-hidden="true">aria-hidden</p>
+      </section>
+
+      <section>
+        <h2>hidden</h2>
+        <p hidden>hidden</p>
+      </section>
+
+      <section>
+        <h2>visibility hidden</h2>
+        <p style="visibility: hidden">visibility hidden</p>
+      </section>
+
+      <section>
+        <h2>speak none</h2>
+        <p style="speak: none">speak none</p>
+      </section>
+
+      <section>
+        <h2>css sr only</h2>
+        <p class="sr-only">css sr only</p>
+      </section>
+    </section>
+
+    <section>
+      <h2>Special characters</h2>
+      <p>Emoticons: 💩 😱</p>
+      <p>PUA: &#xE000; &#xF8FF; &#xF0000; &#x100000;</p>
+    </section>
+
+    <section>
+      <h2>Various control states</h2>
+
+      <section>
+        <h3>Disabled</h3>
+        <label>
+          <input disabled>
+          Disabled
+        </label>
+      </section>
+
+      <section>
+        <h3>Read-only</h3>
+        <label>
+          <input readonly>
+          Read-only
+        </label>
+      </section>
+
+      <section>
+        <h3>Invalid control</h3>
+        <label>
+          <input type="email" value="xxx" />
+          control with validation error
+        </label>
+      </section>
+
+      <section>
+        <h3>aria-invalid control</h3>
+        <label>
+          <input type="email" value="xxx" aria-invalid="true" />
+          control with aria-invalid
+        </label>
+      </section>
+
+      <section>
+        <h3>Required</h3>
+        <label>
+          <input required>
+          control that is required
+        </label>
+      </section>
+
+      <section>
+        <h3>Pattern</h3>
+        <label>
+          <input pattern="\w+" title="letters">
+          control with a pattern and title
+        </label>
+      </section>
+
+      <section>
+        <h3>title</h3>
+        <label>
+          <input title="title">
+          control with a title
+        </label>
+      </section>
+
+      <section>
+        <h3>placeholder</h3>
+        <label>
+          <input placeholder="placeholder">
+          control with a placeholder
+        </label>
+      </section>
+
+      <section>
+        <h3>placeholder and value</h3>
+        <label>
+          <input placeholder="placeholder" value="value">
+          control with a placeholder and value
+        </label>
+      </section>
+    </section>
+
+    <section>
+      <h2>Buttons and links</h2>
+
+      <section>
+        <h3>input button</h3>
+        <input type="button" value="button">
+      </section>
+
+      <section>
+        <h3>button</h3>
+        <button type="button">button</button>
+      </section>
+
+      <section>
+        <h3>submit</h3>
+        <form>
+          <button type="submit">submit</button>
+        </form>
+      </section>
+
+      <section>
+        <h3>reset</h3>
+        <form>
+          <button type="reset">reset</button>
+        </form>
+      </section>
+
+      <section>
+        <h3>local link</h3>
+        <a href="local.htm">local link</a>
+      </section>
+
+      <section>
+        <h3>external link</h3>
+        <a href="http://example.com/">external link</a>
+      </section>
+
+      <section>
+        <h3>fragment link</h3>
+        <a href="#fragment">fragment link</a>
+      </section>
+
+      <section>
+        <h3>link with rel=external</h3>
+        <a href="http://example.com/" rel="external">link with rel=external</a>
+      </section>
+
+      <section>
+        <h3>link with download attribute</h3>
+        <a href="http://example.com/" download="download">link with download attribute</a>
+      </section>
+
+      <section>
+        <h3>link with target=_blank</h3>
+        <a href="http://example.com/" target="_blank">link with target=_blank</a>
+      </section>
+    </section>
+
+    <section>
+      <h2>Title attribute</h2>
+
+      <section>
+        <h3>Plain paragraph</h3>
+        <p>Just a normal pargraph</p>
+      </section>
+
+      <section>
+        <h3>Title on a paragraph</h3>
+        <p title="title">Paragraph with a title</p>
+      </section>
+
+      <section>
+        <h3>aria-label on a paragraph</h3>
+        <p aria-label="label">Paragraph with an aria-label </p>
+      </section>
+
+      <section>
+        <h3>Title on an abbr</h3>
+        <abbr title="Just Another Vague Acronyn Script">JavaScript</p>
+      </section>
+    </section>
+
+    <section>
+      <h2>Tables</h2>
+
+      <section>
+        <h3>Plain table</h3>
+        <table>
+          <tr>
+            <td>one
+            <td>two
+          <tr>
+            <td>three
+            <td>four
+        </table>
+      </section>
+
+      <section>
+        <h3>Table with cells</h3>
+        <table>
+          <tr>
+            <th>Column 1
+            <th>Column 2
+          <tr>
+            <td>one
+            <td>two
+          <tr>
+            <td>three
+            <td>four
+        </table>
+      </section>
+
+      <section>
+        <h3>Table with header and footer</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Column 1
+              <th>Column 2
+          <tbody>
+            <tr>
+              <td>one
+              <td>two
+            <tr>
+              <td>three
+              <td>four
+          <tfoot>
+            <tr>
+              <td>foot 1
+              <td>foot 2
+        </table>
+      </section>
+
+      <section>
+        <h3>Table with caption</h3>
+        <table>
+          <caption>Table caption</caption>
+          <tr>
+            <th>Column 1
+            <th>Column 2
+          <tr>
+            <td>one
+            <td>two
+          <tr>
+            <td>three
+            <td>four
+        </table>
+      </section>
+
+      <section>
+        <h3>Table in figure</h3>
+        <figure>
+          <table>
+            <tr>
+              <th>Column 1
+              <th>Column 2
+            <tr>
+              <td>one
+              <td>two
+            <tr>
+              <td>three
+              <td>four
+          </table>
+          Figure description
+        </figure>
+      </section>
+
+      <section>
+        <h3>Table in figure with figcaption</h3>
+        <figure>
+          <table>
+            <tr>
+              <th>Column 1
+              <th>Column 2
+            <tr>
+              <td>one
+              <td>two
+            <tr>
+              <td>three
+              <td>four
+          </table>
+          <figcaption>fig-caption</figcaption>
+          Figure description
+        </figure>
+      </section>
+    </section>
+
+    <h2>Additional tests to add</h2>
+    <ul>
+      <li>aria-haspopup</li>
+      <li>aria-expanded</li>
+    </ul>
+  </body>
+</html>

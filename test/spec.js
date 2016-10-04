@@ -1,5 +1,4 @@
 describe('AccessibilityLinter', () => {
-
   const test = {
     name: 'test',
     message: 'foo-bar',
@@ -17,7 +16,7 @@ describe('AccessibilityLinter', () => {
   });
 
   context('running a test', () => {
-    let linter, el, spy;
+    let linter, el;
 
     beforeEach(() => {
       linter = new AccessibilityLinter({ tests: [test], logger });
@@ -62,7 +61,7 @@ describe('AccessibilityLinter', () => {
   });
 
   describe('filter', () => {
-    let linter, el, el2, spy;
+    let linter, el, el2;
     const filterTest = {
       name: 'test',
       selector: 'accessibility-linter',
@@ -90,7 +89,7 @@ describe('AccessibilityLinter', () => {
   });
 
   context('whitelist', () => {
-    let el, spy;
+    let el;
 
     beforeEach(() => {
       el = document.createElement('accessibility-linter');
@@ -137,7 +136,7 @@ describe('AccessibilityLinter', () => {
   });
 
   context('data-ignore attributes', () => {
-    let linter, el, spy;
+    let linter, el;
 
     beforeEach(() => {
       linter = new AccessibilityLinter({ tests: [test], logger });
@@ -182,16 +181,16 @@ describe('AccessibilityLinter', () => {
       el.remove();
     });
 
-    it('finds errors when DOM modifications occur', () => {
-      return whenDomChanges(() => {
+    it('finds errors when DOM modifications occur', () => (
+      whenDomChanges(() => {
         el = document.createElement('accessibility-linter');
         document.body.appendChild(el);
       })
       .then(() => {
         expect(logger).toHaveEntries();
         el.remove();
-      });
-    });
+      })
+    ));
 
     describe('#stopObserving', () => {
       it('stops finding errors when DOM modifications occur', () => {
@@ -223,6 +222,10 @@ describe('AccessibilityLinter', () => {
 });
 
 describe('Logger', () => {
+  it('is a property of AccessibilityLinter', () => {
+    expect(AccessibilityLinter.Logger).toBeA(Function);
+  });
+
   let logger, el;
 
   beforeEach(() => {
@@ -272,6 +275,26 @@ describe('Logger', () => {
     it('generates an error where message is a function', () => {
       logger.warn({ message: elm => elm.getAttribute('data-foo') }, el);
       expect(spy).toHaveBeenCalledWith('bar', el);
+    });
+  });
+});
+
+describe('tests', () => {
+  testSpecs.forEach((spec, test) => {
+    describe(test.name, () => {
+      const context = { logger: null, test, linter: null };
+
+      beforeEach(() => {
+        const logger = context.logger = new TestLogger();
+        const linter = context.linter = new AccessibilityLinter({ logger, tests: [test] });
+        linter.observe();
+      });
+
+      afterEach(() => {
+        (window.domAdditions || []).splice(0).forEach(el => el.remove());
+      });
+
+      spec.call(context);
     });
   });
 });

@@ -7,9 +7,12 @@
    * @param {Function} fn A function that amends the DOM
    */
   const whenDomChanges = window.whenDomChanges = function whenDomChanges(fn) {
+    const additions = window.domAdditions = window.domAdditions || [];
+
     return new Promise(resolve => {
       const observer = new MutationObserver(mutations => {
         observer.disconnect();
+        mutations.forEach(mutation => mutation.addedNodes.forEach(node => additions.push(node)));
         resolve(mutations);
       });
       observer.observe(document, { subtree: true, childList: true });
@@ -36,22 +39,42 @@
   window.setupDomChangeBeforeAll = fn => setupDomChange(fn, before, after);
   window.changeDomBeforeEach = fn => setupDomChange(fn, beforeEach, afterEach);
 
+  window.appendElement = (name, attrs = {}, text) => {
+    const created = document.createElement(name);
+    Object.keys(attrs).forEach(key => {
+      created.setAttribute(key, attrs[key]);
+    });
+    if (text) {
+      created.appendChild(document.createTextNode(text));
+    }
+    document.body.appendChild(created);
+    return created;
+  };
+
+  let idCount = 0;
+  window.uniqueId = () => `unique-id-${++idCount}`;
+
   window.TestLogger = class {
     constructor() {
-      this.errors = [];
+      this.clear();
     }
 
     error() {
       this.errors.push(Array.from(arguments));
     }
+
+    clear() {
+      this.errors = [];
+    }
   };
 
+  // Assertions for the logger
   expect.extend({
     toNotHaveEntries() {
       expect.assert(
         this.actual.errors.length === 0,
         'expected %s to have no logged entries',
-        this.actual.errors.length
+        this.actual.errors
       );
       return this;
     },
@@ -66,6 +89,13 @@
         return this;
       }
       expect(this.actual.errors).toEqual(Array.from(arguments));
+      return this;
+    },
+
+    toGenerateErrorMessage(error) {
+      const test = this.actual;
+      const message = test.message;
+      expect(message).toEqual(error);
       return this;
     },
   });
