@@ -279,7 +279,48 @@ describe('Logger', () => {
   });
 });
 
-describe('tests', () => {
+// Tests are run in an iframe so mocha display does not interfere
+describe('iframe', () => {
+  let frame;
+  let context;
+
+  before(done => {
+    frame = document.createElement('iframe');
+    frame.src = 'frame.htm';
+    frame.style = 'border: 0; height: 0; width: 0;';
+    document.body.appendChild(frame);
+    frame.contentWindow.addEventListener('load', () => done());
+    context = frame.contentWindow;
+  });
+
+  after(() => {
+    frame.remove();
+  });
+
+  testSpecs.forEach((spec, name) => {
+    const test = context.AccessibilityLinter.tests.get(name);
+    if (!test) {
+      throw new Error(`test ${name} not found`);
+    }
+
+    // Make sure everything is setup using the iFrame versions
+    describe(name, () => {
+      beforeEach(() => {
+        const logger = context.logger = new context.TestLogger();
+        const linter = context.linter = new context.AccessibilityLinter({ logger, tests: [test] });
+        linter.observe();
+      });
+
+      afterEach(() => {
+        (context.domAdditions || []).splice(0).forEach(el => el.remove());
+      });
+
+      spec.call(context);
+    });
+  });
+});
+
+xdescribe('tests', () => {
   testSpecs.forEach((spec, test) => {
     describe(test.name, () => {
       const context = { logger: null, test, linter: null };
