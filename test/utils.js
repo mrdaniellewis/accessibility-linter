@@ -1,45 +1,44 @@
 /**
  * Utils to make writing tests easier
  */
+(function () {
+  let idCount = 0;
+  window.uniqueId = () => `unique-id-${++idCount}`;
 
-// Find an element by a selector
-window.$ = (selector, context = document) => context.querySelector(selector);
-
-// Find elements by a selector
-window.$$ = (selector, context = document) => Array.from(context.querySelectorAll(selector));
-
-// Create an element
-window.create = (name, attrs) => {
-  const created = document.createElement(name);
-  Object.keys(attrs).forEach(key => {
-    created.setAttribute(key, attrs[key]);
-  });
-};
-
-window.domAdditions = [];
-window.whenDomChanges = function whenDomChanges(fn) {
-  return new Promise(resolve => {
-    const additions = window.domAdditions;
-    const observer = new MutationObserver(mutations => {
-      observer.disconnect();
-      mutations.forEach(mutation => mutation.addedNodes.forEach(node => additions.push(node)));
-      resolve(mutations);
+  // Run a function that returns a promise that will resolve
+  // once the DOM has childlist mutations.
+  // After the then handler has been run, remove the additions
+  window.when = function when(fn) {
+    const domAdditions = [];
+    const promise = new Promise(resolve => {
+      const observer = new MutationObserver(mutations => {
+        observer.disconnect();
+        mutations.forEach(mutation => mutation.addedNodes.forEach(node => domAdditions.push(node)));
+        resolve(mutations);
+      });
+      observer.observe(document, { subtree: true, childList: true });
+      fn();
     });
-    observer.observe(document, { subtree: true, childList: true });
-    fn();
-  });
-};
 
-window.TestLogger = class {
-  constructor() {
-    this.clear();
-  }
+    promise.then = test => Promise.prototype.then.call(promise, test)
+      .then(() => {
+        domAdditions.splice(0).forEach(el => el.remove());
+      });
 
-  error() {
-    this.errors.push(Array.from(arguments));
-  }
+    return promise;
+  };
 
-  clear() {
-    this.errors = [];
-  }
-};
+  window.TestLogger = class {
+    constructor() {
+      this.clear();
+    }
+
+    error() {
+      this.errors.push(Array.from(arguments));
+    }
+
+    clear() {
+      this.errors = [];
+    }
+  };
+}());

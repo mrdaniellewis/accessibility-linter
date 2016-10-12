@@ -4,9 +4,8 @@
   },
   "globals": {
     "expect": false,
-    "whenDomChanges": false,
-    "setupDomChangeBeforeAll": false,
-    "setupDomChangeBefore": false,
+    "$": false,
+    "when": false,
     "AccessibilityLinter": false,
     "TestLogger": false,
     "testSpecs": false
