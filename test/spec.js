@@ -181,16 +181,14 @@ describe('AccessibilityLinter', () => {
       el.remove();
     });
 
-    it('finds errors when DOM modifications occur', () => (
-      whenDomChanges(() => {
-        el = document.createElement('accessibility-linter');
-        document.body.appendChild(el);
-      })
-      .then(() => {
-        expect(logger).toHaveEntries();
-        el.remove();
-      })
-    ));
+    it('finds errors when DOM modifications occur', when(() => {
+      el = document.createElement('accessibility-linter');
+      document.body.appendChild(el);
+    })
+    .then(() => {
+      expect(logger).toHaveEntries();
+      el.remove();
+    }));
 
     describe('#stopObserving', () => {
       it('stops finding errors when DOM modifications occur', () => {
@@ -281,8 +279,8 @@ describe('Logger', () => {
 
 // Tests are run in an iframe so mocha display does not interfere
 describe('iframe', () => {
+  const context = {};
   let frame;
-  let context;
 
   before(done => {
     frame = document.createElement('iframe');
@@ -290,7 +288,6 @@ describe('iframe', () => {
     frame.style = 'border: 0; height: 0; width: 0;';
     document.body.appendChild(frame);
     frame.contentWindow.addEventListener('load', () => done());
-    context = frame.contentWindow;
   });
 
   after(() => {
@@ -298,41 +295,22 @@ describe('iframe', () => {
   });
 
   testSpecs.forEach((spec, name) => {
-    const test = context.AccessibilityLinter.tests.get(name);
-    if (!test) {
-      throw new Error(`test ${name} not found`);
-    }
+    let test;
 
     // Make sure everything is setup using the iFrame versions
     describe(name, () => {
+      before(() => {
+        context.window = frame.contentWindow;
+        test = context.test = context.AccessibilityLinter.tests.get(name);
+        if (!context.test) {
+          throw new Error(`test ${name} not found`);
+        }
+      });
+
       beforeEach(() => {
         const logger = context.logger = new context.TestLogger();
         const linter = context.linter = new context.AccessibilityLinter({ logger, tests: [test] });
         linter.observe();
-      });
-
-      afterEach(() => {
-        (context.domAdditions || []).splice(0).forEach(el => el.remove());
-      });
-
-      spec.call(context);
-    });
-  });
-});
-
-xdescribe('tests', () => {
-  testSpecs.forEach((spec, test) => {
-    describe(test.name, () => {
-      const context = { logger: null, test, linter: null };
-
-      beforeEach(() => {
-        const logger = context.logger = new TestLogger();
-        const linter = context.linter = new AccessibilityLinter({ logger, tests: [test] });
-        linter.observe();
-      });
-
-      afterEach(() => {
-        (window.domAdditions || []).splice(0).forEach(el => el.remove());
       });
 
       spec.call(context);
