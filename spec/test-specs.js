@@ -39,7 +39,98 @@
       },
     ],
     [
-      "fieldset-legend",
+      "fieldset/checkbox-groups-in-fieldset",
+      function() {
+        let el, test, logger, linter, window, document, $, appendToBody;
+        const when = fn => this.when(fn, this);
+
+        before(() => {
+          ({ window, document, window: { $, appendToBody } } = this);
+        });
+
+        beforeEach(() => {
+          ({test, logger, linter} = this);
+        });
+
+        let el2;
+
+        it('generates the expected error message', () => {
+          expect(test).toGenerateErrorMessage('All checkbox groups must be within a fieldset');
+        });
+
+        context('within a form', () => {
+          it('does not add an error if a checkbox has no name', when(() => {
+            appendToBody('<form><input type="checkbox"></form>');
+          }).then(() => {
+            expect(logger).toNotHaveEntries();
+          }));
+
+          it('does not add an error if a checkbox name is unique', when(() => {
+            appendToBody('<form><input type="checkbox" name="x"></form>');
+          }).then(() => {
+            expect(logger).toNotHaveEntries();
+          }));
+
+          it('does not add an error if a checkbox name is unique within a form', when(() => {
+            appendToBody('<form><input type="checkbox" name="x"></form>');
+            appendToBody('<form><input type="checkbox" name="x"></form>');
+          }).then(() => {
+            expect(logger).toNotHaveEntries();
+          }));
+
+          it('does not add an error if a checkbox group is in a fieldset', when(() => {
+            appendToBody('<form><fieldset><input type="checkbox" name="x"><input type="checkbox" name="x"></fieldset></form>');
+          }).then(() => {
+            expect(logger).toNotHaveEntries();
+          }));
+
+          it('adds an error if checkbox group is not in a fieldset', when(() => {
+            appendToBody('<form><input type="checkbox" name="x"><input type="checkbox" name="x"></form>');
+            el = $('input')[0];
+            el2 = $('input')[1];
+          }).then(() => {
+            expect(logger).toHaveEntries([test, el], [test, el2]);
+          }));
+        });
+
+        context('outside of a form', () => {
+          it('does not add an error if a checkbox has no name', when(() => {
+            appendToBody('<input type="checkbox">');
+          }).then(() => {
+            expect(logger).toNotHaveEntries();
+          }));
+
+          it('does not add an error if a checkbox name is unique', when(() => {
+            appendToBody('<input type="checkbox" name="x">');
+          }).then(() => {
+            expect(logger).toNotHaveEntries();
+          }));
+
+          it('does not add an error if a checkbox name is unique outside of a form', when(() => {
+            appendToBody('<input type="checkbox" name="x">');
+            appendToBody('<form><input type="checkbox" name="x"></form>');
+          }).then(() => {
+            expect(logger).toNotHaveEntries();
+          }));
+
+          it('does not add an error if a checkbox group is in a fieldset', when(() => {
+            appendToBody('<fieldset><input type="checkbox" name="x"><input type="checkbox" name="x"></fieldset>');
+          }).then(() => {
+            expect(logger).toNotHaveEntries();
+          }));
+
+          it('adds an error if checkbox group is not in a fieldset', when(() => {
+            appendToBody('<input type="checkbox" name="x"><input type="checkbox" name="x">');
+            el = $('input')[0];
+            el2 = $('input')[1];
+          }).then(() => {
+            expect(logger).toHaveEntries([test, el], [test, el2]);
+          }));
+        });
+      },
+    ],
+    [
+      "fieldset/fieldset-has-legend",
       function() {
         let el, test, logger, linter, window, document, $, appendToBody;
         const when = fn => this.when(fn, this);
@@ -91,6 +182,86 @@
       },
     ],
     [
+      "fieldset/legend-has-fieldset",
+      function() {
+        let el, test, logger, linter, window, document, $, appendToBody;
+        const when = fn => this.when(fn, this);
+
+        before(() => {
+          ({ window, document, window: { $, appendToBody } } = this);
+        });
+
+        beforeEach(() => {
+          ({test, logger, linter} = this);
+        });
+
+        it('generates the expected error message', () => {
+          expect(test).toGenerateErrorMessage('All legends must be the first child of a fieldset');
+        });
+
+        it('adds an error if a legend is not in a fieldset', when(() => {
+          el = appendToBody('<legend>');
+        }).then(() => {
+          expect(logger).toHaveEntries([test, el]);
+        }));
+
+        it('adds an error if a legend is not the first child of a fieldset', when(() => {
+          appendToBody(`
+            <fieldset>
+              <p>Lorem ispum</p>
+              <legend>legend</legend>
+            </fieldset>
+          `);
+          el = $('legend')[0];
+        }).then(() => {
+          expect(logger).toHaveEntries([test, el]);
+        }));
+
+        it('does not an error if a legend is the first child of a fieldset', when(() => {
+          appendToBody(`
+            <fieldset>
+              <legend>legend</legend>
+              Lorem ispum
+            </fieldset>
+          `);
+          el = $('legend')[0];
+        }).then(() => {
+          expect(logger).toNotHaveEntries();
+        }));
+      },
+    ],
+    [
+      "fieldset/radios-in-fieldset",
+      function() {
+        let el, test, logger, linter, window, document, $, appendToBody;
+        const when = fn => this.when(fn, this);
+
+        before(() => {
+          ({ window, document, window: { $, appendToBody } } = this);
+        });
+
+        beforeEach(() => {
+          ({test, logger, linter} = this);
+        });
+
+        it('generates the expected error message', () => {
+          expect(this.test).toGenerateErrorMessage('All radio inputs must be within a fieldset');
+        });
+
+        it('adds an error if a radio is not in a fieldset', when(() => {
+          el = appendToBody('<input type="radio">');
+        }).then(() => {
+          expect(logger).toHaveEntries([test, el]);
+        }));
+
+        it('does not add an error if a radio is in a fieldset', when(() => {
+          appendToBody('<fieldset><input type="radio"></fieldset>');
+        }).then(() => {
+          expect(logger).toNotHaveEntries();
+        }));
+      },
+    ],
+    [
       "headings",
       function() {
         let el, test, logger, linter, window, document, $, appendToBody;
@@ -110,14 +281,14 @@
 
         const heading = i => `<h${i}>heading</h${i}>`;
 
-        [2, 3, 4, 5, 6].forEach(h => {
+        [2, 3, 4, 5, 6].forEach((h) => {
           it(`it adds an error for a <h${h}> with no proceeding heading`, when(() => {
             el = appendToBody(`<h${h}>Heading</h${h}>`);
           }).then(() => {
             expect(logger).toHaveEntries([test, el]);
           }));
 
-          [1, 2, 3, 4, 5, 6].forEach(p => {
+          [1, 2, 3, 4, 5, 6].forEach((p) => {
             const errors = p + 1 < h;
             it(`it ${errors ? 'adds' : 'does not add'} an error for a sibling <h${h}> after a <h${p}>`, when(() => {
               for (let i = 1; i <= p; ++i) {
@@ -164,7 +335,7 @@
       },
     ],
     [
-      "label",
+      "label/inputs-are-labelled",
       function() {
         let el, test, logger, linter, window, document, $, appendToBody;
         const when = fn => this.when(fn, this);
@@ -280,7 +451,7 @@
       },
     ],
     [
-      "label-associated",
+      "label/labels-have-inputs",
       function() {
         let el, test, logger, linter, window, document, $, appendToBody;
         const when = fn => this.when(fn, this);
@@ -318,7 +489,7 @@
       },
     ],
     [
-      "legend",
+      "no-empty-select",
       function() {
         let el, test, logger, linter, window, document, $, appendToBody;
         const when = fn => this.when(fn, this);
@@ -332,42 +503,24 @@
         });
 
         it('generates the expected error message', () => {
-          expect(test).toGenerateErrorMessage('All legends must be the first child of a fieldset');
+          expect(test).toGenerateErrorMessage('Selects should have options');
         });
 
-        it('adds an error if a legend is not in a fieldset', when(() => {
-          el = appendToBody('<legend>');
+        it('adds an error if a select has no options', when(() => {
+          el = appendToBody('<select />');
         }).then(() => {
           expect(logger).toHaveEntries([test, el]);
         }));
 
-        it('adds an error if a legend is not the first child of a fieldset', when(() => {
-          appendToBody(`
-            <fieldset>
-              <p>Lorem ispum</p>
-              <legend>legend</legend>
-            </fieldset>
-          `);
-          el = $('legend')[0];
-        }).then(() => {
-          expect(logger).toHaveEntries([test, el]);
-        }));
-
-        it('does not an error if a legend is the first child of a fieldset', when(() => {
-          appendToBody(`
-            <fieldset>
-              <legend>legend</legend>
-              Lorem ispum
-            </fieldset>
-          `);
-          el = $('legend')[0];
+        it('does not add an error if a select has options', when(() => {
+          appendToBody('<select><option></select>');
         }).then(() => {
           expect(logger).toNotHaveEntries();
         }));
       },
     ],
     [
-      "radio-fieldset",
+      "no-multiple-select",
       function() {
         let el, test, logger, linter, window, document, $, appendToBody;
         const when = fn => this.when(fn, this);
@@ -381,17 +534,60 @@
         });
 
         it('generates the expected error message', () => {
-          expect(this.test).toGenerateErrorMessage('All radio inputs must be within a fieldset');
+          expect(test).toGenerateErrorMessage('Do not use multiple selects');
         });
 
-        it('adds an error if a radio is not in a fieldset', when(() => {
-          el = appendToBody('<input type="radio">');
+        it('adds an error if a multiple select is used', when(() => {
+          el = appendToBody('<select multiple />');
         }).then(() => {
           expect(logger).toHaveEntries([test, el]);
         }));
 
-        it('does not add an error if a radio is in a fieldset', when(() => {
-          appendToBody('<fieldset><input type="radio"></fieldset>');
+        it('does not add an error if an normal select is used', when(() => {
+          appendToBody('<select />');
+        }).then(() => {
+          expect(logger).toNotHaveEntries();
+        }));
+      },
+    ],
+    [
+      "no-reset",
+      function() {
+        let el, test, logger, linter, window, document, $, appendToBody;
+        const when = fn => this.when(fn, this);
+
+        before(() => {
+          ({ window, document, window: { $, appendToBody } } = this);
+        });
+
+        beforeEach(() => {
+          ({test, logger, linter} = this);
+        });
+
+        it('generates the expected error message', () => {
+          expect(test).toGenerateErrorMessage('Do not use reset buttons');
+        });
+
+        it('adds an error if a reset input is used', when(() => {
+          el = appendToBody('<input type="reset">');
+        }).then(() => {
+          expect(logger).toHaveEntries([test, el]);
+        }));
+
+        it('does not add an error if an input is used', when(() => {
+          appendToBody('<input>');
+        }).then(() => {
+          expect(logger).toNotHaveEntries();
+        }));
+
+        it('adds an error if a reset button is used', when(() => {
+          el = appendToBody('<button type="reset" />');
+        }).then(() => {
+          expect(logger).toHaveEntries([test, el]);
+        }));
+
+        it('does not add an error if a button is used', when(() => {
+          appendToBody('<button />');
         }).then(() => {
           expect(logger).toNotHaveEntries();
         }));
@@ -411,40 +607,32 @@
           ({test, logger, linter} = this);
         });
 
+        let el2;
+
         it('generates the expected error message', () => {
-          expect(this.test).toGenerateErrorMessage('id is not unique');
+          expect(test).toGenerateErrorMessage('id is not unique');
         });
 
-        it('adds an error if an id is not unique', () => {
-          let el2;
-          return whenDomChanges(() => {
-            const id = uniqueId();
-            el = appendElement('div', { id });
-            el2 = appendElement('div', { id });
-          })
-          .then(() => {
-            expect(this.logger).toHaveEntries([this.test, el], [this.test, el2]);
-          });
-        });
+        it('adds an error if an id is not unique', when(() => {
+          const id = uniqueId();
+          el = appendToBody(`<div id="${id}" />`);
+          el2 = appendToBody(`<div id="${id}" />`);
+        }).then(() => {
+          expect(logger).toHaveEntries([test, el], [test, el2]);
+        }));
 
-        it('does not add an error if ids are unique', () => (
-          whenDomChanges(() => {
-            appendElement('div', { id: uniqueId() });
-            appendElement('div', { id: uniqueId() });
-          })
-          .then(() => {
-            expect(this.logger).toNotHaveEntries();
-          })
-        ));
+        it('does not add an error if ids are unique', when(() => {
+          appendToBody(`<div id="${uniqueId()}" />`);
+          appendToBody(`<div id="${uniqueId()}" />`);
+        }).then(() => {
+          expect(logger).toNotHaveEntries();
+        }));
 
-        it('ignores empty ids', () => (
-          whenDomChanges(() => {
-            appendElement('div', { id: '' });
-          })
-          .then(() => {
-            expect(this.logger).toNotHaveEntries();
-          })
-        ));
+        it('ignores empty ids', when(() => {
+          appendToBody('<div id />');
+        }).then(() => {
+          expect(logger).toNotHaveEntries();
+        }));
       },
     ],
   ]);

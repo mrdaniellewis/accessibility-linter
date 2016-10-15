@@ -1,41 +1,72 @@
 [ { name: 'alt',
-    docPath: '/Users/Zen/Documents/Code/web/accessibility-linter/lib/tests/alt/doc.md',
-    specPath: '/Users/Zen/Documents/Code/web/accessibility-linter/lib/tests/alt/spec.js',
-    testPath: '/Users/Zen/Documents/Code/web/accessibility-linter/lib/tests/alt/test.js' },
-  { name: 'fieldset-legend',
-    specPath: '/Users/Zen/Documents/Code/web/accessibility-linter/lib/tests/fieldset-legend/spec.js',
-    testPath: '/Users/Zen/Documents/Code/web/accessibility-linter/lib/tests/fieldset-legend/test.js' },
+    docPath: '/Users/Zen/Documents/Code/web/accessibility-linter/tests/alt/doc.md',
+    specPath: '/Users/Zen/Documents/Code/web/accessibility-linter/tests/alt/spec.js',
+    testPath: '/Users/Zen/Documents/Code/web/accessibility-linter/tests/alt/test.js' },
+  { name: 'fieldset/checkbox-groups-in-fieldset',
+    specPath: '/Users/Zen/Documents/Code/web/accessibility-linter/tests/fieldset/checkbox-groups-in-fieldset/spec.js',
+    testPath: '/Users/Zen/Documents/Code/web/accessibility-linter/tests/fieldset/checkbox-groups-in-fieldset/test.js' },
+  { name: 'fieldset/fieldset-has-legend',
+    specPath: '/Users/Zen/Documents/Code/web/accessibility-linter/tests/fieldset/fieldset-has-legend/spec.js',
+    testPath: '/Users/Zen/Documents/Code/web/accessibility-linter/tests/fieldset/fieldset-has-legend/test.js' },
+  { name: 'fieldset/legend-has-fieldset',
+    specPath: '/Users/Zen/Documents/Code/web/accessibility-linter/tests/fieldset/legend-has-fieldset/spec.js',
+    testPath: '/Users/Zen/Documents/Code/web/accessibility-linter/tests/fieldset/legend-has-fieldset/test.js' },
+  { name: 'fieldset/radios-in-fieldset',
+    specPath: '/Users/Zen/Documents/Code/web/accessibility-linter/tests/fieldset/radios-in-fieldset/spec.js',
+    testPath: '/Users/Zen/Documents/Code/web/accessibility-linter/tests/fieldset/radios-in-fieldset/test.js' },
   { name: 'headings',
-    specPath: '/Users/Zen/Documents/Code/web/accessibility-linter/lib/tests/headings/spec.js',
-    testPath: '/Users/Zen/Documents/Code/web/accessibility-linter/lib/tests/headings/test.js' },
-  { name: 'label',
-    docPath: '/Users/Zen/Documents/Code/web/accessibility-linter/lib/tests/label/doc.md',
-    specPath: '/Users/Zen/Documents/Code/web/accessibility-linter/lib/tests/label/spec.js',
-    testPath: '/Users/Zen/Documents/Code/web/accessibility-linter/lib/tests/label/test.js' },
-  { name: 'label-associated',
-    specPath: '/Users/Zen/Documents/Code/web/accessibility-linter/lib/tests/label-associated/spec.js',
-    testPath: '/Users/Zen/Documents/Code/web/accessibility-linter/lib/tests/label-associated/test.js' },
-  { name: 'legend',
-    specPath: '/Users/Zen/Documents/Code/web/accessibility-linter/lib/tests/legend/spec.js',
-    testPath: '/Users/Zen/Documents/Code/web/accessibility-linter/lib/tests/legend/test.js' },
-  { name: 'radio-fieldset',
-    specPath: '/Users/Zen/Documents/Code/web/accessibility-linter/lib/tests/radio-fieldset/spec.js',
-    testPath: '/Users/Zen/Documents/Code/web/accessibility-linter/lib/tests/radio-fieldset/test.js' },
+    specPath: '/Users/Zen/Documents/Code/web/accessibility-linter/tests/headings/spec.js',
+    testPath: '/Users/Zen/Documents/Code/web/accessibility-linter/tests/headings/test.js' },
+  { name: 'label/inputs-are-labelled',
+    specPath: '/Users/Zen/Documents/Code/web/accessibility-linter/tests/label/inputs-are-labelled/spec.js',
+    testPath: '/Users/Zen/Documents/Code/web/accessibility-linter/tests/label/inputs-are-labelled/test.js' },
+  { name: 'label/labels-have-inputs',
+    specPath: '/Users/Zen/Documents/Code/web/accessibility-linter/tests/label/labels-have-inputs/spec.js',
+    testPath: '/Users/Zen/Documents/Code/web/accessibility-linter/tests/label/labels-have-inputs/test.js' },
+  { name: 'no-empty-select',
+    specPath: '/Users/Zen/Documents/Code/web/accessibility-linter/tests/no-empty-select/spec.js',
+    testPath: '/Users/Zen/Documents/Code/web/accessibility-linter/tests/no-empty-select/test.js' },
+  { name: 'no-multiple-select',
+    specPath: '/Users/Zen/Documents/Code/web/accessibility-linter/tests/no-multiple-select/spec.js',
+    testPath: '/Users/Zen/Documents/Code/web/accessibility-linter/tests/no-multiple-select/test.js' },
+  { name: 'no-reset',
+    specPath: '/Users/Zen/Documents/Code/web/accessibility-linter/tests/no-reset/spec.js',
+    testPath: '/Users/Zen/Documents/Code/web/accessibility-linter/tests/no-reset/test.js' },
   { name: 'unique-id',
-    specPath: '/Users/Zen/Documents/Code/web/accessibility-linter/lib/tests/unique-id/spec.js',
-    testPath: '/Users/Zen/Documents/Code/web/accessibility-linter/lib/tests/unique-id/test.js' } ]
+    specPath: '/Users/Zen/Documents/Code/web/accessibility-linter/tests/unique-id/spec.js',
+    testPath: '/Users/Zen/Documents/Code/web/accessibility-linter/tests/unique-id/test.js' } ]
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.accessibilityLinter = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"./tests":[function(require,module,exports){
 "use strict";
 const tests = module.exports = new Map();
     let name;
-    const { $, $$ } = require('./utils');
+    const { $, $$, cssEscape } = require('./utils');
     const defineTest = test => tests.set(name, test);
     name = "alt";
 defineTest({
   message: 'missing alt attribute',
   selector: 'img:not([alt])',
 });
-name = "fieldset-legend";
+name = "fieldset/checkbox-groups-in-fieldset";
+defineTest({
+  message: 'All checkbox groups must be within a fieldset',
+  selector: 'input[type=checkbox]',
+  filter: (el) => {
+    if (!el.name) {
+      return true;
+    }
+
+    if (el.form && !(el.form.elements[el.name] instanceof NodeList)) {
+      return true;
+    }
+
+    if (!el.form && $$(`input[type=checkbox][name="${cssEscape(el.name)}"]`).filter(elm => !elm.form).length === 1) {
+      return true;
+    }
+
+    return el.closest('fieldset');
+  },
+});
+name = "fieldset/fieldset-has-legend";
 defineTest({
   message: 'All fieldsets must have a legend',
   selector: 'fieldset',
@@ -43,6 +74,19 @@ defineTest({
     const first = el.firstElementChild;
     return first && first.matches('legend') && first.textContent.trim();
   },
+});
+name = "fieldset/legend-has-fieldset";
+defineTest({
+  message: 'All legends must be the first child of a fieldset',
+  selector: 'legend',
+  // Detecting text nodes isn't worth it
+  filter: el => el.parentNode.matches('fieldset') && el === el.parentNode.firstElementChild,
+});
+name = "fieldset/radios-in-fieldset";
+defineTest({
+  message: 'All radio inputs must be within a fieldset',
+  selector: 'input[type=radio]',
+  filter: el => el.closest('fieldset'),
 });
 name = "headings";
 defineTest({
@@ -68,7 +112,7 @@ defineTest({
     return false;
   },
 });
-name = "label";
+name = "label/inputs-are-labelled";
 defineTest({
   message: 'all form elements must have a label',
   selector: 'input,select,textarea',
@@ -99,24 +143,27 @@ defineTest({
     return label && label.textContent.trim();
   },
 });
-name = "label-associated";
+name = "label/labels-have-inputs";
 defineTest({
   message: 'all labels must be linked to a control',
   selector: 'label',
   filter: el => el.htmlFor && document.getElementById(el.htmlFor),
 });
-name = "legend";
+name = "no-empty-select";
 defineTest({
-  message: 'All legends must be the first child of a fieldset',
-  selector: 'legend',
-  // Detecting text nodes isn't worth it
-  filter: el => el.parentNode.matches('fieldset') && el === el.parentNode.firstElementChild,
+  message: 'Selects should have options',
+  selector: 'select',
+  filter: el => $$('option', el).length,
 });
-name = "radio-fieldset";
+name = "no-multiple-select";
 defineTest({
-  message: 'All radio inputs must be within a fieldset',
-  selector: 'input[type=radio]',
-  filter: el => el.closest('fieldset'),
+  message: 'Do not use multiple selects',
+  selector: 'select[multiple]',
+});
+name = "no-reset";
+defineTest({
+  message: 'Do not use reset buttons',
+  selector: 'input[type=reset],button[type=reset]',
 });
 name = "unique-id";
 defineTest({
@@ -320,13 +367,17 @@ exports.$ = function $(selector, context) {
   return exports.$$(selector, context)[0];
 };
 
+exports.cssEscape = function cssEscape(name) {
+  return name.replace(/["\/]/g, '$&');
+};
+
 /**
  * Observe for child list mutations
  * @param {Function} fn function to call for each mutation
  */
 exports.observe = function mutationObserver(fn, root) {
-  const observer = new MutationObserver(mutations => {
-    mutations.forEach(mutation => {
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
       Array.from(mutation.addedNodes)
         .filter(node => node.nodeType === Node.ELEMENT_NODE)
         .forEach(node => fn(node));

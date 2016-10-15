@@ -5,11 +5,10 @@ outputs errors to the JavaScript console.
 
 ## Roadmap
 
-- Test specs
 - Configuration
+  - Can turn rules off
+  - Can turn all rules off
 - Documentation
-- customisable config
-- customisable config via `<script>` tag
 - Integrate instanbul for code coverage:
   https://blog.engineyard.com/2015/measuring-clientside-javascript-test-coverage-with-istanbul
 - Integrate karma for browser coverage
@@ -24,11 +23,11 @@ outputs errors to the JavaScript console.
 ✓ All ids are unique
 ✓ Radios have a `<legend>`
 ✓ No `<fieldset>` without a `<legend>`
-- No `<legend>` without a `<fieldset>`
+✓ No `<legend>` without a `<fieldset>`
 - Multiple checkboxs are in a fieldset
-- Colour contrast checker
-- Heading levels
 - No multiple `<select>`
+- No reset buttons
+✓ Heading levels
 - All `<a>` elements link to a valid id or name (#top)
 - http://www.thesitewizard.com/webdesign/access-keys-are-useless.shtml
 - All aria-labelledby link to valid elements
@@ -36,3 +35,4 @@ outputs errors to the JavaScript console.
 - All aria-attributes have the correct value
 - All roles are allowed roles
 - Roles are applied to the correct elements
+- Colour contrast checker
