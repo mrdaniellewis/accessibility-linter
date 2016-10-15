@@ -9,6 +9,7 @@ module.exports = {
     defineTest: true,
     $: false,
     $$: false,
+    cssEscape: false,
     // Globals for specs
     appendToBody: false,
     when: false,

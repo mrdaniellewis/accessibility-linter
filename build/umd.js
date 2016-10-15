@@ -2,14 +2,34 @@
 "use strict";
 const tests = module.exports = new Map();
     let name;
-    const { $, $$ } = require('./utils');
+    const { $, $$, cssEscape } = require('./utils');
     const defineTest = test => tests.set(name, test);
     name = "alt";
 defineTest({
   message: 'missing alt attribute',
   selector: 'img:not([alt])',
 });
-name = "fieldset-legend";
+name = "fieldset/checkbox-groups-in-fieldset";
+defineTest({
+  message: 'All checkbox groups must be within a fieldset',
+  selector: 'input[type=checkbox]',
+  filter: (el) => {
+    if (!el.name) {
+      return true;
+    }
+
+    if (el.form && !(el.form.elements[el.name] instanceof NodeList)) {
+      return true;
+    }
+
+    if (!el.form && $$(`input[type=checkbox][name="${cssEscape(el.name)}"]`).filter(elm => !elm.form).length === 1) {
+      return true;
+    }
+
+    return el.closest('fieldset');
+  },
+});
+name = "fieldset/fieldset-has-legend";
 defineTest({
   message: 'All fieldsets must have a legend',
   selector: 'fieldset',
@@ -17,6 +37,19 @@ defineTest({
     const first = el.firstElementChild;
     return first && first.matches('legend') && first.textContent.trim();
   },
+});
+name = "fieldset/legend-has-fieldset";
+defineTest({
+  message: 'All legends must be the first child of a fieldset',
+  selector: 'legend',
+  // Detecting text nodes isn't worth it
+  filter: el => el.parentNode.matches('fieldset') && el === el.parentNode.firstElementChild,
+});
+name = "fieldset/radios-in-fieldset";
+defineTest({
+  message: 'All radio inputs must be within a fieldset',
+  selector: 'input[type=radio]',
+  filter: el => el.closest('fieldset'),
 });
 name = "headings";
 defineTest({
@@ -42,7 +75,7 @@ defineTest({
     return false;
   },
 });
-name = "label";
+name = "label/inputs-are-labelled";
 defineTest({
   message: 'all form elements must have a label',
   selector: 'input,select,textarea',
@@ -73,24 +106,27 @@ defineTest({
     return label && label.textContent.trim();
   },
 });
-name = "label-associated";
+name = "label/labels-have-inputs";
 defineTest({
   message: 'all labels must be linked to a control',
   selector: 'label',
   filter: el => el.htmlFor && document.getElementById(el.htmlFor),
 });
-name = "legend";
+name = "no-empty-select";
 defineTest({
-  message: 'All legends must be the first child of a fieldset',
-  selector: 'legend',
-  // Detecting text nodes isn't worth it
-  filter: el => el.parentNode.matches('fieldset') && el === el.parentNode.firstElementChild,
+  message: 'Selects should have options',
+  selector: 'select',
+  filter: el => $$('option', el).length,
 });
-name = "radio-fieldset";
+name = "no-multiple-select";
 defineTest({
-  message: 'All radio inputs must be within a fieldset',
-  selector: 'input[type=radio]',
-  filter: el => el.closest('fieldset'),
+  message: 'Do not use multiple selects',
+  selector: 'select[multiple]',
+});
+name = "no-reset";
+defineTest({
+  message: 'Do not use reset buttons',
+  selector: 'input[type=reset],button[type=reset]',
 });
 name = "unique-id";
 defineTest({
@@ -271,13 +307,17 @@ exports.$ = function $(selector, context) {
   return exports.$$(selector, context)[0];
 };
 
+exports.cssEscape = function cssEscape(name) {
+  return name.replace(/["\/]/g, '$&');
+};
+
 /**
  * Observe for child list mutations
  * @param {Function} fn function to call for each mutation
  */
 exports.observe = function mutationObserver(fn, root) {
-  const observer = new MutationObserver(mutations => {
-    mutations.forEach(mutation => {
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
       Array.from(mutation.addedNodes)
         .filter(node => node.nodeType === Node.ELEMENT_NODE)
         .forEach(node => fn(node));

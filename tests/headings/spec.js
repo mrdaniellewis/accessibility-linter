@@ -4,14 +4,14 @@ it('generates the expected error message', () => {
 
 const heading = i => `<h${i}>heading</h${i}>`;
 
-[2, 3, 4, 5, 6].forEach(h => {
+[2, 3, 4, 5, 6].forEach((h) => {
   it(`it adds an error for a <h${h}> with no proceeding heading`, when(() => {
     el = appendToBody(`<h${h}>Heading</h${h}>`);
   }).then(() => {
     expect(logger).toHaveEntries([test, el]);
   }));
 
-  [1, 2, 3, 4, 5, 6].forEach(p => {
+  [1, 2, 3, 4, 5, 6].forEach((p) => {
     const errors = p + 1 < h;
     it(`it ${errors ? 'adds' : 'does not add'} an error for a sibling <h${h}> after a <h${p}>`, when(() => {
       for (let i = 1; i <= p; ++i) {
