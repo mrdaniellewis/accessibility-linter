@@ -23,13 +23,20 @@ defineTest({
   message: 'Headings must be nested correctly',
   selector: 'h2,h3,h4,h5,h6',
   allowed: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
+  previous(el) {
+    let cursor = el.previousElementSibling;
+    while (cursor && cursor.lastElementChild) {
+      cursor = cursor.lastElementChild;
+    }
+    return cursor || el.parentElement;
+  },
   filter(el) {
     let cursor = el;
     const level = +el.nodeName[1];
     do {
-      cursor = cursor.previousElementSibling || cursor.parentElement;
+      cursor = this.previous(cursor) || cursor.parentElement;
       if (cursor && cursor.matches(this.allowed.join())) {
-        return !cursor.matches(this.allowed.slice(level - 1));
+        return cursor.matches(this.allowed.slice(level - 2).join(','));
       }
     } while (cursor);
     return false;
@@ -76,7 +83,8 @@ name = "legend";
 defineTest({
   message: 'All legends must be the first child of a fieldset',
   selector: 'legend',
-  filter: el => el === el.parentNode.firstElementChild,
+  // Detecting text nodes isn't worth it
+  filter: el => el.parentNode.matches('fieldset') && el === el.parentNode.firstElementChild,
 });
 name = "radio-fieldset";
 defineTest({
@@ -133,7 +141,7 @@ Linter.tests = tests;
 },{"./logger":2,"./runner":3,"./tests":"./tests","./utils":4}],2:[function(require,module,exports){
 "use strict";
 /* eslint-disable no-console */
-class Logger {
+module.exports = class Logger {
   message(message, el) {
     if (typeof message === 'string') {
       return message;
@@ -148,7 +156,7 @@ class Logger {
   warn(test, el) {
     console.warn(this.message(test.message, el), el);
   }
-}
+};
 
 },{}],3:[function(require,module,exports){
 "use strict";
@@ -180,8 +188,7 @@ module.exports = class Runner {
    */
   run(context) {
     this.tests
-      .filter(test => !(test.globalOnly && context))
-      .forEach(test => this.runTest(test, context));
+      .forEach((test, name) => this.runTest(test, name, context));
   }
 
   /**
@@ -189,15 +196,15 @@ module.exports = class Runner {
    * @param {Object} test The test to run
    * @param {HTMLElement} [context] A context to run the tests within
    */
-  runTest(test, context) {
+  runTest(test, name, context) {
     $$(test.selector, context)
-      .filter(el => this.filterIgnoreAttribute(el, test.name))
-      .filter(el => this.filterWhitelist(el, test.name))
-      .filter(el => !isInSetArray(this.reported, el, test.name))
+      .filter(el => this.filterIgnoreAttribute(el, name))
+      .filter(el => this.filterWhitelist(el, name))
+      .filter(el => !isInSetArray(this.reported, el, name))
       .filter(el => (test.filter ? !test.filter(el) : true))
       .forEach(el => {
         this.logger.error(test, el);
-        addToSetArray(this.reported, el, test.name);
+        addToSetArray(this.reported, el, name);
       });
   }
 

@@ -1,29 +1,29 @@
 [ { name: 'alt',
-    docPath: '/Users/daniellewis/code/accessibility-linter/lib/tests/alt/doc.md',
-    specPath: '/Users/daniellewis/code/accessibility-linter/lib/tests/alt/spec.js',
-    testPath: '/Users/daniellewis/code/accessibility-linter/lib/tests/alt/test.js' },
+    docPath: '/Users/Zen/Documents/Code/web/accessibility-linter/lib/tests/alt/doc.md',
+    specPath: '/Users/Zen/Documents/Code/web/accessibility-linter/lib/tests/alt/spec.js',
+    testPath: '/Users/Zen/Documents/Code/web/accessibility-linter/lib/tests/alt/test.js' },
   { name: 'fieldset-legend',
-    specPath: '/Users/daniellewis/code/accessibility-linter/lib/tests/fieldset-legend/spec.js',
-    testPath: '/Users/daniellewis/code/accessibility-linter/lib/tests/fieldset-legend/test.js' },
+    specPath: '/Users/Zen/Documents/Code/web/accessibility-linter/lib/tests/fieldset-legend/spec.js',
+    testPath: '/Users/Zen/Documents/Code/web/accessibility-linter/lib/tests/fieldset-legend/test.js' },
   { name: 'headings',
-    specPath: '/Users/daniellewis/code/accessibility-linter/lib/tests/headings/spec.js',
-    testPath: '/Users/daniellewis/code/accessibility-linter/lib/tests/headings/test.js' },
+    specPath: '/Users/Zen/Documents/Code/web/accessibility-linter/lib/tests/headings/spec.js',
+    testPath: '/Users/Zen/Documents/Code/web/accessibility-linter/lib/tests/headings/test.js' },
   { name: 'label',
-    docPath: '/Users/daniellewis/code/accessibility-linter/lib/tests/label/doc.md',
-    specPath: '/Users/daniellewis/code/accessibility-linter/lib/tests/label/spec.js',
-    testPath: '/Users/daniellewis/code/accessibility-linter/lib/tests/label/test.js' },
+    docPath: '/Users/Zen/Documents/Code/web/accessibility-linter/lib/tests/label/doc.md',
+    specPath: '/Users/Zen/Documents/Code/web/accessibility-linter/lib/tests/label/spec.js',
+    testPath: '/Users/Zen/Documents/Code/web/accessibility-linter/lib/tests/label/test.js' },
   { name: 'label-associated',
-    specPath: '/Users/daniellewis/code/accessibility-linter/lib/tests/label-associated/spec.js',
-    testPath: '/Users/daniellewis/code/accessibility-linter/lib/tests/label-associated/test.js' },
+    specPath: '/Users/Zen/Documents/Code/web/accessibility-linter/lib/tests/label-associated/spec.js',
+    testPath: '/Users/Zen/Documents/Code/web/accessibility-linter/lib/tests/label-associated/test.js' },
   { name: 'legend',
-    specPath: '/Users/daniellewis/code/accessibility-linter/lib/tests/legend/spec.js',
-    testPath: '/Users/daniellewis/code/accessibility-linter/lib/tests/legend/test.js' },
+    specPath: '/Users/Zen/Documents/Code/web/accessibility-linter/lib/tests/legend/spec.js',
+    testPath: '/Users/Zen/Documents/Code/web/accessibility-linter/lib/tests/legend/test.js' },
   { name: 'radio-fieldset',
-    specPath: '/Users/daniellewis/code/accessibility-linter/lib/tests/radio-fieldset/spec.js',
-    testPath: '/Users/daniellewis/code/accessibility-linter/lib/tests/radio-fieldset/test.js' },
+    specPath: '/Users/Zen/Documents/Code/web/accessibility-linter/lib/tests/radio-fieldset/spec.js',
+    testPath: '/Users/Zen/Documents/Code/web/accessibility-linter/lib/tests/radio-fieldset/test.js' },
   { name: 'unique-id',
-    specPath: '/Users/daniellewis/code/accessibility-linter/lib/tests/unique-id/spec.js',
-    testPath: '/Users/daniellewis/code/accessibility-linter/lib/tests/unique-id/test.js' } ]
+    specPath: '/Users/Zen/Documents/Code/web/accessibility-linter/lib/tests/unique-id/spec.js',
+    testPath: '/Users/Zen/Documents/Code/web/accessibility-linter/lib/tests/unique-id/test.js' } ]
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.accessibilityLinter = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"./tests":[function(require,module,exports){
 "use strict";
 const tests = module.exports = new Map();
@@ -49,13 +49,20 @@ defineTest({
   message: 'Headings must be nested correctly',
   selector: 'h2,h3,h4,h5,h6',
   allowed: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
+  previous(el) {
+    let cursor = el.previousElementSibling;
+    while (cursor && cursor.lastElementChild) {
+      cursor = cursor.lastElementChild;
+    }
+    return cursor || el.parentElement;
+  },
   filter(el) {
     let cursor = el;
     const level = +el.nodeName[1];
     do {
-      cursor = cursor.previousElementSibling || cursor.parentElement;
+      cursor = this.previous(cursor) || cursor.parentElement;
       if (cursor && cursor.matches(this.allowed.join())) {
-        return !cursor.matches(this.allowed.slice(level - 1));
+        return cursor.matches(this.allowed.slice(level - 2).join(','));
       }
     } while (cursor);
     return false;
@@ -102,7 +109,8 @@ name = "legend";
 defineTest({
   message: 'All legends must be the first child of a fieldset',
   selector: 'legend',
-  filter: el => el === el.parentNode.firstElementChild,
+  // Detecting text nodes isn't worth it
+  filter: el => el.parentNode.matches('fieldset') && el === el.parentNode.firstElementChild,
 });
 name = "radio-fieldset";
 defineTest({
@@ -182,7 +190,7 @@ Linter.tests = tests;
 },{"./logger":3,"./runner":4,"./tests":"./tests","./utils":5}],3:[function(require,module,exports){
 "use strict";
 /* eslint-disable no-console */
-class Logger {
+module.exports = class Logger {
   message(message, el) {
     if (typeof message === 'string') {
       return message;
@@ -197,7 +205,7 @@ class Logger {
   warn(test, el) {
     console.warn(this.message(test.message, el), el);
   }
-}
+};
 
 },{}],4:[function(require,module,exports){
 "use strict";
@@ -229,8 +237,7 @@ module.exports = class Runner {
    */
   run(context) {
     this.tests
-      .filter(test => !(test.globalOnly && context))
-      .forEach(test => this.runTest(test, context));
+      .forEach((test, name) => this.runTest(test, name, context));
   }
 
   /**
@@ -238,15 +245,15 @@ module.exports = class Runner {
    * @param {Object} test The test to run
    * @param {HTMLElement} [context] A context to run the tests within
    */
-  runTest(test, context) {
+  runTest(test, name, context) {
     $$(test.selector, context)
-      .filter(el => this.filterIgnoreAttribute(el, test.name))
-      .filter(el => this.filterWhitelist(el, test.name))
-      .filter(el => !isInSetArray(this.reported, el, test.name))
+      .filter(el => this.filterIgnoreAttribute(el, name))
+      .filter(el => this.filterWhitelist(el, name))
+      .filter(el => !isInSetArray(this.reported, el, name))
       .filter(el => (test.filter ? !test.filter(el) : true))
       .forEach(el => {
         this.logger.error(test, el);
-        addToSetArray(this.reported, el, test.name);
+        addToSetArray(this.reported, el, name);
       });
   }
 

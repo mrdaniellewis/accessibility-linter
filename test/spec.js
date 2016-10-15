@@ -1,9 +1,10 @@
 describe('AccessibilityLinter', () => {
   const test = {
-    name: 'test',
     message: 'foo-bar',
     selector: 'accessibility-linter',
   };
+
+  const tests = new Map([['test', test]]);
 
   it('is a property of window', () => {
     expect(window.AccessibilityLinter).toBeA(Function);
@@ -19,7 +20,7 @@ describe('AccessibilityLinter', () => {
     let linter, el;
 
     beforeEach(() => {
-      linter = new AccessibilityLinter({ tests: [test], logger });
+      linter = new AccessibilityLinter({ tests, logger });
       el = document.createElement('accessibility-linter');
       document.body.appendChild(el);
     });
@@ -63,13 +64,12 @@ describe('AccessibilityLinter', () => {
   describe('filter', () => {
     let linter, el, el2;
     const filterTest = {
-      name: 'test',
       selector: 'accessibility-linter',
       filter: match => match.hasAttribute('data-test'),
     };
 
     beforeEach(() => {
-      linter = new AccessibilityLinter({ tests: [filterTest], logger });
+      linter = new AccessibilityLinter({ tests: new Map([['test', filterTest]]), logger });
       el = document.createElement('accessibility-linter');
       document.body.appendChild(el);
       el2 = document.createElement('accessibility-linter');
@@ -102,7 +102,7 @@ describe('AccessibilityLinter', () => {
 
     it('does not add errors to elements on a whitelist with no test names', () => {
       const linter = new AccessibilityLinter({
-        tests: [test],
+        tests,
         logger,
         whitelist: { 'accessibility-linter': '' },
       });
@@ -114,7 +114,7 @@ describe('AccessibilityLinter', () => {
 
     it('does not add named errors to elements on a whitelist with test names', () => {
       const linter = new AccessibilityLinter({
-        tests: [test],
+        tests,
         logger,
         whitelist: { 'accessibility-linter': ['test'] },
       });
@@ -125,7 +125,7 @@ describe('AccessibilityLinter', () => {
 
     it('adds unnamed errors to elements on a whitelist', () => {
       const linter = new AccessibilityLinter({
-        tests: [test],
+        tests,
         logger,
         whitelist: { 'accessibility-linter': ['foo'] },
       });
@@ -139,7 +139,7 @@ describe('AccessibilityLinter', () => {
     let linter, el;
 
     beforeEach(() => {
-      linter = new AccessibilityLinter({ tests: [test], logger });
+      linter = new AccessibilityLinter({ tests, logger });
       el = document.createElement('accessibility-linter');
       document.body.appendChild(el);
     });
@@ -172,7 +172,7 @@ describe('AccessibilityLinter', () => {
     let linter, el;
 
     beforeEach(() => {
-      linter = new AccessibilityLinter({ tests: [test], logger });
+      linter = new AccessibilityLinter({ tests, logger });
       linter.observe();
     });
 
@@ -191,30 +191,24 @@ describe('AccessibilityLinter', () => {
     }));
 
     describe('#stopObserving', () => {
-      it('stops finding errors when DOM modifications occur', () => {
+      it('stops finding errors when DOM modifications occur', when(() => {
         linter.stopObserving();
-        return whenDomChanges(() => {
-          el = document.createElement('accessibility-linter');
-          document.body.appendChild(el);
-        })
-        .then(() => {
-          expect(logger).toNotHaveEntries();
-          el.remove();
-        });
-      });
+        el = document.createElement('accessibility-linter');
+        document.body.appendChild(el);
+      }).then(() => {
+        expect(logger).toNotHaveEntries();
+        el.remove();
+      }));
 
-      it('resumes finding errors if #observe is called again', () => {
+      it('resumes finding errors if #observe is called again', when(() => {
         linter.stopObserving();
         linter.observe();
-        return whenDomChanges(() => {
-          el = document.createElement('accessibility-linter');
-          document.body.appendChild(el);
-        })
-        .then(() => {
-          expect(logger).toHaveEntries();
-          el.remove();
-        });
-      });
+        el = document.createElement('accessibility-linter');
+        document.body.appendChild(el);
+      }).then(() => {
+        expect(logger).toHaveEntries();
+        el.remove();
+      }));
     });
   });
 });
@@ -278,8 +272,8 @@ describe('Logger', () => {
 });
 
 // Tests are run in an iframe so mocha display does not interfere
-describe('iframe', () => {
-  const context = {};
+describe('tests', () => {
+  const context = { when };
   let frame;
 
   before(done => {
@@ -295,21 +289,23 @@ describe('iframe', () => {
   });
 
   testSpecs.forEach((spec, name) => {
-    let test;
+    let window, test, tests;
 
     // Make sure everything is setup using the iFrame versions
     describe(name, () => {
       before(() => {
-        context.window = frame.contentWindow;
-        test = context.test = context.AccessibilityLinter.tests.get(name);
-        if (!context.test) {
-          throw new Error(`test ${name} not found`);
+        window = context.window = frame.contentWindow;
+        context.document = window.document;
+        test = context.test = window.AccessibilityLinter.tests.get(name);
+        tests = new Map([[name, test]]);
+        if (!test) {
+          throw new Error(`spec for "${name}" not found`);
         }
       });
 
       beforeEach(() => {
-        const logger = context.logger = new context.TestLogger();
-        const linter = context.linter = new context.AccessibilityLinter({ logger, tests: [test] });
+        const logger = context.logger = new TestLogger();
+        const linter = context.linter = new window.AccessibilityLinter({ logger, tests });
         linter.observe();
       });
 
