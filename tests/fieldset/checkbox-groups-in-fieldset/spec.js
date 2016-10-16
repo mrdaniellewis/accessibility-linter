@@ -70,4 +70,10 @@ context('outside of a form', () => {
   }).then(() => {
     expect(logger).toHaveEntries([test, el], [test, el2]);
   }));
+
+  it('does not blow up if the name required escaping', when(() => {
+    appendToBody('<input type="checkbox" name="&quot; \\">');
+  }).then(() => {
+    expect(logger).toNotHaveEntries();
+  }));
 });

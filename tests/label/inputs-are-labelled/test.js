@@ -18,7 +18,7 @@
 
     if (!label) {
       if (el.id) {
-        label = $(`label[for="${el.id}"]`);
+        label = $(`label[for="${cssEscape(el.id)}"]`);
       }
       if (!label) {
         label = el.closest('label');

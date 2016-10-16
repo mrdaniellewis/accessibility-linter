@@ -75,18 +75,25 @@ it('generates the expected error message', () => {
 
     it('does not add an error if the explicit label is missing, and an implicit label is present', when(() => {
       const id = uniqueId();
-      appendToBody(`
-        <label><${name} id="${id}"/>label</label>
-      `);
+      appendToBody(`<label><${name} id="${id}"/>label</label>`);
     }).then(() => {
       expect(logger).toNotHaveEntries();
     }));
 
-    it('does add an error if the implict label is empty', when(() => {
+    it('does add an error if the implicit label is empty', when(() => {
       appendToBody(`<label><${name} /></label>`);
       el = $(name)[0];
     }).then(() => {
       expect(logger).toHaveEntries([test, el]);
+    }));
+
+    it('does not blow up if an id needs escaping', when(() => {
+      appendToBody(`
+        <label for="$quot; \\">label</label>
+        <label for="$quot; \\"></label>
+      `);
+    }).then(() => {
+      expect(logger).toNotHaveEntries();
     }));
   });
 });

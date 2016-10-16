@@ -23,7 +23,7 @@ it('ignores empty ids', when(() => {
   expect(logger).toNotHaveEntries();
 }));
 
-it('does not blow up if ids required escaping', when(() => {
+it('does not blow up if an id required escaping', when(() => {
   appendToBody('<div id="&quot; \\" />');
 }).then(() => {
   expect(logger).toNotHaveEntries();
