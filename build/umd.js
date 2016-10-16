@@ -122,7 +122,7 @@
 
     if (!label) {
       if (el.id) {
-        label = $(`label[for="${el.id}"]`);
+        label = $(`label[for="${cssEscape(el.id)}"]`);
       }
       if (!label) {
         label = el.closest('label');
@@ -239,12 +239,16 @@
       ]
     ]);
   
-},{"./utils":4}],1:[function(require,module,exports){
+},{"./utils":4}],"./version":[function(require,module,exports){
+"use strict";
+module.exports = "1.0.0"
+},{}],1:[function(require,module,exports){
 "use strict";
 const Runner = require('./runner');
 const Logger = require('./logger');
 const tests = require('./tests');
 const utils = require('./utils');
+const version = require('./version');
 
 const Linter = module.exports = class AccessibilityLinter extends Runner {
   constructor(options) {
@@ -277,8 +281,9 @@ const Linter = module.exports = class AccessibilityLinter extends Runner {
 
 Linter.Logger = Logger;
 Linter.tests = tests;
+Linter.version = version;
 
-},{"./logger":2,"./runner":3,"./tests":"./tests","./utils":4}],2:[function(require,module,exports){
+},{"./logger":2,"./runner":3,"./tests":"./tests","./utils":4,"./version":"./version"}],2:[function(require,module,exports){
 "use strict";
 /* eslint-disable no-console */
 module.exports = class Logger {
@@ -444,6 +449,6 @@ exports.observe = function mutationObserver(fn, root) {
   return observer;
 };
 
-},{}]},{},["./tests",1])(1)
+},{}]},{},["./tests","./version",1])(1)
 });
 //# sourceMappingURL=umd.js.map

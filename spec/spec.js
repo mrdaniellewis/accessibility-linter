@@ -10,6 +10,10 @@ describe('AccessibilityLinter', () => {
     expect(window.AccessibilityLinter).toBeA(Function);
   });
 
+  it('it has a version property', () => {
+    expect(window.AccessibilityLinter.version).toExist();
+  });
+
   let logger;
 
   beforeEach(() => {

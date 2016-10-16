@@ -29,8 +29,7 @@ outputs errors to the JavaScript console.
 - Build to gh_pages
 - Highlight option
 - Screenreader transcript
-- add version
-- check css is properly escaped when querying by attribute and add tests
+- remove code duplication in build process
 
 ### List of tests to create
 
