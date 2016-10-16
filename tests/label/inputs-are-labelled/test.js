@@ -1,7 +1,7 @@
-defineTest({
+({
   message: 'all form elements must have a label',
   selector: 'input,select,textarea',
-  filter: el => {
+  filter(el) {
     if (/^(?:submit|reset|button|image|hidden)$/.test(el.type)) {
       return true;
     }
