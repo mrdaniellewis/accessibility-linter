@@ -1,4 +1,4 @@
-defineTest({
+({
   message: 'All checkbox groups must be within a fieldset',
   selector: 'input[type=checkbox]',
   filter: (el) => {

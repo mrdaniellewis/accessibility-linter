@@ -1,16 +1,22 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.AccessibilityLinter = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"./tests":[function(require,module,exports){
 "use strict";
-const tests = module.exports = new Map();
-    let name;
+
     const { $, $$, cssEscape } = require('./utils');
-    const defineTest = test => tests.set(name, test);
-    name = "alt";
-defineTest({
+    module.exports = new Map([
+      [
+        "alt",
+        Object.assign(
+          { name: "alt", doc: "alt" },
+          {
   message: 'missing alt attribute',
   selector: 'img:not([alt])',
-});
-name = "fieldset/checkbox-groups-in-fieldset";
-defineTest({
+}
+        ),
+      ],[
+        "fieldset/checkbox-groups-in-fieldset",
+        Object.assign(
+          { name: "fieldset/checkbox-groups-in-fieldset", doc: "fieldset" },
+          {
   message: 'All checkbox groups must be within a fieldset',
   selector: 'input[type=checkbox]',
   filter: (el) => {
@@ -28,31 +34,47 @@ defineTest({
 
     return el.closest('fieldset');
   },
-});
-name = "fieldset/fieldset-has-legend";
-defineTest({
+}
+        ),
+      ],[
+        "fieldset/fieldset-has-legend",
+        Object.assign(
+          { name: "fieldset/fieldset-has-legend", doc: "fieldset" },
+          {
   message: 'All fieldsets must have a legend',
   selector: 'fieldset',
-  filter: el => {
+  filter: (el) => {
     const first = el.firstElementChild;
     return first && first.matches('legend') && first.textContent.trim();
   },
-});
-name = "fieldset/legend-has-fieldset";
-defineTest({
+}
+        ),
+      ],[
+        "fieldset/legend-has-fieldset",
+        Object.assign(
+          { name: "fieldset/legend-has-fieldset", doc: "fieldset" },
+          {
   message: 'All legends must be the first child of a fieldset',
   selector: 'legend',
   // Detecting text nodes isn't worth it
   filter: el => el.parentNode.matches('fieldset') && el === el.parentNode.firstElementChild,
-});
-name = "fieldset/radios-in-fieldset";
-defineTest({
+}
+        ),
+      ],[
+        "fieldset/radios-in-fieldset",
+        Object.assign(
+          { name: "fieldset/radios-in-fieldset", doc: "fieldset" },
+          {
   message: 'All radio inputs must be within a fieldset',
   selector: 'input[type=radio]',
   filter: el => el.closest('fieldset'),
-});
-name = "headings";
-defineTest({
+}
+        ),
+      ],[
+        "headings",
+        Object.assign(
+          { name: "headings", doc: undefined },
+          {
   message: 'Headings must be nested correctly',
   selector: 'h2,h3,h4,h5,h6',
   allowed: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
@@ -74,12 +96,16 @@ defineTest({
     } while (cursor);
     return false;
   },
-});
-name = "label/inputs-are-labelled";
-defineTest({
+}
+        ),
+      ],[
+        "label/inputs-are-labelled",
+        Object.assign(
+          { name: "label/inputs-are-labelled", doc: "label-inputs-are-labelled" },
+          {
   message: 'all form elements must have a label',
   selector: 'input,select,textarea',
-  filter: el => {
+  filter(el) {
     if (/^(?:submit|reset|button|image|hidden)$/.test(el.type)) {
       return true;
     }
@@ -105,35 +131,113 @@ defineTest({
 
     return label && label.textContent.trim();
   },
-});
-name = "label/labels-have-inputs";
-defineTest({
+}
+        ),
+      ],[
+        "label/labels-have-inputs",
+        Object.assign(
+          { name: "label/labels-have-inputs", doc: "label" },
+          {
   message: 'all labels must be linked to a control',
   selector: 'label',
   filter: el => el.htmlFor && document.getElementById(el.htmlFor),
-});
-name = "no-empty-select";
-defineTest({
+}
+        ),
+      ],[
+        "list-id",
+        Object.assign(
+          { name: "list-id", doc: undefined },
+          {
+  message: 'no datalist found',
+  selector: 'input[list]',
+  filter(el) {
+    const listId = el.getAttribute('list');
+    return listId && $(`datalist[id="${cssEscape(listId)}"]`);
+  },
+}
+        ),
+      ],[
+        "no-duplicate-anchor-names",
+        Object.assign(
+          { name: "no-duplicate-anchor-names", doc: undefined },
+          {
+  message: 'Name is not unique',
+  selector: 'a[name]',
+  filter(el) {
+    const id = cssEscape(el.name);
+    return id && $$(`a[name="${id}"],[id="${id}"]`).length === 1;
+  },
+}
+        ),
+      ],[
+        "no-empty-select",
+        Object.assign(
+          { name: "no-empty-select", doc: undefined },
+          {
   message: 'Selects should have options',
   selector: 'select',
   filter: el => $$('option', el).length,
-});
-name = "no-multiple-select";
-defineTest({
+}
+        ),
+      ],[
+        "no-links-to-missing-fragments",
+        Object.assign(
+          { name: "no-links-to-missing-fragments", doc: undefined },
+          {
+  message: 'Fragment not found in document',
+  selector: 'a[href*="#"]',
+  removeHash(ob) {
+    return ob.href.replace(/#.*$/, '');
+  },
+  filter(el) {
+    if (this.removeHash(location) !== this.removeHash(el)) {
+      return true;
+    }
+    const id = cssEscape(decodeURI(el.hash.slice(1)));
+    return $(`[id="${id}"],a[name="${id}"]`);
+  },
+}
+        ),
+      ],[
+        "no-multiple-select",
+        Object.assign(
+          { name: "no-multiple-select", doc: undefined },
+          {
   message: 'Do not use multiple selects',
   selector: 'select[multiple]',
-});
-name = "no-reset";
-defineTest({
+}
+        ),
+      ],[
+        "no-outside-controls",
+        Object.assign(
+          { name: "no-outside-controls", doc: undefined },
+          {
+  message: 'All controls should be within a form',
+  selector: 'input,textarea,select',
+  filter: el => el.form,
+}
+        ),
+      ],[
+        "no-reset",
+        Object.assign(
+          { name: "no-reset", doc: undefined },
+          {
   message: 'Do not use reset buttons',
   selector: 'input[type=reset],button[type=reset]',
-});
-name = "unique-id";
-defineTest({
+}
+        ),
+      ],[
+        "unique-id",
+        Object.assign(
+          { name: "unique-id", doc: undefined },
+          {
   message: 'id is not unique',
   selector: '[id]',
-  filter: el => !el.id || $$(`#${el.id}`).length === 1,
-});
+  filter: el => !el.id || $$(`[id="${cssEscape(el.id)}"]`).length === 1,
+}
+        ),
+      ]
+    ]);
   
 },{"./utils":4}],1:[function(require,module,exports){
 "use strict";
@@ -178,19 +282,32 @@ Linter.tests = tests;
 "use strict";
 /* eslint-disable no-console */
 module.exports = class Logger {
-  message(message, el) {
-    if (typeof message === 'string') {
-      return message;
-    }
-    return message(el);
+  constructor(docLink) {
+    this.docLink = docLink;
   }
 
   error(test, el) {
-    console.error(this.message(test.message, el), el);
+    console.error.apply(console, this.message(test, el));
   }
 
   warn(test, el) {
-    console.warn(this.message(test.message, el), el);
+    console.warn.apply(console, this.message(test, el));
+  }
+
+  message(test, el) {
+    return [
+      typeof test.message === 'function' ? test.message(el) : test.message,
+      el,
+      this.getLink(test),
+    ].filter(Boolean);
+  }
+
+  getLink(test) {
+    if (!this.docLink || !test.doc) {
+      return null;
+    }
+
+    return `${this.docLink}#${test.doc}`;
   }
 };
 
@@ -238,7 +355,7 @@ module.exports = class Runner {
       .filter(el => this.filterWhitelist(el, name))
       .filter(el => !isInSetArray(this.reported, el, name))
       .filter(el => (test.filter ? !test.filter(el) : true))
-      .forEach(el => {
+      .forEach((el) => {
         this.logger.error(test, el);
         addToSetArray(this.reported, el, name);
       });
@@ -254,7 +371,7 @@ module.exports = class Runner {
       return false;
     }
 
-    const isWhitelisted = Object.keys(whitelist).some(selector => {
+    const isWhitelisted = Object.keys(whitelist).some((selector) => {
       const testList = whitelist[selector];
       if (testList && !testList.includes(testName)) {
         return false;
@@ -308,7 +425,7 @@ exports.$ = function $(selector, context) {
 };
 
 exports.cssEscape = function cssEscape(name) {
-  return name.replace(/["\/]/g, '$&');
+  return name.replace(/["\\]/g, '\\$&');
 };
 
 /**

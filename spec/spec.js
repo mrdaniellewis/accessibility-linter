@@ -226,47 +226,54 @@ describe('Logger', () => {
     logger = new AccessibilityLinter.Logger();
   });
 
-  context('error', () => {
-    let spy;
+  ['error', 'warn'].forEach((type) => {
+    context(type, () => {
+      let spy;
 
-    beforeEach(() => {
-      spy = expect.spyOn(console, 'error');
-    });
+      beforeEach(() => {
+        spy = expect.spyOn(console, type);
+      });
 
-    afterEach(() => {
-      spy.restore();
-    });
+      afterEach(() => {
+        spy.restore();
+      });
 
-    it('generates an error where message is a string', () => {
-      logger.error({ message: 'bar' }, el);
-      expect(spy).toHaveBeenCalledWith('bar', el);
-    });
+      it('outputs a string message', () => {
+        logger[type]({ message: 'bar' });
+        expect(spy).toHaveBeenCalledWith('bar');
+      });
 
-    it('generates an error where message is a function', () => {
-      logger.error({ message: elm => elm.getAttribute('data-foo') }, el);
-      expect(spy).toHaveBeenCalledWith('bar', el);
-    });
-  });
+      it('outputs a function string message', () => {
+        logger[type]({ message: () => 'bar' });
+        expect(spy).toHaveBeenCalledWith('bar');
+      });
 
-  context('warn', () => {
-    let spy;
+      it('includes el in the message when provided', () => {
+        logger[type]({ message: 'bar' }, el);
+        expect(spy).toHaveBeenCalledWith('bar', el);
+      });
 
-    beforeEach(() => {
-      spy = expect.spyOn(console, 'warn');
-    });
+      it('outputs a function message using el', () => {
+        logger[type]({ message: elm => elm.getAttribute('data-foo') }, el);
+        expect(spy).toHaveBeenCalledWith('bar', el);
+      });
 
-    afterEach(() => {
-      spy.restore();
-    });
+      it('includes link in the message when docLink and doc are provided', () => {
+        const docLogger = new AccessibilityLinter.Logger('http://example.com/doc.htm');
+        docLogger[type]({ message: 'bar', doc: 'hash' });
+        expect(spy).toHaveBeenCalledWith('bar', 'http://example.com/doc.htm#hash');
+      });
 
-    it('generates an error where message is a string', () => {
-      logger.warn({ message: 'bar' }, el);
-      expect(spy).toHaveBeenCalledWith('bar', el);
-    });
+      it('includes link and el in the message when docLink and doc are provided', () => {
+        const docLogger = new AccessibilityLinter.Logger('http://example.com/doc.htm');
+        docLogger[type]({ message: 'bar', doc: 'hash' }, el);
+        expect(spy).toHaveBeenCalledWith('bar', el, 'http://example.com/doc.htm#hash');
+      });
 
-    it('generates an error where message is a function', () => {
-      logger.warn({ message: elm => elm.getAttribute('data-foo') }, el);
-      expect(spy).toHaveBeenCalledWith('bar', el);
+      it('does not include the doc link if no docLink is provided', () => {
+        logger[type]({ message: 'bar', doc: 'hash' }, el);
+        expect(spy).toHaveBeenCalledWith('bar', el);
+      });
     });
   });
 });
@@ -276,7 +283,7 @@ describe('tests', () => {
   const context = { when };
   let frame;
 
-  before(done => {
+  before((done) => {
     frame = document.createElement('iframe');
     frame.src = 'frame.htm';
     frame.style = 'border: 0; height: 0; width: 0;';
@@ -301,6 +308,9 @@ describe('tests', () => {
         if (!test) {
           throw new Error(`spec for "${name}" not found`);
         }
+        window.onerror = function (message) {
+          throw new Error(`Error in iframe ${message}`);
+        };
       });
 
       beforeEach(() => {

@@ -4,11 +4,11 @@
     [
       "alt",
       function() {
-        let el, test, logger, linter, window, document, $, appendToBody;
+        let el, test, logger, linter, window, document, $, appendToBody, location;
         const when = fn => this.when(fn, this);
 
         before(() => {
-          ({ window, document, window: { $, appendToBody } } = this);
+          ({ window, document, window: { $, appendToBody, location } } = this);
         });
 
         beforeEach(() => {
@@ -41,11 +41,11 @@
     [
       "fieldset/checkbox-groups-in-fieldset",
       function() {
-        let el, test, logger, linter, window, document, $, appendToBody;
+        let el, test, logger, linter, window, document, $, appendToBody, location;
         const when = fn => this.when(fn, this);
 
         before(() => {
-          ({ window, document, window: { $, appendToBody } } = this);
+          ({ window, document, window: { $, appendToBody, location } } = this);
         });
 
         beforeEach(() => {
@@ -132,11 +132,11 @@
     [
       "fieldset/fieldset-has-legend",
       function() {
-        let el, test, logger, linter, window, document, $, appendToBody;
+        let el, test, logger, linter, window, document, $, appendToBody, location;
         const when = fn => this.when(fn, this);
 
         before(() => {
-          ({ window, document, window: { $, appendToBody } } = this);
+          ({ window, document, window: { $, appendToBody, location } } = this);
         });
 
         beforeEach(() => {
@@ -184,11 +184,11 @@
     [
       "fieldset/legend-has-fieldset",
       function() {
-        let el, test, logger, linter, window, document, $, appendToBody;
+        let el, test, logger, linter, window, document, $, appendToBody, location;
         const when = fn => this.when(fn, this);
 
         before(() => {
-          ({ window, document, window: { $, appendToBody } } = this);
+          ({ window, document, window: { $, appendToBody, location } } = this);
         });
 
         beforeEach(() => {
@@ -233,11 +233,11 @@
     [
       "fieldset/radios-in-fieldset",
       function() {
-        let el, test, logger, linter, window, document, $, appendToBody;
+        let el, test, logger, linter, window, document, $, appendToBody, location;
         const when = fn => this.when(fn, this);
 
         before(() => {
-          ({ window, document, window: { $, appendToBody } } = this);
+          ({ window, document, window: { $, appendToBody, location } } = this);
         });
 
         beforeEach(() => {
@@ -264,11 +264,11 @@
     [
       "headings",
       function() {
-        let el, test, logger, linter, window, document, $, appendToBody;
+        let el, test, logger, linter, window, document, $, appendToBody, location;
         const when = fn => this.when(fn, this);
 
         before(() => {
-          ({ window, document, window: { $, appendToBody } } = this);
+          ({ window, document, window: { $, appendToBody, location } } = this);
         });
 
         beforeEach(() => {
@@ -337,11 +337,11 @@
     [
       "label/inputs-are-labelled",
       function() {
-        let el, test, logger, linter, window, document, $, appendToBody;
+        let el, test, logger, linter, window, document, $, appendToBody, location;
         const when = fn => this.when(fn, this);
 
         before(() => {
-          ({ window, document, window: { $, appendToBody } } = this);
+          ({ window, document, window: { $, appendToBody, location } } = this);
         });
 
         beforeEach(() => {
@@ -453,11 +453,11 @@
     [
       "label/labels-have-inputs",
       function() {
-        let el, test, logger, linter, window, document, $, appendToBody;
+        let el, test, logger, linter, window, document, $, appendToBody, location;
         const when = fn => this.when(fn, this);
 
         before(() => {
-          ({ window, document, window: { $, appendToBody } } = this);
+          ({ window, document, window: { $, appendToBody, location } } = this);
         });
 
         beforeEach(() => {
@@ -489,13 +489,114 @@
       },
     ],
     [
-      "no-empty-select",
+      "list-id",
       function() {
-        let el, test, logger, linter, window, document, $, appendToBody;
+        let el, test, logger, linter, window, document, $, appendToBody, location;
         const when = fn => this.when(fn, this);
 
         before(() => {
-          ({ window, document, window: { $, appendToBody } } = this);
+          ({ window, document, window: { $, appendToBody, location } } = this);
+        });
+
+        beforeEach(() => {
+          ({test, logger, linter} = this);
+        });
+
+        it('generates the expected error message', () => {
+          expect(test).toGenerateErrorMessage('no datalist found');
+        });
+
+        it('does not add an error if an input is linked to a valid datalist', when(() => {
+          const id = uniqueId();
+          appendToBody(`<input list="${id}"><datalist id="${id}"><datalist />`);
+        }).then(() => {
+          expect(logger).toNotHaveEntries();
+        }));
+
+        it('adds an error if the list attribute is empty', when(() => {
+          el = appendToBody('<input list>');
+        }).then(() => {
+          expect(logger).toHaveEntries([test, el]);
+        }));
+
+        it('adds an error if the list is missing', when(() => {
+          const id = uniqueId();
+          el = appendToBody(`<input list="${id}">`);
+        }).then(() => {
+          expect(logger).toHaveEntries([test, el]);
+        }));
+
+        it('does not blow up if the id is invalid', when(() => {
+          el = appendToBody('<input list="&quot; \\">');
+        }).then(() => {
+          expect(logger).toHaveEntries([test, el]);
+        }));
+      },
+    ],
+    [
+      "no-duplicate-anchor-names",
+      function() {
+        let el, test, logger, linter, window, document, $, appendToBody, location;
+        const when = fn => this.when(fn, this);
+
+        before(() => {
+          ({ window, document, window: { $, appendToBody, location } } = this);
+        });
+
+        beforeEach(() => {
+          ({test, logger, linter} = this);
+        });
+
+        let el2;
+
+        it('generates the expected error message', () => {
+          expect(test).toGenerateErrorMessage('Name is not unique');
+        });
+
+        it('adds an error if a name is empty', when(() => {
+          el = appendToBody('<a name />');
+        }).then(() => {
+          expect(logger).toHaveEntries([test, el]);
+        }));
+
+        it('adds an error if a name is not unique', when(() => {
+          const id = uniqueId();
+          el = appendToBody(`<a name="${id}" />`);
+          el2 = appendToBody(`<a name="${id}" />`);
+        }).then(() => {
+          expect(logger).toHaveEntries([test, el], [test, el2]);
+        }));
+
+        it('does not add an error if name is unique', when(() => {
+          appendToBody(`<a name="${uniqueId()}" />`);
+          appendToBody(`<a name="${uniqueId()}" />`);
+        }).then(() => {
+          expect(logger).toNotHaveEntries();
+        }));
+
+        it('adds an error if a name is shared by an id', when(() => {
+          const id = uniqueId();
+          el = appendToBody(`<a name="${id}" />`);
+          appendToBody(`<a id="${id}" />`);
+        }).then(() => {
+          expect(logger).toHaveEntries([test, el]);
+        }));
+
+        it('does not blow up if the name requires escaping', when(() => {
+          appendToBody('<a name="&quot; \\" />');
+        }).then(() => {
+          expect(logger).toNotHaveEntries();
+        }));
+      },
+    ],
+    [
+      "no-empty-select",
+      function() {
+        let el, test, logger, linter, window, document, $, appendToBody, location;
+        const when = fn => this.when(fn, this);
+
+        before(() => {
+          ({ window, document, window: { $, appendToBody, location } } = this);
         });
 
         beforeEach(() => {
@@ -520,13 +621,105 @@
       },
     ],
     [
-      "no-multiple-select",
+      "no-links-to-missing-fragments",
       function() {
-        let el, test, logger, linter, window, document, $, appendToBody;
+        let el, test, logger, linter, window, document, $, appendToBody, location;
         const when = fn => this.when(fn, this);
 
         before(() => {
-          ({ window, document, window: { $, appendToBody } } = this);
+          ({ window, document, window: { $, appendToBody, location } } = this);
+        });
+
+        beforeEach(() => {
+          ({test, logger, linter} = this);
+        });
+
+        it('generates the expected error message', () => {
+          expect(test).toGenerateErrorMessage('Fragment not found in document');
+        });
+
+        it('it does not add an error for a link without a hash', when(() => {
+          appendToBody('<a href="path" />');
+        }).then(() => {
+          expect(logger).toNotHaveEntries();
+        }));
+
+        it('it does not add an error if a link to a hash points to a valid id', when(() => {
+          const id = uniqueId();
+          appendToBody(`<p id="${id}">p</p><a href="#${id}">link</a>`);
+        }).then(() => {
+          expect(logger).toNotHaveEntries();
+        }));
+
+        it('it does not add an error if a link to a hash points to a valid anchor name', when(() => {
+          const id = uniqueId();
+          appendToBody(`<a name="${id}">p</p><a href="#${id}">link</a>`);
+        }).then(() => {
+          expect(logger).toNotHaveEntries();
+        }));
+
+        it('it does not add an error if link with a hash points to another location', when(() => {
+          const id = uniqueId();
+          appendToBody(`<a href="other#${id}">link</a>`);
+        }).then(() => {
+          expect(logger).toNotHaveEntries();
+        }));
+
+        it('it does not add an error if a page with a base and a link with a hash points to another location', when(() => {
+          const id = uniqueId();
+          $('<base href="http://www.example.com" />').appendTo('head');
+          appendToBody(`<a href="#${id}">link</a>`);
+        }).then(() => {
+          expect(logger).toNotHaveEntries();
+          $('base').remove();
+        }));
+
+        it('it adds an error if link with a hash has no valid target on the page', when(() => {
+          const id = uniqueId();
+          el = appendToBody(`<a href="#${id}">link</a>`);
+        }).then(() => {
+          expect(logger).toHaveEntries([test, el]);
+        }));
+
+        it('it adds an error if link with a path and hash has no valid target on the page', when(() => {
+          const id = uniqueId();
+          el = appendToBody(`<a href="${location.pathname}#${id}">link</a>`);
+        }).then(() => {
+          expect(logger).toHaveEntries([test, el]);
+        }));
+
+        it('it adds an error if an absolute link with a hash has no valid target on the page', when(() => {
+          const id = uniqueId();
+          el = appendToBody(`<a href="${location.href}#${id}">link</a>`);
+        }).then(() => {
+          expect(logger).toHaveEntries([test, el]);
+        }));
+
+        it('it adds an error if a page with a base and a link with a hash has no valid target on the page', when(() => {
+          const pathParts = location.pathname.split('/');
+          $(`<base href="${pathParts.slice(0, -2).join('/')}" />`).appendTo('head');
+          const id = uniqueId();
+          el = appendToBody(`<a href="${pathParts.slice(-3).join('/')}#${id}">link</a>`);
+        }).then(() => {
+          $('base').remove();
+          expect(logger).toHaveEntries([test, el]);
+        }));
+
+        it('does not blow up if the hash requires css escaping', when(() => {
+          el = appendToBody('<a href="#%22 %5c">link</a>');
+        }).then(() => {
+          expect(logger).toHaveEntries([test, el]);
+        }));
+      },
+    ],
+    [
+      "no-multiple-select",
+      function() {
+        let el, test, logger, linter, window, document, $, appendToBody, location;
+        const when = fn => this.when(fn, this);
+
+        before(() => {
+          ({ window, document, window: { $, appendToBody, location } } = this);
         });
 
         beforeEach(() => {
@@ -551,13 +744,46 @@
       },
     ],
     [
-      "no-reset",
+      "no-outside-controls",
       function() {
-        let el, test, logger, linter, window, document, $, appendToBody;
+        let el, test, logger, linter, window, document, $, appendToBody, location;
         const when = fn => this.when(fn, this);
 
         before(() => {
-          ({ window, document, window: { $, appendToBody } } = this);
+          ({ window, document, window: { $, appendToBody, location } } = this);
+        });
+
+        beforeEach(() => {
+          ({test, logger, linter} = this);
+        });
+
+        it('generates the expected error message', () => {
+          expect(test).toGenerateErrorMessage('All controls should be within a form');
+        });
+
+        ['input', 'textarea', 'select'].forEach((type) => {
+          it(`adds an error if a ${type} is outside a form`, when(() => {
+            el = appendToBody(`<${type} />`);
+          }).then(() => {
+            expect(logger).toHaveEntries([test, el]);
+          }));
+
+          it(`does not adds an error if a ${type} is inside a form`, when(() => {
+            appendToBody(`<form><${type} /></form>`);
+          }).then(() => {
+            expect(logger).toNotHaveEntries();
+          }));
+        });
+      },
+    ],
+    [
+      "no-reset",
+      function() {
+        let el, test, logger, linter, window, document, $, appendToBody, location;
+        const when = fn => this.when(fn, this);
+
+        before(() => {
+          ({ window, document, window: { $, appendToBody, location } } = this);
         });
 
         beforeEach(() => {
@@ -596,11 +822,11 @@
     [
       "unique-id",
       function() {
-        let el, test, logger, linter, window, document, $, appendToBody;
+        let el, test, logger, linter, window, document, $, appendToBody, location;
         const when = fn => this.when(fn, this);
 
         before(() => {
-          ({ window, document, window: { $, appendToBody } } = this);
+          ({ window, document, window: { $, appendToBody, location } } = this);
         });
 
         beforeEach(() => {
@@ -630,6 +856,12 @@
 
         it('ignores empty ids', when(() => {
           appendToBody('<div id />');
+        }).then(() => {
+          expect(logger).toNotHaveEntries();
+        }));
+
+        it('does not blow up if ids required escaping', when(() => {
+          appendToBody('<div id="&quot; \\" />');
         }).then(() => {
           expect(logger).toNotHaveEntries();
         }));

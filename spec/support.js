@@ -21,8 +21,8 @@
       },
 
       run() {
-        const promise = new Promise(resolve => {
-          const observer = new MutationObserver(mutations => {
+        const promise = new Promise((resolve) => {
+          const observer = new MutationObserver((mutations) => {
             observer.disconnect();
             mutations.forEach(
               mutation => mutation.addedNodes.forEach(
@@ -39,7 +39,7 @@
           .then(this.test)
           .then(
             () => this.cleanUp(),
-            e => {
+            (e) => {
               this.cleanUp();
               return Promise.reject(e);
             }

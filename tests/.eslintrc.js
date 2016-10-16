@@ -17,4 +17,7 @@ module.exports = {
     el: true,
     uniqueId: false,
   },
+  rules: {
+    'no-unused-expressions': 0,
+  }
 };
