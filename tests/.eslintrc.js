@@ -15,6 +15,7 @@ module.exports = {
     when: false,
     logger: false,
     el: true,
+    el2: true,
     uniqueId: false,
   },
   rules: {

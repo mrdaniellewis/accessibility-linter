@@ -1,5 +1,3 @@
-let el2;
-
 it('generates the expected error message', () => {
   expect(test).toGenerateErrorMessage('id is not unique');
 });
