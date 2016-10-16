@@ -1,5 +1,3 @@
-let el2;
-
 it('generates the expected error message', () => {
   expect(test).toGenerateErrorMessage('All checkbox groups must be within a fieldset');
 });

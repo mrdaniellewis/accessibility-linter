@@ -4,7 +4,7 @@
     [
       "alt",
       function() {
-        let el, test, logger, linter, window, document, $, appendToBody, location;
+        let el, el2, test, logger, linter, window, document, $, appendToBody, location;
         const when = fn => this.when(fn, this);
 
         before(() => {
@@ -13,6 +13,10 @@
 
         beforeEach(() => {
           ({test, logger, linter} = this);
+        });
+
+        afterEach(() => {
+          el = el2 = test = logger = linter = null;
         });
 
         it('generates the expected error message', () => {
@@ -41,7 +45,7 @@
     [
       "fieldset/checkbox-groups-in-fieldset",
       function() {
-        let el, test, logger, linter, window, document, $, appendToBody, location;
+        let el, el2, test, logger, linter, window, document, $, appendToBody, location;
         const when = fn => this.when(fn, this);
 
         before(() => {
@@ -52,7 +56,9 @@
           ({test, logger, linter} = this);
         });
 
-        let el2;
+        afterEach(() => {
+          el = el2 = test = logger = linter = null;
+        });
 
         it('generates the expected error message', () => {
           expect(test).toGenerateErrorMessage('All checkbox groups must be within a fieldset');
@@ -132,7 +138,7 @@
     [
       "fieldset/fieldset-has-legend",
       function() {
-        let el, test, logger, linter, window, document, $, appendToBody, location;
+        let el, el2, test, logger, linter, window, document, $, appendToBody, location;
         const when = fn => this.when(fn, this);
 
         before(() => {
@@ -141,6 +147,10 @@
 
         beforeEach(() => {
           ({test, logger, linter} = this);
+        });
+
+        afterEach(() => {
+          el = el2 = test = logger = linter = null;
         });
 
         it('generates the expected error message', () => {
@@ -184,7 +194,7 @@
     [
       "fieldset/legend-has-fieldset",
       function() {
-        let el, test, logger, linter, window, document, $, appendToBody, location;
+        let el, el2, test, logger, linter, window, document, $, appendToBody, location;
         const when = fn => this.when(fn, this);
 
         before(() => {
@@ -193,6 +203,10 @@
 
         beforeEach(() => {
           ({test, logger, linter} = this);
+        });
+
+        afterEach(() => {
+          el = el2 = test = logger = linter = null;
         });
 
         it('generates the expected error message', () => {
@@ -233,7 +247,7 @@
     [
       "fieldset/radios-in-fieldset",
       function() {
-        let el, test, logger, linter, window, document, $, appendToBody, location;
+        let el, el2, test, logger, linter, window, document, $, appendToBody, location;
         const when = fn => this.when(fn, this);
 
         before(() => {
@@ -242,6 +256,10 @@
 
         beforeEach(() => {
           ({test, logger, linter} = this);
+        });
+
+        afterEach(() => {
+          el = el2 = test = logger = linter = null;
         });
 
         it('generates the expected error message', () => {
@@ -264,7 +282,7 @@
     [
       "headings",
       function() {
-        let el, test, logger, linter, window, document, $, appendToBody, location;
+        let el, el2, test, logger, linter, window, document, $, appendToBody, location;
         const when = fn => this.when(fn, this);
 
         before(() => {
@@ -273,6 +291,10 @@
 
         beforeEach(() => {
           ({test, logger, linter} = this);
+        });
+
+        afterEach(() => {
+          el = el2 = test = logger = linter = null;
         });
 
         it('generates the expected error message', () => {
@@ -337,7 +359,7 @@
     [
       "label/inputs-are-labelled",
       function() {
-        let el, test, logger, linter, window, document, $, appendToBody, location;
+        let el, el2, test, logger, linter, window, document, $, appendToBody, location;
         const when = fn => this.when(fn, this);
 
         before(() => {
@@ -346,6 +368,10 @@
 
         beforeEach(() => {
           ({test, logger, linter} = this);
+        });
+
+        afterEach(() => {
+          el = el2 = test = logger = linter = null;
         });
 
         it('generates the expected error message', () => {
@@ -453,7 +479,7 @@
     [
       "label/labels-have-inputs",
       function() {
-        let el, test, logger, linter, window, document, $, appendToBody, location;
+        let el, el2, test, logger, linter, window, document, $, appendToBody, location;
         const when = fn => this.when(fn, this);
 
         before(() => {
@@ -462,6 +488,10 @@
 
         beforeEach(() => {
           ({test, logger, linter} = this);
+        });
+
+        afterEach(() => {
+          el = el2 = test = logger = linter = null;
         });
 
         it('generates the expected error message', () => {
@@ -491,7 +521,7 @@
     [
       "list-id",
       function() {
-        let el, test, logger, linter, window, document, $, appendToBody, location;
+        let el, el2, test, logger, linter, window, document, $, appendToBody, location;
         const when = fn => this.when(fn, this);
 
         before(() => {
@@ -500,6 +530,10 @@
 
         beforeEach(() => {
           ({test, logger, linter} = this);
+        });
+
+        afterEach(() => {
+          el = el2 = test = logger = linter = null;
         });
 
         it('generates the expected error message', () => {
@@ -536,7 +570,7 @@
     [
       "no-duplicate-anchor-names",
       function() {
-        let el, test, logger, linter, window, document, $, appendToBody, location;
+        let el, el2, test, logger, linter, window, document, $, appendToBody, location;
         const when = fn => this.when(fn, this);
 
         before(() => {
@@ -547,7 +581,9 @@
           ({test, logger, linter} = this);
         });
 
-        let el2;
+        afterEach(() => {
+          el = el2 = test = logger = linter = null;
+        });
 
         it('generates the expected error message', () => {
           expect(test).toGenerateErrorMessage('Name is not unique');
@@ -592,7 +628,7 @@
     [
       "no-empty-select",
       function() {
-        let el, test, logger, linter, window, document, $, appendToBody, location;
+        let el, el2, test, logger, linter, window, document, $, appendToBody, location;
         const when = fn => this.when(fn, this);
 
         before(() => {
@@ -601,6 +637,10 @@
 
         beforeEach(() => {
           ({test, logger, linter} = this);
+        });
+
+        afterEach(() => {
+          el = el2 = test = logger = linter = null;
         });
 
         it('generates the expected error message', () => {
@@ -623,7 +663,7 @@
     [
       "no-links-to-missing-fragments",
       function() {
-        let el, test, logger, linter, window, document, $, appendToBody, location;
+        let el, el2, test, logger, linter, window, document, $, appendToBody, location;
         const when = fn => this.when(fn, this);
 
         before(() => {
@@ -632,6 +672,10 @@
 
         beforeEach(() => {
           ({test, logger, linter} = this);
+        });
+
+        afterEach(() => {
+          el = el2 = test = logger = linter = null;
         });
 
         it('generates the expected error message', () => {
@@ -715,7 +759,7 @@
     [
       "no-multiple-select",
       function() {
-        let el, test, logger, linter, window, document, $, appendToBody, location;
+        let el, el2, test, logger, linter, window, document, $, appendToBody, location;
         const when = fn => this.when(fn, this);
 
         before(() => {
@@ -724,6 +768,10 @@
 
         beforeEach(() => {
           ({test, logger, linter} = this);
+        });
+
+        afterEach(() => {
+          el = el2 = test = logger = linter = null;
         });
 
         it('generates the expected error message', () => {
@@ -746,7 +794,7 @@
     [
       "no-outside-controls",
       function() {
-        let el, test, logger, linter, window, document, $, appendToBody, location;
+        let el, el2, test, logger, linter, window, document, $, appendToBody, location;
         const when = fn => this.when(fn, this);
 
         before(() => {
@@ -755,6 +803,10 @@
 
         beforeEach(() => {
           ({test, logger, linter} = this);
+        });
+
+        afterEach(() => {
+          el = el2 = test = logger = linter = null;
         });
 
         it('generates the expected error message', () => {
@@ -779,7 +831,7 @@
     [
       "no-reset",
       function() {
-        let el, test, logger, linter, window, document, $, appendToBody, location;
+        let el, el2, test, logger, linter, window, document, $, appendToBody, location;
         const when = fn => this.when(fn, this);
 
         before(() => {
@@ -788,6 +840,10 @@
 
         beforeEach(() => {
           ({test, logger, linter} = this);
+        });
+
+        afterEach(() => {
+          el = el2 = test = logger = linter = null;
         });
 
         it('generates the expected error message', () => {
@@ -822,7 +878,7 @@
     [
       "unique-id",
       function() {
-        let el, test, logger, linter, window, document, $, appendToBody, location;
+        let el, el2, test, logger, linter, window, document, $, appendToBody, location;
         const when = fn => this.when(fn, this);
 
         before(() => {
@@ -833,7 +889,9 @@
           ({test, logger, linter} = this);
         });
 
-        let el2;
+        afterEach(() => {
+          el = el2 = test = logger = linter = null;
+        });
 
         it('generates the expected error message', () => {
           expect(test).toGenerateErrorMessage('id is not unique');

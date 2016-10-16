@@ -31,7 +31,6 @@ outputs errors to the JavaScript console.
 - Screenreader transcript
 - add version
 - check css is properly escaped when querying by attribute and add tests
-- add el2 as pre-existing global
 
 ### List of tests to create
 
@@ -47,9 +46,8 @@ outputs errors to the JavaScript console.
 ✓ No reset buttons
 ✓ No empty selects
 ✓ Heading levels
-- datalist ids are valid
-- any other id associations?
-- wrap inputs in a form
+✓ datalist ids are valid
+✓ wrap inputs in a form
 - roles
   - roles are valid
   - roles are not applied where default roles exist
@@ -59,7 +57,7 @@ outputs errors to the JavaScript console.
   - aria attributes are applied to allowed elements
   - aria id lists point to valid elements
   - aria attributes are correct for roles
-- All `<a>` elements link to a valid id or name (#top)
+✓ All `<a>` elements link to a valid id or name (#top)
 - Do not use buttons as names
 - Colour contrast checker
 - Problem private use characters
