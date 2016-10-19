@@ -3,17 +3,14 @@
   "version": "1.0.0",
   "description": "Accessibility test a web page or web application",
   "main": "lib/index.js",
-  "config": {
-    "uglify": "-m -c --screw-ie8"
-  },
   "scripts": {
     "lint": "eslint . --ext .js",
     "clean": "rm -f build/*",
     "build:standalone": "node lib/build/standalone | exorcist build/linter.js.map > build/linter.js",
-    "uglify:standalone": "uglifyjs build/linter.js $npm_package_config_uglify > build/linter.min.js",
-    "build:bookmarklet": "cat build/linter.js | node lib/build/bookmarklet.js > build/bookmarklet.htm",
+    "uglify:standalone": "uglifyjs build/linter.js > build/linter.min.js",
+    "build:bookmarklet": "cat build/linter.min.js | node lib/build/bookmarklet.js > build/bookmarklet.htm",
     "build:umd": "node lib/build/umd | exorcist build/umd.js.map > build/umd.js",
-    "uglify:umd": "uglifyjs build/umd.js $npm_package_config_uglify > build/umd.min.js",
+    "uglify:umd": "uglifyjs build/umd.js > build/umd.min.js",
     "build:specs": "node lib/build/specs > spec/test-specs.js",
     "build:docs": "node lib/build/docs > build/doc.html",
     "build:dev": "npm run build:umd && npm run build:specs",
