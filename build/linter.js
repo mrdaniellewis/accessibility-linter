@@ -83,7 +83,7 @@
     while (cursor && cursor.lastElementChild) {
       cursor = cursor.lastElementChild;
     }
-    return cursor || el.parentElement;
+    return cursor;
   },
   filter(el) {
     let cursor = el;
@@ -122,7 +122,7 @@
 
     if (!label) {
       if (el.id) {
-        label = $(`label[for="${el.id}"]`);
+        label = $(`label[for="${cssEscape(el.id)}"]`);
       }
       if (!label) {
         label = el.closest('label');
@@ -144,6 +144,32 @@
 }
         ),
       ],[
+        "list-id",
+        Object.assign(
+          { name: "list-id", doc: undefined },
+          {
+  message: 'no datalist found',
+  selector: 'input[list]',
+  filter(el) {
+    const listId = el.getAttribute('list');
+    return listId && $(`datalist[id="${cssEscape(listId)}"]`);
+  },
+}
+        ),
+      ],[
+        "no-duplicate-anchor-names",
+        Object.assign(
+          { name: "no-duplicate-anchor-names", doc: undefined },
+          {
+  message: 'Name is not unique',
+  selector: 'a[name]',
+  filter(el) {
+    const id = cssEscape(el.name);
+    return id && $$(`a[name="${id}"],[id="${id}"]`).length === 1;
+  },
+}
+        ),
+      ],[
         "no-empty-select",
         Object.assign(
           { name: "no-empty-select", doc: undefined },
@@ -154,12 +180,41 @@
 }
         ),
       ],[
+        "no-links-to-missing-fragments",
+        Object.assign(
+          { name: "no-links-to-missing-fragments", doc: undefined },
+          {
+  message: 'Fragment not found in document',
+  selector: 'a[href*="#"]',
+  removeHash(ob) {
+    return ob.href.replace(/#.*$/, '');
+  },
+  filter(el) {
+    if (this.removeHash(location) !== this.removeHash(el)) {
+      return true;
+    }
+    const id = cssEscape(decodeURI(el.hash.slice(1)));
+    return $(`[id="${id}"],a[name="${id}"]`);
+  },
+}
+        ),
+      ],[
         "no-multiple-select",
         Object.assign(
           { name: "no-multiple-select", doc: undefined },
           {
   message: 'Do not use multiple selects',
   selector: 'select[multiple]',
+}
+        ),
+      ],[
+        "no-outside-controls",
+        Object.assign(
+          { name: "no-outside-controls", doc: undefined },
+          {
+  message: 'All controls should be within a form',
+  selector: 'input,textarea,select',
+  filter: el => el.form,
 }
         ),
       ],[
@@ -178,13 +233,16 @@
           {
   message: 'id is not unique',
   selector: '[id]',
-  filter: el => !el.id || $$(`#${el.id}`).length === 1,
+  filter: el => !el.id || $$(`[id="${cssEscape(el.id)}"]`).length === 1,
 }
         ),
       ]
     ]);
   
-},{"./utils":5}],1:[function(require,module,exports){
+},{"./utils":5}],"./version":[function(require,module,exports){
+"use strict";
+module.exports = "1.0.0"
+},{}],1:[function(require,module,exports){
 "use strict";
 /**
  * Entry point for standalone autorunning linter
@@ -216,6 +274,7 @@ const Runner = require('./runner');
 const Logger = require('./logger');
 const tests = require('./tests');
 const utils = require('./utils');
+const version = require('./version');
 
 const Linter = module.exports = class AccessibilityLinter extends Runner {
   constructor(options) {
@@ -248,8 +307,9 @@ const Linter = module.exports = class AccessibilityLinter extends Runner {
 
 Linter.Logger = Logger;
 Linter.tests = tests;
+Linter.version = version;
 
-},{"./logger":3,"./runner":4,"./tests":"./tests","./utils":5}],3:[function(require,module,exports){
+},{"./logger":3,"./runner":4,"./tests":"./tests","./utils":5,"./version":"./version"}],3:[function(require,module,exports){
 "use strict";
 /* eslint-disable no-console */
 module.exports = class Logger {
@@ -396,7 +456,7 @@ exports.$ = function $(selector, context) {
 };
 
 exports.cssEscape = function cssEscape(name) {
-  return name.replace(/["\/]/g, '$&');
+  return name.replace(/["\\]/g, '\\$&');
 };
 
 /**
@@ -415,6 +475,6 @@ exports.observe = function mutationObserver(fn, root) {
   return observer;
 };
 
-},{}]},{},["./tests",1])(1)
+},{}]},{},["./tests","./version",1])(1)
 });
 //# sourceMappingURL=linter.js.map

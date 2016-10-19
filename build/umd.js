@@ -83,7 +83,7 @@
     while (cursor && cursor.lastElementChild) {
       cursor = cursor.lastElementChild;
     }
-    return cursor || el.parentElement;
+    return cursor;
   },
   filter(el) {
     let cursor = el;

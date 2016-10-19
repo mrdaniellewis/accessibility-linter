@@ -8,7 +8,6 @@ outputs errors to the JavaScript console.
 - linter
   - add integration tests using minified version
 - bookmarklet
-  - get minified working
   - better looking html
 - Documentation
   - correct section generation
