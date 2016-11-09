@@ -10,6 +10,7 @@ module.exports = {
     $: false,
     $$: false,
     cssEscape: false,
+    rules: false,
     // Globals for specs
     appendToBody: false,
     when: false,

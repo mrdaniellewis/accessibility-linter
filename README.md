@@ -53,11 +53,41 @@ outputs errors to the JavaScript console.
   - aria attribute names are valid
   - aria attribute values are valid
   - aria attributes are applied to allowed elements
-  - aria id lists point to valid elements
-  - aria attributes are correct for roles
+  - disabled
+  - required
+  - readonly
+  - hidden
+  - invalid
+- Element nesting rules
+- Text nesting rule
 ✓ All `<a>` elements link to a valid id or name (#top)
 - Do not use buttons as names
 - Colour contrast checker
 - Problem private use characters
+- no empty headings
+- buttons have labels
+- links have labels
+- exclude svg
+- must have title
+- must have lang
+- no submit / reset outside of forms
+- obsolete elements
+- obsolete attributes
 
+Useful references
+
+- https://medium.com/@jessebeach/beware-smushed-off-screen-accessible-text-5952a4c2cbfe#.4pkdrctuo
 - http://www.thesitewizard.com/webdesign/access-keys-are-useless.shtml
+- https://www.paciellogroup.com/blog/2016/10/a-not-so-short-note-on-aria-to-the-rescue/
+- https://www.w3.org/TR/html-aria/#docconformance
+- http://wps.pearsoned.com/WAI_ARIA_Testing/235/60309/15439152.cw/index.html
+
+Other conformance checkers
+
+- https://validator.w3.org/nu/
+
+Spec issues
+
+- no feed
+- no term - what happens to dl?
+- should address really be contentinfo

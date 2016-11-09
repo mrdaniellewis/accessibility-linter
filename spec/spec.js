@@ -300,7 +300,7 @@ describe('tests', () => {
   });
 
   testSpecs.forEach((spec, name) => {
-    let window, test, tests;
+    let window, test, tests, cleaner;
 
     // Make sure everything is setup using the iFrame versions
     describe(name, () => {
@@ -321,7 +321,15 @@ describe('tests', () => {
         const logger = context.logger = new TestLogger();
         const linter = context.linter = new window.AccessibilityLinter({ logger, tests });
         linter.observe();
+        cleaner = window.domCleaner();
       });
+
+      // Execute in a promise so it runs next tick after any dom mutations
+      afterEach(() => Promise.resolve().then(() => {
+        cleaner.stop();
+        cleaner.clean();
+        cleaner = null;
+      }));
 
       spec.call(context);
     });
