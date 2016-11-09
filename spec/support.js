@@ -9,41 +9,21 @@
 
       global,
 
-      additions: [],
-
       then(test) {
         this.test = test;
         return this.run.bind(this);
       },
 
-      cleanUp() {
-        this.additions.splice(0).forEach(el => el.remove());
-      },
-
       run() {
-        const promise = new Promise((resolve) => {
+        return new Promise((resolve) => {
           const observer = new MutationObserver((mutations) => {
             observer.disconnect();
-            mutations.forEach(
-              mutation => mutation.addedNodes.forEach(
-                node => this.additions.push(node)
-              )
-            );
             resolve(mutations);
           });
           observer.observe(global.document, { subtree: true, childList: true });
           this.setup();
-        });
-
-        return promise
-          .then(this.test)
-          .then(
-            () => this.cleanUp(),
-            (e) => {
-              this.cleanUp();
-              return Promise.reject(e);
-            }
-          );
+        })
+        .then(this.test);
       },
     };
   };
@@ -92,10 +72,31 @@
       return this;
     },
 
-    toGenerateErrorMessage(error) {
+    toGenerateErrorMessage(ob, error) {
       const test = this.actual;
-      const message = test.message;
-      expect(message).toEqual(error);
+      const expected = error || ob;
+      let message;
+      if (typeof test.message === 'function') {
+        message = test.message(ob.for);
+      } else {
+        message = test.message;
+      }
+      expect(message).toEqual(expected);
+      return this;
+    },
+
+    toEqualArray(array) {
+      try {
+        expect(this.actual).toEqual(array);
+      } catch (e) {
+        const missing = array.filter(item => !this.actual.includes(item));
+        const additional = this.actual.filter(item => !array.includes(item));
+        const parts = [
+          missing.length ? `to include ${JSON.stringify(missing)}` : null,
+          additional.length ? `not to include ${JSON.stringify(additional)}` : null,
+        ];
+        throw new Error(`Expected array ${parts.join(' and ')}`);
+      }
       return this;
     },
   });
