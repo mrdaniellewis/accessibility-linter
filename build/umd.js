@@ -7,7 +7,7 @@
       [
         "alt",
         Object.assign(
-          { name: "alt", doc: "alt" },
+          { name: "alt" },
           {
   message: 'missing alt attribute',
   selector: 'img:not([alt])',
@@ -16,7 +16,7 @@
       ],[
         "aria/roles",
         Object.assign(
-          { name: "aria/roles", doc: undefined },
+          { name: "aria/roles" },
           {
   message(el) {
     const rule = rules.match(el);
@@ -40,7 +40,7 @@
       ],[
         "fieldset/checkbox-groups-in-fieldset",
         Object.assign(
-          { name: "fieldset/checkbox-groups-in-fieldset", doc: "fieldset" },
+          { name: "fieldset/checkbox-groups-in-fieldset" },
           {
   message: 'All checkbox groups must be within a fieldset',
   selector: 'input[type=checkbox]',
@@ -64,7 +64,7 @@
       ],[
         "fieldset/fieldset-has-legend",
         Object.assign(
-          { name: "fieldset/fieldset-has-legend", doc: "fieldset" },
+          { name: "fieldset/fieldset-has-legend" },
           {
   message: 'All fieldsets must have a legend',
   selector: 'fieldset',
@@ -77,7 +77,7 @@
       ],[
         "fieldset/legend-has-fieldset",
         Object.assign(
-          { name: "fieldset/legend-has-fieldset", doc: "fieldset" },
+          { name: "fieldset/legend-has-fieldset" },
           {
   message: 'All legends must be the first child of a fieldset',
   selector: ':not(fieldset)>legend,fieldset>legend:not(:first-child)',
@@ -86,7 +86,7 @@
       ],[
         "fieldset/radios-in-fieldset",
         Object.assign(
-          { name: "fieldset/radios-in-fieldset", doc: "fieldset" },
+          { name: "fieldset/radios-in-fieldset" },
           {
   message: 'All radio inputs must be within a fieldset',
   selector: 'input[type=radio]',
@@ -96,7 +96,7 @@
       ],[
         "headings",
         Object.assign(
-          { name: "headings", doc: undefined },
+          { name: "headings" },
           {
   message: 'Headings must be nested correctly',
   selector: 'h2,h3,h4,h5,h6',
@@ -124,7 +124,7 @@
       ],[
         "label/inputs-are-labelled",
         Object.assign(
-          { name: "label/inputs-are-labelled", doc: "label-inputs-are-labelled" },
+          { name: "label/inputs-are-labelled" },
           {
   message: 'all form elements must have a label',
   selector: 'input,select,textarea',
@@ -159,7 +159,7 @@
       ],[
         "label/labels-have-inputs",
         Object.assign(
-          { name: "label/labels-have-inputs", doc: "label" },
+          { name: "label/labels-have-inputs" },
           {
   message: 'all labels must be linked to a control',
   selector: 'label',
@@ -169,7 +169,7 @@
       ],[
         "list-id",
         Object.assign(
-          { name: "list-id", doc: undefined },
+          { name: "list-id" },
           {
   message: 'no datalist found',
   selector: 'input[list]',
@@ -182,7 +182,7 @@
       ],[
         "no-duplicate-anchor-names",
         Object.assign(
-          { name: "no-duplicate-anchor-names", doc: undefined },
+          { name: "no-duplicate-anchor-names" },
           {
   message: 'Name is not unique',
   selector: 'a[name]',
@@ -195,7 +195,7 @@
       ],[
         "no-empty-select",
         Object.assign(
-          { name: "no-empty-select", doc: undefined },
+          { name: "no-empty-select" },
           {
   message: 'Selects should have options',
   selector: 'select',
@@ -205,7 +205,7 @@
       ],[
         "no-links-to-missing-fragments",
         Object.assign(
-          { name: "no-links-to-missing-fragments", doc: undefined },
+          { name: "no-links-to-missing-fragments" },
           {
   message: 'Fragment not found in document',
   selector: 'a[href*="#"]',
@@ -224,7 +224,7 @@
       ],[
         "no-multiple-select",
         Object.assign(
-          { name: "no-multiple-select", doc: undefined },
+          { name: "no-multiple-select" },
           {
   message: 'Do not use multiple selects',
   selector: 'select[multiple]',
@@ -233,7 +233,7 @@
       ],[
         "no-outside-controls",
         Object.assign(
-          { name: "no-outside-controls", doc: undefined },
+          { name: "no-outside-controls" },
           {
   message: 'All controls should be within a form',
   selector: 'input,textarea,select',
@@ -243,7 +243,7 @@
       ],[
         "no-reset",
         Object.assign(
-          { name: "no-reset", doc: undefined },
+          { name: "no-reset" },
           {
   message: 'Do not use reset buttons',
   selector: 'input[type=reset],button[type=reset]',
@@ -252,7 +252,7 @@
       ],[
         "unique-id",
         Object.assign(
-          { name: "unique-id", doc: undefined },
+          { name: "unique-id" },
           {
   message: 'id is not unique',
   selector: '[id]',
