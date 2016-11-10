@@ -12,6 +12,25 @@
     "prefer-rest-params": 0,
     "prefer-spread": 0,
     "no-cond-assign": ["error", "except-parens"],
-    "no-plusplus": 0
+    "no-plusplus": 0,
+    "indent": ["error", 2, {
+      "SwitchCase": 1,
+      "VariableDeclarator": 1,
+      "outerIIFEBody": 1,
+      "FunctionDeclaration": {
+        "parameters": "first"
+      },
+      "FunctionExpression": {
+        "parameters": "first"
+      },
+      "CallExpression": {
+        "parameters": "first"
+      }
+    }],
+    "comma-dangle": ["error", {
+      "arrays": "always-multiline",
+      "objects": "always-multiline",
+      "functions": "never"
+    }]
   }
 }
