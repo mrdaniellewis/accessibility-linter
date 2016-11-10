@@ -108,8 +108,10 @@ describe('rules', () => {
       const el = build('<a href="#" />');
       expect(match(el)).toEqual({
         implicitRoles: ['link'],
-        allowedRoles: ['button', 'checkbox', 'menuitem', 'menuitemcheckbox',
-                       'menuitemradio', 'radio', 'tab', 'switch', 'treeitem'],
+        allowedRoles: [
+          'button', 'checkbox', 'menuitem', 'menuitemcheckbox',
+          'menuitemradio', 'radio', 'tab', 'switch', 'treeitem',
+        ],
       });
     });
 
@@ -933,8 +935,10 @@ describe('rules', () => {
       const el = build('<section />');
       expect(match(el)).toEqual({
         implicitRoles: ['region'],
-        allowedRoles: ['alert', 'alertdialog', 'application', 'banner', 'complementary', 'contentinfo',
-                       'dialog', 'document', 'log', 'main', 'marquee', 'navigation', 'search', 'status'],
+        allowedRoles: [
+          'alert', 'alertdialog', 'application', 'banner', 'complementary', 'contentinfo',
+          'dialog', 'document', 'log', 'main', 'marquee', 'navigation', 'search', 'status',
+        ],
       });
     });
 
@@ -1050,9 +1054,10 @@ describe('rules', () => {
       });
     });
 
-    ['em', 'strong', 'small', 's', 'cite', 'q', 'dfn', 'abbr', 'time',
-     'code', 'var', 'samp', 'kbd', 'sub', 'sup', 'i', 'b', 'u', 'mark',
-     'ruby', 'rt', 'rp', 'bdi', 'bdo', 'br', 'wbr',
+    [
+      'em', 'strong', 'small', 's', 'cite', 'q', 'dfn', 'abbr', 'time',
+      'code', 'var', 'samp', 'kbd', 'sub', 'sup', 'i', 'b', 'u', 'mark',
+      'ruby', 'rt', 'rp', 'bdi', 'bdo', 'br', 'wbr',
     ].forEach((name) => {
       it(name, () => {
         const el = build(`<${name} />`);
@@ -1091,8 +1096,10 @@ describe('rules', () => {
       const el = build('<ul />');
       expect(match(el)).toEqual({
         implicitRoles: ['list'],
-        allowedRoles: ['directory', 'group', 'listbox', 'menu', 'menubar', 'tablist',
-                       'toolbar', 'tree', 'presentation'],
+        allowedRoles: [
+          'directory', 'group', 'listbox', 'menu', 'menubar', 'tablist',
+          'toolbar', 'tree', 'presentation',
+        ],
       });
     });
 

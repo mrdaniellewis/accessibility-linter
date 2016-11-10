@@ -23,9 +23,9 @@
   "devDependencies": {
     "browserify": "^13.1.0",
     "escape-html": "^1.0.3",
-    "eslint": "^3.7.1",
-    "eslint-config-airbnb-base": "^8.0.0",
-    "eslint-plugin-import": "^2.0.1",
+    "eslint": "^3.9.1",
+    "eslint-config-airbnb-base": "^10.0.1",
+    "eslint-plugin-import": "^2.2.0",
     "exorcist": "^0.4.0",
     "expect": "^1.20.2",
     "highlight.js": "^9.7.0",
@@ -33,7 +33,7 @@
     "marked": "^0.3.6",
     "mocha": "^3.0.2",
     "strictify": "^0.2.0",
-    "uglify-js-harmony": "^2.6.2",
+    "uglify-js": "https://github.com/mishoo/UglifyJS2#harmony",
     "watch": "^1.0.1"
   }
 }

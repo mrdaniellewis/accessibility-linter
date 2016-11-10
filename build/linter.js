@@ -1,4 +1,4 @@
-(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.AccessibilityLinter = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"./tests":[function(require,module,exports){
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.accessibilityLinter = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"./tests":[function(require,module,exports){
 "use strict";
 
     const { $, $$, cssEscape } = require('./utils');
@@ -262,7 +262,7 @@
       ]
     ]);
   
-},{"./rules":5,"./utils":7}],"./version":[function(require,module,exports){
+},{"./rules":6,"./utils":8}],"./version":[function(require,module,exports){
 "use strict";
 module.exports = "1.0.0"
 },{}],1:[function(require,module,exports){
@@ -459,6 +459,32 @@ exports.properties = properties;
 
 },{}],2:[function(require,module,exports){
 "use strict";
+/**
+ * Entry point for standalone autorunning linter
+ */
+const Linter = require('./linter');
+
+const config = window.accessibilityLinterConfig || {};
+const scriptElement = document.currentScript;
+if (scriptElement) {
+  eval(`!function(){${scriptElement.textContent}}()`); // eslint-disable-line no-eval
+  if (!('whitelist' in config)) {
+    config.whitelist = scriptElement.dataset.whitelist;
+  }
+}
+
+const linter = new Linter(config);
+if (/^(:?interactive|complete)$/.test(document.readyState)) {
+  // Document already loaded
+  linter.observe();
+} else {
+  document.addEventListener('DOMContentLoaded', () => linter.observe());
+}
+
+module.exports = linter;
+
+},{"./linter":3}],3:[function(require,module,exports){
+"use strict";
 const Runner = require('./runner');
 const Logger = require('./logger');
 const tests = require('./tests');
@@ -500,7 +526,7 @@ Linter.tests = tests;
 Linter.version = version;
 Linter.rules = rules;
 
-},{"./logger":3,"./rules":5,"./runner":6,"./tests":"./tests","./utils":7,"./version":"./version"}],3:[function(require,module,exports){
+},{"./logger":4,"./rules":6,"./runner":7,"./tests":"./tests","./utils":8,"./version":"./version"}],4:[function(require,module,exports){
 "use strict";
 /* eslint-disable no-console */
 module.exports = class Logger {
@@ -533,7 +559,7 @@ module.exports = class Logger {
   }
 };
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 "use strict";
 /**
  * Rules for what an element allows
@@ -975,7 +1001,7 @@ exports.rules = {
   }),
 };
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 "use strict";
 /**
  * Rules engine for aria conformance
@@ -1017,7 +1043,7 @@ exports.match = function match(el) {
 
 exports.roles = allRoles;
 
-},{"./aria-rules":1,"./role-rules":4}],6:[function(require,module,exports){
+},{"./aria-rules":1,"./role-rules":5}],7:[function(require,module,exports){
 "use strict";
 const { $$ } = require('./utils');
 
@@ -1110,7 +1136,7 @@ module.exports = class Runner {
   }
 };
 
-},{"./utils":7}],7:[function(require,module,exports){
+},{"./utils":8}],8:[function(require,module,exports){
 "use strict";
 /**
  * Find DOM nodes from a selector.  The found node can include the supplied context
@@ -1152,4 +1178,4 @@ exports.observe = function mutationObserver(fn, root) {
 
 },{}]},{},["./tests","./version",2])(2)
 });
-//# sourceMappingURL=umd.js.map
+//# sourceMappingURL=linter.js.map
