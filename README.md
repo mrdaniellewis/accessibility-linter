@@ -3,28 +3,24 @@
 Runs accessibility tests against the current web page and
 outputs errors to the JavaScript console.
 
-## Roadmap
+## Todo
 
+- write more readme
 - config
   - can turn rules off
   - can turn all rules off
   - can add additional rules
 - improve bookmarklet presentation
-- remote bookmarklet
 - integration test
-- add additional basic rules
-- exclude svg
-- deploy to github
+- exclude svg children from tests
+- integrate instanbul for code coverage:
+  https://blog.engineyard.com/2015/measuring-clientside-javascript-test-coverage-with-istanbul
+- integrate karma for browser coverage
+- highlight option
+- screenreader transcript
+- remove code duplication in build process
 
-- future
-  - integrate instanbul for code coverage:
-    https://blog.engineyard.com/2015/measuring-clientside-javascript-test-coverage-with-istanbul
-  - integrate karma for browser coverage
-  - highlight option
-  - screenreader transcript
-  - remove code duplication in build process
-
-### List of tests to create
+## List of tests to create
 
 - aria
   - aria attribute names are valid
@@ -46,10 +42,8 @@ outputs errors to the JavaScript console.
 - no unknown elements
 - no obsolete elements
 - no obsolete attributes
-
-- future rules
-  - problem private use characters
-  - colour contrast checker
+- problem private use characters?
+- colour contrast checker
 
 Useful references
 
@@ -63,8 +57,3 @@ Other conformance checkers
 
 - https://validator.w3.org/nu/
 
-Spec issues
-
-- no feed
-- no term - what happens to dl?
-- should address really be contentinfo
