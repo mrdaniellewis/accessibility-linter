@@ -5,6 +5,7 @@
   "main": "lib/index.js",
   "scripts": {
     "lint": "eslint . --ext .js",
+    "mkbuild": "mkdir -p build",
     "clean": "rm -f build/*",
     "build:standalone": "node lib/build/standalone | exorcist build/linter.js.map > build/linter.js",
     "uglify:standalone": "uglifyjs build/linter.js > build/linter.min.js",
@@ -14,7 +15,8 @@
     "build:specs": "node lib/build/specs > spec/test-specs.js",
     "build:dev": "npm run build:umd && npm run build:specs",
     "build:all": "npm run build:standalone && npm run build:umd && npm run build:specs",
-    "prebuild": "npm run clean; npm run lint",
+    "gh-pages": "npm run build && echo \"!**\" >> build/.gitignore && git subtree push --prefix build origin/gh-pages && rm build/.gitignore",
+    "prebuild": "npm run mkbuild && npm run clean && npm run lint",
     "build": "npm run build:all && npm run uglify:standalone && npm run build:bookmarklet && npm run uglify:umd",
     "watch": "watch 'npm run build:dev' lib tests"
   },
