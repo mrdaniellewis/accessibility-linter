@@ -11,13 +11,24 @@
 
   window.build = html => $(html)[0];
 
-  window.domCleaner = function () {
+  window.domCleaner = function ({ exclude } = {}) {
     const additions = [];
     const observer = new MutationObserver((mutations) => {
       mutations.forEach(
-        mutation => mutation.addedNodes.forEach(
-          node => additions.push(node)
-        )
+        mutation => Array.from(mutation.addedNodes)
+          .filter((node) => {
+            if (!exclude) {
+              return true;
+            }
+            if (node.nodeType === Node.ELEMENT_NODE) {
+              return !node.matches(exclude);
+            }
+            if (node.parentNode) {
+              return !node.parentNode.matches(exclude);
+            }
+            return true;
+          })
+          .forEach(node => additions.push(node))
       );
     });
 
