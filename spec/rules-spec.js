@@ -85,7 +85,7 @@ describe('rules', () => {
     let cleaner;
 
     before(() => {
-      cleaner = domCleaner();
+      cleaner = domCleaner({ exclude: '#mocha *' });
     });
 
     afterEach(() => {
