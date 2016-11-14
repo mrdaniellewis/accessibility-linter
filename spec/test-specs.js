@@ -458,6 +458,79 @@
       },
     ],
     [
+      "label/buttons-have-labels",
+      function() {
+        let el, el2, test, logger, linter, window, document, $, appendToBody, location;
+        const when = fn => this.when(fn, this);
+
+        before(() => {
+          ({ window, document, window: { $, appendToBody, location } } = this);
+        });
+
+        beforeEach(() => {
+          ({test, logger, linter} = this);
+        });
+
+        afterEach(() => {
+          el = el2 = test = logger = linter = null;
+        });
+
+        it('generates the expected error message', () => {
+          expect(test).toGenerateErrorMessage('buttons must have a label');
+        });
+
+        it('does not add an error if a button has a text label', when(() => {
+          appendToBody('<button>text</button>');
+        }).then(() => {
+          expect(logger).toNotHaveEntries();
+        }));
+
+        it('does not add an error if a button has a non-empty aria-label', when(() => {
+          appendToBody('<button aria-label="label" />');
+        }).then(() => {
+          expect(logger).toNotHaveEntries();
+        }));
+
+        it('does not add an error if a button has a non-empty aria-labelledby', when(() => {
+          const id = uniqueId();
+          appendToBody(`<span id="${id}">label</span>`);
+          appendToBody(`<button aria-labelledby="${id}" />`);
+        }).then(() => {
+          expect(logger).toNotHaveEntries();
+        }));
+
+        it('does not add an error if a button has non-empty multiple aria-labelledby', when(() => {
+          const id1 = uniqueId();
+          const id2 = uniqueId();
+          appendToBody(`<span id="${id1}">label</span>`);
+          appendToBody(`<span id="${id2}">label</span>`);
+          appendToBody(`<button aria-labelledby="${id1} ${id2}" />`);
+        }).then(() => {
+          expect(logger).toNotHaveEntries();
+        }));
+
+        it('adds an error if a button has no label of any kind', when(() => {
+          el = appendToBody('<button />');
+        }).then(() => {
+          expect(logger).toHaveEntries([test, el]);
+        }));
+
+        it('adds an error if a button has an empty aria-label', when(() => {
+          el = appendToBody('<button aria-label="">label</button>');
+        }).then(() => {
+          expect(logger).toHaveEntries([test, el]);
+        }));
+
+        it('adds an error if a button has an empty aria-labelledby', when(() => {
+          const id = uniqueId();
+          appendToBody(`<span id="${id}"></span>`);
+          el = appendToBody(`<button aria-label="label" aria-labelledby="${id}">label</button>`);
+        }).then(() => {
+          expect(logger).toHaveEntries([test, el]);
+        }));
+      },
+    ],
+    [
       "label/inputs-are-labelled",
       function() {
         let el, el2, test, logger, linter, window, document, $, appendToBody, location;
@@ -623,6 +696,79 @@
           el = appendToBody(`<label for="${id}"><input id="${id}">`);
         }).then(() => {
           expect(logger).toNotHaveEntries();
+        }));
+      },
+    ],
+    [
+      "label/links-have-labels",
+      function() {
+        let el, el2, test, logger, linter, window, document, $, appendToBody, location;
+        const when = fn => this.when(fn, this);
+
+        before(() => {
+          ({ window, document, window: { $, appendToBody, location } } = this);
+        });
+
+        beforeEach(() => {
+          ({test, logger, linter} = this);
+        });
+
+        afterEach(() => {
+          el = el2 = test = logger = linter = null;
+        });
+
+        it('generates the expected error message', () => {
+          expect(test).toGenerateErrorMessage('links must have a label');
+        });
+
+        it('does not add an error if a button has a text label', when(() => {
+          appendToBody('<a>text</a>');
+        }).then(() => {
+          expect(logger).toNotHaveEntries();
+        }));
+
+        it('does not add an error if a button has a non-empty aria-label', when(() => {
+          appendToBody('<a aria-label="label" />');
+        }).then(() => {
+          expect(logger).toNotHaveEntries();
+        }));
+
+        it('does not add an error if a button has a non-empty aria-labelledby', when(() => {
+          const id = uniqueId();
+          appendToBody(`<span id="${id}">label</span>`);
+          appendToBody(`<a aria-labelledby="${id}" />`);
+        }).then(() => {
+          expect(logger).toNotHaveEntries();
+        }));
+
+        it('does not add an error if a button has non-empty multiple aria-labelledby', when(() => {
+          const id1 = uniqueId();
+          const id2 = uniqueId();
+          appendToBody(`<span id="${id1}">label</span>`);
+          appendToBody(`<span id="${id2}">label</span>`);
+          appendToBody(`<a aria-labelledby="${id1} ${id2}" />`);
+        }).then(() => {
+          expect(logger).toNotHaveEntries();
+        }));
+
+        it('adds an error if a button has no label of any kind', when(() => {
+          el = appendToBody('<a />');
+        }).then(() => {
+          expect(logger).toHaveEntries([test, el]);
+        }));
+
+        it('adds an error if a button has an empty aria-label', when(() => {
+          el = appendToBody('<a aria-label="">label</a>');
+        }).then(() => {
+          expect(logger).toHaveEntries([test, el]);
+        }));
+
+        it('adds an error if a button has an empty aria-labelledby', when(() => {
+          const id = uniqueId();
+          appendToBody(`<span id="${id}"></span>`);
+          el = appendToBody(`<a aria-label="label" aria-labelledby="${id}">label</a>`);
+        }).then(() => {
+          expect(logger).toHaveEntries([test, el]);
         }));
       },
     ],
