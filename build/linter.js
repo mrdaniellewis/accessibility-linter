@@ -300,6 +300,18 @@
 }
         ),
       ],[
+        "title",
+        Object.assign(
+          { name: "title" },
+          {
+  message: 'document must have a title',
+  selector: 'html',
+  filter() {
+    return document.title.trim();
+  },
+}
+        ),
+      ],[
         "unique-id",
         Object.assign(
           { name: "unique-id" },
@@ -314,7 +326,7 @@
   
 },{"./rules":6,"./utils":8}],"./version":[function(require,module,exports){
 "use strict";
-module.exports = "1.0.0"
+module.exports = "1.1.0"
 },{}],1:[function(require,module,exports){
 "use strict";
 /**
@@ -524,11 +536,16 @@ if (scriptElement) {
 }
 
 const linter = new Linter(config);
+const start = () => {
+  linter.run();
+  linter.observe();
+};
+
 if (/^(:?interactive|complete)$/.test(document.readyState)) {
   // Document already loaded
-  linter.observe();
+  start();
 } else {
-  document.addEventListener('DOMContentLoaded', () => linter.observe());
+  document.addEventListener('DOMContentLoaded', start);
 }
 
 module.exports = linter;
@@ -556,7 +573,6 @@ const Linter = module.exports = class AccessibilityLinter extends Runner {
    * Start looking for issues
    */
   observe() {
-    this.run(this.root);
     this.observer = utils.observe(this.run.bind(this), this.root);
   }
 

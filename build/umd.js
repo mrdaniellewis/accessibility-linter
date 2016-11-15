@@ -300,6 +300,18 @@
 }
         ),
       ],[
+        "title",
+        Object.assign(
+          { name: "title" },
+          {
+  message: 'document must have a title',
+  selector: 'html',
+  filter() {
+    return document.title.trim();
+  },
+}
+        ),
+      ],[
         "unique-id",
         Object.assign(
           { name: "unique-id" },
@@ -314,7 +326,7 @@
   
 },{"./rules":5,"./utils":7}],"./version":[function(require,module,exports){
 "use strict";
-module.exports = "1.0.0"
+module.exports = "1.1.0"
 },{}],1:[function(require,module,exports){
 "use strict";
 /**
@@ -530,7 +542,6 @@ const Linter = module.exports = class AccessibilityLinter extends Runner {
    * Start looking for issues
    */
   observe() {
-    this.run(this.root);
     this.observer = utils.observe(this.run.bind(this), this.root);
   }
 
