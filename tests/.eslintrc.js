@@ -18,6 +18,7 @@ module.exports = {
     el: true,
     el2: true,
     uniqueId: false,
+    linter: false,
   },
   rules: {
     'no-unused-expressions': 0,
