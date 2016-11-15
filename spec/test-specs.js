@@ -1130,6 +1130,40 @@
       },
     ],
     [
+      "title",
+      function() {
+        let el, el2, test, logger, linter, window, document, $, appendToBody, location;
+        const when = fn => this.when(fn, this);
+
+        before(() => {
+          ({ window, document, window: { $, appendToBody, location } } = this);
+        });
+
+        beforeEach(() => {
+          ({test, logger, linter} = this);
+        });
+
+        afterEach(() => {
+          el = el2 = test = logger = linter = null;
+        });
+
+        it('generates the expected error message', () => {
+          expect(test).toGenerateErrorMessage('document must have a title');
+        });
+
+        it('it adds an error if the document has an empty title', () => {
+          linter.run(document);
+          expect(logger).toHaveEntries([test, $('html')[0]]);
+        });
+
+        it('it does not add an error if the document has a title', when(() => {
+          document.title = 'title';
+        }).then(() => {
+          expect(logger).toNotHaveEntries();
+        }));
+      },
+    ],
+    [
       "unique-id",
       function() {
         let el, el2, test, logger, linter, window, document, $, appendToBody, location;
