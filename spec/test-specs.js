@@ -909,6 +909,41 @@
       },
     ],
     [
+      "no-button-without-type",
+      function() {
+        let el, el2, test, logger, linter, window, document, $, appendToBody, location;
+        const when = fn => this.when(fn, this);
+
+        before(() => {
+          ({ window, document, window: { $, appendToBody, location } } = this);
+        });
+
+        beforeEach(() => {
+          ({test, logger, linter} = this);
+        });
+
+        afterEach(() => {
+          el = el2 = test = logger = linter = null;
+        });
+
+        it('generates the expected error message', () => {
+          expect(test).toGenerateErrorMessage('all buttons should have a type attribute');
+        });
+
+        it('does not generate an error message with a type attribute', when(() => {
+          appendToBody('<button type="button" />');
+        }).then(() => {
+          expect(logger).toNotHaveEntries();
+        }));
+
+        it('generates an error message without a type attribute', when(() => {
+          el = appendToBody('<button />');
+        }).then(() => {
+          expect(logger).toHaveEntries([test, el]);
+        }));
+      },
+    ],
+    [
       "no-duplicate-anchor-names",
       function() {
         let el, el2, test, logger, linter, window, document, $, appendToBody, location;
