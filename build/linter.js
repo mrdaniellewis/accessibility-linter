@@ -8,16 +8,16 @@
         "alt",
         Object.assign(
           { name: "alt" },
-          {
+          ({
   message: 'missing alt attribute',
   selector: 'img:not([alt])',
-}
+})
         ),
       ],[
         "aria/roles",
         Object.assign(
           { name: "aria/roles" },
-          {
+          ({
   message(el) {
     const rule = rules.match(el);
     const role = el.getAttribute('role');
@@ -35,69 +35,60 @@
     const role = el.getAttribute('role');
     return rule.allowedRoles.includes(role);
   },
-}
-        ),
-      ],[
-        "fieldset/checkbox-groups-in-fieldset",
-        Object.assign(
-          { name: "fieldset/checkbox-groups-in-fieldset" },
-          {
-  message: 'All checkbox groups must be within a fieldset',
-  selector: 'input[type=checkbox]',
-  filter: (el) => {
-    if (!el.name) {
-      return true;
-    }
-
-    if (el.form && !(el.form.elements[el.name] instanceof NodeList)) {
-      return true;
-    }
-
-    if (!el.form && $$(`input[type=checkbox][name="${cssEscape(el.name)}"]`).filter(elm => !elm.form).length === 1) {
-      return true;
-    }
-
-    return el.closest('fieldset');
-  },
-}
+})
         ),
       ],[
         "fieldset/fieldset-has-legend",
         Object.assign(
           { name: "fieldset/fieldset-has-legend" },
-          {
+          ({
   message: 'All fieldsets must have a legend',
   selector: 'fieldset',
   filter: (el) => {
     const first = el.firstElementChild;
     return first && first.matches('legend') && first.textContent.trim();
   },
-}
+})
         ),
       ],[
         "fieldset/legend-has-fieldset",
         Object.assign(
           { name: "fieldset/legend-has-fieldset" },
-          {
+          ({
   message: 'All legends must be the first child of a fieldset',
   selector: ':not(fieldset)>legend,fieldset>legend:not(:first-child)',
-}
+})
         ),
       ],[
-        "fieldset/radios-in-fieldset",
+        "fieldset/multiple-in-fieldset",
         Object.assign(
-          { name: "fieldset/radios-in-fieldset" },
-          {
-  message: 'All radio inputs must be within a fieldset',
-  selector: 'input[type=radio]',
-  filter: el => el.closest('fieldset'),
-}
+          { name: "fieldset/multiple-in-fieldset" },
+          ({
+  message: 'Multiple inputs with the same name should be in a fieldset',
+  selector: 'input[name]:not([type=hidden]),textarea[name],select[name]',
+  filter: (el) => {
+    let group;
+
+    if (el.form) {
+      const elements = el.form.elements[el.name];
+      if (elements instanceof Node) {
+        return true;
+      }
+      group = Array.from(elements).filter(elm => elm.type !== 'hidden');
+    } else {
+      const namePart = `[name="${cssEscape(el.name)}"]`;
+      group = $$(`input${namePart}:not([type=hidden]),textarea${namePart},select${namePart}`).filter(elm => !elm.form);
+    }
+
+    return group.length === 1 || el.closest('fieldset');
+  },
+})
         ),
       ],[
         "headings",
         Object.assign(
           { name: "headings" },
-          {
+          ({
   message: 'Headings must be nested correctly',
   selector: 'h2,h3,h4,h5,h6',
   allowed: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
@@ -119,13 +110,13 @@
     } while (cursor);
     return false;
   },
-}
+})
         ),
       ],[
         "label/buttons-have-labels",
         Object.assign(
           { name: "label/buttons-have-labels" },
-          {
+          ({
   message: 'buttons must have a label',
   selector: 'button',
   filter(el) {
@@ -144,13 +135,13 @@
 
     return text.trim();
   },
-}
+})
         ),
       ],[
         "label/inputs-are-labelled",
         Object.assign(
           { name: "label/inputs-are-labelled" },
-          {
+          ({
   message: 'all form elements must have a label',
   selector: 'input,select,textarea',
   filter(el) {
@@ -179,23 +170,23 @@
 
     return label && label.textContent.trim();
   },
-}
+})
         ),
       ],[
         "label/labels-have-inputs",
         Object.assign(
           { name: "label/labels-have-inputs" },
-          {
+          ({
   message: 'all labels must be linked to a control',
   selector: 'label',
   filter: el => el.htmlFor && document.getElementById(el.htmlFor),
-}
+})
         ),
       ],[
         "label/links-have-labels",
         Object.assign(
           { name: "label/links-have-labels" },
-          {
+          ({
   message: 'links must have a label',
   selector: 'a',
   filter(el) {
@@ -214,49 +205,64 @@
 
     return text.trim();
   },
-}
+})
+        ),
+      ],[
+        "lang",
+        Object.assign(
+          { name: "lang" },
+          // Language tags are defined in http://www.ietf.org/rfc/bcp/bcp47.txt
+// This regular expression ignores reserved parts, irregular codes, extensions and private use
+({
+  message: el => (el.lang ? 'language code is invalid' : 'missing lang attribute'),
+  selector: 'html',
+  match: /^((en-gb-oed)|([a-z]{2,3}(-[a-z]{3})?(-[a-z]{4})?(-[a-z]{2}|-\d{3})?(-[a-z0-9]{5,8}|-(\d[a-z0-9]{3}))*))$/i,
+  filter(el) {
+    return this.match.test(el.lang);
+  },
+})
         ),
       ],[
         "list-id",
         Object.assign(
           { name: "list-id" },
-          {
+          ({
   message: 'no datalist found',
   selector: 'input[list]',
   filter(el) {
     const listId = el.getAttribute('list');
     return listId && $(`datalist[id="${cssEscape(listId)}"]`);
   },
-}
+})
         ),
       ],[
         "no-duplicate-anchor-names",
         Object.assign(
           { name: "no-duplicate-anchor-names" },
-          {
+          ({
   message: 'Name is not unique',
   selector: 'a[name]',
   filter(el) {
     const id = cssEscape(el.name);
     return id && $$(`a[name="${id}"],[id="${id}"]`).length === 1;
   },
-}
+})
         ),
       ],[
         "no-empty-select",
         Object.assign(
           { name: "no-empty-select" },
-          {
+          ({
   message: 'Selects should have options',
   selector: 'select',
   filter: el => $$('option', el).length,
-}
+})
         ),
       ],[
         "no-links-to-missing-fragments",
         Object.assign(
           { name: "no-links-to-missing-fragments" },
-          {
+          ({
   message: 'Fragment not found in document',
   selector: 'a[href*="#"]',
   removeHash(ob) {
@@ -269,64 +275,64 @@
     const id = cssEscape(decodeURI(el.hash.slice(1)));
     return $(`[id="${id}"],a[name="${id}"]`);
   },
-}
+})
         ),
       ],[
         "no-multiple-select",
         Object.assign(
           { name: "no-multiple-select" },
-          {
+          ({
   message: 'Do not use multiple selects',
   selector: 'select[multiple]',
-}
+})
         ),
       ],[
         "no-outside-controls",
         Object.assign(
           { name: "no-outside-controls" },
-          {
+          ({
   message: 'All controls should be within a form',
   selector: 'input,textarea,select',
   filter: el => el.form,
-}
+})
         ),
       ],[
         "no-reset",
         Object.assign(
           { name: "no-reset" },
-          {
+          ({
   message: 'Do not use reset buttons',
   selector: 'input[type=reset],button[type=reset]',
-}
+})
         ),
       ],[
         "title",
         Object.assign(
           { name: "title" },
-          {
+          ({
   message: 'document must have a title',
   selector: 'html',
   filter() {
     return document.title.trim();
   },
-}
+})
         ),
       ],[
         "unique-id",
         Object.assign(
           { name: "unique-id" },
-          {
+          ({
   message: 'id is not unique',
   selector: '[id]',
   filter: el => !el.id || $$(`[id="${cssEscape(el.id)}"]`).length === 1,
-}
+})
         ),
       ]
     ]);
   
 },{"./rules":6,"./utils":8}],"./version":[function(require,module,exports){
 "use strict";
-module.exports = "1.1.0"
+module.exports = "1.2.0"
 },{}],1:[function(require,module,exports){
 "use strict";
 /**
