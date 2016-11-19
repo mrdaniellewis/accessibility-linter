@@ -12,13 +12,13 @@
     "build:bookmarklet": "cat build/linter.min.js | node lib/build/bookmarklet.js > build/bookmarklet.htm",
     "build:umd": "node lib/build/umd | exorcist build/umd.js.map > build/umd.js",
     "uglify:umd": "uglifyjs build/umd.js > build/umd.min.js",
-    "build:specs": "node lib/build/specs > spec/test-specs.js",
+    "build:specs": "node lib/build/specs > spec/rule-specs.js",
     "build:dev": "npm run mkbuild && npm run build:umd && npm run build:specs",
     "build:all": "npm run build:standalone && npm run build:umd && npm run build:specs",
     "gh-pages": "git checkout gh-pages && git merge master -X theirs && npm run build && echo \"!**\" > build/.gitignore && git add -A && git commit -m \"merge master and latest build\" && git push && git checkout master",
     "prebuild": "npm run mkbuild && npm run clean && npm run lint",
     "build": "npm run build:all && npm run uglify:standalone && npm run build:bookmarklet && npm run uglify:umd",
-    "watch": "watch 'npm run build:dev' lib tests"
+    "watch": "watch 'npm run build:dev' lib rules"
   },
   "author": "Daniel Lewis",
   "license": "ISC",
