@@ -73,13 +73,13 @@
     },
 
     toGenerateErrorMessage(ob, error) {
-      const test = this.actual;
+      const rule = this.actual;
       const expected = error || ob;
       let message;
-      if (typeof test.message === 'function') {
-        message = test.message(ob.for);
+      if (typeof rule.message === 'function') {
+        message = rule.message(ob.for);
       } else {
-        message = test.message;
+        message = rule.message;
       }
       expect(message).toEqual(expected);
       return this;

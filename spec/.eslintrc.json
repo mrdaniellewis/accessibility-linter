@@ -8,7 +8,7 @@
     "when": false,
     "AccessibilityLinter": false,
     "TestLogger": false,
-    "testSpecs": false,
+    "ruleSpecs": false,
     "appendToBody": false,
     "domCleaner": false,
     "build": false
