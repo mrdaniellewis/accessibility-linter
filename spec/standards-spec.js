@@ -71,17 +71,17 @@ describe('standards', () => {
   ];
 
   it('is a property of AccessibilityLinter', () => {
-    expect(AccessibilityLinter.elementRules).toExist();
+    expect(AccessibilityLinter.standards).toExist();
   });
 
-  describe('#allRoles', () => {
+  describe('#aria.roles', () => {
     it('is a list of all possible roles', () => {
-      expect(AccessibilityLinter.elementRules.roles).toEqualArray(allRoles);
+      expect(AccessibilityLinter.standards.aria.roles).toEqualArray(allRoles);
     });
   });
 
-  describe('#match has the expected return for', () => {
-    const match = el => AccessibilityLinter.elementRules.match(el);
+  describe('#aria.match has the expected return for', () => {
+    const match = el => AccessibilityLinter.standards.aria.match(el);
     let cleaner;
 
     before(() => {
