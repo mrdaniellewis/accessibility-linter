@@ -1,10 +1,10 @@
 describe('AccessibilityLinter', () => {
-  const test = {
+  const rule = {
     message: 'foo-bar',
     selector: 'accessibility-linter',
   };
 
-  const tests = new Map([['test', test]]);
+  const rules = new Map([['rule', rule]]);
 
   it('is a property of window', () => {
     expect(window.AccessibilityLinter).toBeA(Function);
@@ -20,11 +20,11 @@ describe('AccessibilityLinter', () => {
     logger = new TestLogger();
   });
 
-  context('running a test', () => {
+  context('running a rule', () => {
     let linter, el;
 
     beforeEach(() => {
-      linter = new AccessibilityLinter({ tests, logger });
+      linter = new AccessibilityLinter({ rules, logger });
       el = document.createElement('accessibility-linter');
       document.body.appendChild(el);
     });
@@ -33,15 +33,15 @@ describe('AccessibilityLinter', () => {
       el.remove();
     });
 
-    it('calls the logger with the test and element', () => {
+    it('calls the logger with the rule and element', () => {
       linter.run();
-      expect(logger).toHaveEntries([test, el]);
+      expect(logger).toHaveEntries([rule, el]);
     });
 
     it('does not add the same error twice', () => {
       linter.run();
       linter.run();
-      expect(logger).toHaveEntries([test, el]);
+      expect(logger).toHaveEntries([rule, el]);
     });
 
     context('limiting scope', () => {
@@ -58,22 +58,22 @@ describe('AccessibilityLinter', () => {
         div.remove();
       });
 
-      it('limits the tests to the provided scope', () => {
+      it('limits the rules to the provided scope', () => {
         linter.run(div);
-        expect(logger).toHaveEntries([test, el2]);
+        expect(logger).toHaveEntries([rule, el2]);
       });
     });
   });
 
   describe('filter', () => {
     let linter, el, el2;
-    const filterTest = {
+    const filterRule = {
       selector: 'accessibility-linter',
       filter: match => match.hasAttribute('data-test'),
     };
 
     beforeEach(() => {
-      linter = new AccessibilityLinter({ tests: new Map([['test', filterTest]]), logger });
+      linter = new AccessibilityLinter({ rules: new Map([['rule', filterRule]]), logger });
       el = document.createElement('accessibility-linter');
       document.body.appendChild(el);
       el2 = document.createElement('accessibility-linter');
@@ -88,11 +88,11 @@ describe('AccessibilityLinter', () => {
 
     it('filters out elements', () => {
       linter.run();
-      expect(logger).toHaveEntries([filterTest, el2]);
+      expect(logger).toHaveEntries([filterRule, el2]);
     });
   });
 
-  context('whitelist', () => {
+  describe('whitelist', () => {
     let el;
 
     beforeEach(() => {
@@ -104,46 +104,113 @@ describe('AccessibilityLinter', () => {
       el.remove();
     });
 
-    it('does not add errors to elements on a whitelist with no test names', () => {
+    it('it adds errors for elements not on a whitelist', () => {
       const linter = new AccessibilityLinter({
-        tests,
+        rules,
         logger,
-        whitelist: { 'accessibility-linter': '' },
       });
 
       linter.run();
-      linter.run(); // run twice as whitelist matching is cached
-      expect(logger.errors).toEqual([]);
+      expect(logger).toHaveEntries([rule, el]);
     });
 
-    it('does not add named errors to elements on a whitelist with test names', () => {
+    it('does not add errors to elements on the global whitelist', () => {
       const linter = new AccessibilityLinter({
-        tests,
+        rules,
         logger,
-        whitelist: { 'accessibility-linter': ['test'] },
+        whitelist: 'accessibility-linter',
       });
 
       linter.run();
       expect(logger).toNotHaveEntries();
     });
 
-    it('adds unnamed errors to elements on a whitelist', () => {
+    it('does not add errors to elements on a test whitelist', () => {
       const linter = new AccessibilityLinter({
-        tests,
+        rules,
+        ruleSettings: {
+          rule: { whitelist: 'accessibility-linter' },
+        },
         logger,
-        whitelist: { 'accessibility-linter': ['foo'] },
       });
 
       linter.run();
-      expect(logger).toHaveEntries();
+      expect(logger).toNotHaveEntries();
     });
   });
 
-  context('data-ignore attributes', () => {
+  describe('enable', () => {
+    let el;
+
+    beforeEach(() => {
+      el = document.createElement('accessibility-linter');
+      document.body.appendChild(el);
+    });
+
+    afterEach(() => {
+      el.remove();
+    });
+
+    it('enables a rule by default', () => {
+      const linter = new AccessibilityLinter({
+        rules,
+        logger,
+      });
+
+      linter.run();
+      expect(logger).toHaveEntries([rule, el]);
+    });
+
+    it('disables a rule if the rule has enabled=false', () => {
+      const linter = new AccessibilityLinter({
+        rules: new Map([['rule', Object.assign({ enabled: false }, rule)]]),
+        logger,
+      });
+
+      linter.run();
+      expect(logger).toNotHaveEntries();
+    });
+
+    it('disables a rule if defaultOff is true', () => {
+      const linter = new AccessibilityLinter({
+        rules,
+        logger,
+        defaultOff: true,
+      });
+
+      linter.run();
+      expect(logger).toNotHaveEntries();
+    });
+
+    it('disables a rule if defaultOff is true and the rule has enabled=true', () => {
+      const linter = new AccessibilityLinter({
+        rules: new Map([['rule', Object.assign({ enabled: true }, rule)]]),
+        logger,
+        defaultOff: true,
+      });
+
+      linter.run();
+      expect(logger).toNotHaveEntries();
+    });
+
+    it('enables a rule if defaultOff is true and the rule settings have enabled=true', () => {
+      const linter = new AccessibilityLinter({
+        rules,
+        logger,
+        defaultOff: true,
+        ruleSettings: { rule: { enabled: true } },
+      });
+
+      linter.run();
+      expect(logger).toHaveEntries([rule, el]);
+    });
+  });
+
+  describe('data-ignore attributes', () => {
     let linter, el;
 
     beforeEach(() => {
-      linter = new AccessibilityLinter({ tests, logger });
+      linter = new AccessibilityLinter({ rules, logger });
       el = document.createElement('accessibility-linter');
       document.body.appendChild(el);
     });
@@ -153,20 +220,20 @@ describe('AccessibilityLinter', () => {
     });
 
     it('ignores errors where there is a data-ignore attribute', () => {
-      el.setAttribute('data-allylint-ignore', '');
+      el.setAttribute('data-accessibility-linter-ignore', '');
       linter.run();
       linter.run(); // Run twice as ignore matching is cached
       expect(logger).toNotHaveEntries();
     });
 
     it('ignores named errors where there is a data-ignore attribute', () => {
-      el.setAttribute('data-allylint-ignore', 'test foo');
+      el.setAttribute('data-accessibility-linter-ignore', 'rule foo');
       linter.run();
       expect(logger).toNotHaveEntries();
     });
 
     it('does not ignore unnamed errors where there is a data-ignore attribute', () => {
-      el.setAttribute('data-allylint-ignore', 'foo');
+      el.setAttribute('data-accessibility-linter-ignore', 'foo');
       linter.run();
       expect(logger).toHaveEntries();
     });
@@ -176,7 +243,7 @@ describe('AccessibilityLinter', () => {
     let linter, el;
 
     beforeEach(() => {
-      linter = new AccessibilityLinter({ tests, logger });
+      linter = new AccessibilityLinter({ rules, logger });
       linter.observe();
     });
 
@@ -280,10 +347,65 @@ describe('Logger', () => {
       });
     });
   });
+
+  context('logging errors', () => {
+    let spyError, spyWarning;
+
+    const rule = {
+      message: 'foo-bar',
+      selector: 'accessibility-linter',
+    };
+
+    const rules = new Map([['rule', rule]]);
+
+    beforeEach(() => {
+      spyError = expect.spyOn(console, 'error');
+      spyWarning = expect.spyOn(console, 'warn');
+      el = document.createElement('accessibility-linter');
+      document.body.appendChild(el);
+    });
+
+    afterEach(() => {
+      spyError.restore();
+      spyWarning.restore();
+      el.remove();
+    });
+
+    it('logs an error by default', () => {
+      const linter = new AccessibilityLinter({ rules });
+      linter.run();
+      expect(spyError).toHaveBeenCalled();
+      expect(spyWarning).toNotHaveBeenCalled();
+    });
+
+    it('logs a warning if the rule has type="warn"', () => {
+      const linter = new AccessibilityLinter({ rules: new Map([['rule', Object.assign({ type: 'warn' }, rule)]]) });
+      linter.run();
+      expect(spyError).toNotHaveBeenCalled();
+      expect(spyWarning).toHaveBeenCalled();
+    });
+
+    it('logs a warning if the rule settings have type="warn"', () => {
+      const linter = new AccessibilityLinter({ rules, ruleSettings: { rule: { type: 'warn' } } });
+      linter.run();
+      expect(spyError).toNotHaveBeenCalled();
+      expect(spyWarning).toHaveBeenCalled();
+    });
+
+    it('logs an error if the rule has type="warn" and settings have type="error"', () => {
+      const linter = new AccessibilityLinter({
+        rules: new Map([['rule', Object.assign({ type: 'warn' }, rule)]]),
+        ruleSettings: { rule: { type: 'error' } },
+      });
+      linter.run();
+      expect(spyError).toHaveBeenCalled();
+      expect(spyWarning).toNotHaveBeenCalled();
+    });
+  });
 });
 
-// Tests are run in an iframe so mocha display does not interfere
-describe('tests', () => {
+// Rules are run in an iframe so mocha display does not interfere
+describe('rules', () => {
   const context = { when };
   let frame;
 
@@ -299,17 +421,17 @@ describe('tests', () => {
     frame.remove();
   });
 
-  testSpecs.forEach((spec, name) => {
-    let window, test, tests, cleaner;
+  ruleSpecs.forEach((spec, name) => {
+    let window, rule, rules, cleaner;
 
     // Make sure everything is setup using the iFrame versions
     describe(name, () => {
       before(() => {
         window = context.window = frame.contentWindow;
         context.document = window.document;
-        test = context.test = window.AccessibilityLinter.tests.get(name);
-        tests = new Map([[name, test]]);
-        if (!test) {
+        rule = context.rule = window.AccessibilityLinter.rules.get(name);
+        rules = new Map([[name, rule]]);
+        if (!rule) {
           throw new Error(`spec for "${name}" not found`);
         }
         window.onerror = function (message) {
@@ -319,7 +441,7 @@ describe('tests', () => {
 
       beforeEach(() => {
         const logger = context.logger = new TestLogger();
-        const linter = context.linter = new window.AccessibilityLinter({ logger, tests });
+        const linter = context.linter = new window.AccessibilityLinter({ logger, rules });
         linter.observe();
         cleaner = window.domCleaner();
       });
