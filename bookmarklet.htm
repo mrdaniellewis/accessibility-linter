@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en-gb">
+  <head>
+    <meta charset="utf-8" />
+    <title>Accessibility linter bookmarklet generator</title>
+    <style>
+      html {
+        font: 1em/1.5 sans-serif;
+        background: #ddd;
+      }
+
+      body {
+        max-width: 800px;
+        margin: 1em auto;
+        background: #fff;
+        padding: 1em;
+      }
+
+      label {
+        display: block;
+      }
+
+      input[type=text] {
+        width: 100%;
+        box-sizing: border-box;
+        padding: .2em;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      caption {
+        font-weight: bold;
+        text-align: left;
+      }
+
+      tr {
+        text-align: left;
+      }
+
+      #bookmark {
+        text-decoration: none;
+        display: block;
+        white-space: pre;
+        overflow-y: auto;
+        color: #666;
+        font-family: monospace;
+      }
+
+      #bookmark:empty {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Accessibility linter bookmarklet generator</h1>
+    <form id="form" autocomplete="off">
+
+      <p>
+        <label for="enable-all">
+          <input type="checkbox" id="enable-all" checked />
+          Enable all rules by default
+        </label>
+      </p>
+
+      <p>
+        <label for="whitelist">Global whitelist selector</label>
+        <input type="text" id="whitelist" placeholder="Selector for elements to whitelist" />
+      </p>
+
+      <table>
+        <caption>Customise rules</caption>
+        <thead>
+          <tr>
+            <th>Rule
+            <th>Activation
+            <th>Whitelist
+        <tbody id="table-body">
+          <template id="row-template">
+            <tr role="group">
+              <td><input type="hidden" name="rule-name" />
+              <td>
+                <select name="rule-state" aria-label="Activation">
+                  <option value="">Default</option>
+                  <option value="error">Error</option>
+                  <option value="warn">Warn</option>
+                  <option value="off">Off</option>
+                </select>
+              <td>
+                <input type="text" name="rule-whitelist" placeholder="Selector for elements to ignore" aria-label="Whitelist selector" />
+          </template>
+        <tfoot>
+          <tr>
+            <td colspan="3" role="group" aria-label="Add rules">
+              <select id="all-rules" aria-label="Select rule">
+                <option value="">Select a rule...</option>
+              </select>
+              <button type="button" id="add-rule">Add rule</button>
+              <button type="button" id="add-all-rules">Add all rules</button>
+      </table>
+
+      <p><input type="submit" value="Generate bookmarklet" />
+      <p><a id="bookmark"></a>
+    </form>
+
+    <script src="build/umd.min.js"></script>
+    <script>
+      const $ = selector => document.querySelector(selector);
+
+      Array.from(AccessibilityLinter.rules.keys())
+        .sort()
+        .forEach(key => {
+          const option = document.createElement('option');
+          option.value = key;
+          option.innerText = key;
+          $('#all-rules').appendChild(option);
+        });
+
+      $('#add-rule').addEventListener('click', e => {
+        const name = $('#all-rules').value;
+        if (!name || $(`[aria-label="Rule ${name}"]`)) {
+          return;
+        }
+
+        $(`#all-rules > option[value="${name}"]`).disabled = true;
+
+        const row = document.importNode($('#row-template').content.querySelector('tr'), true);
+        row.setAttribute('aria-label', `Rule ${name}`);
+        row.querySelector('[name="rule-name"]').value = name;
+        row.querySelector('td').appendChild(document.createTextNode(name));
+        $('#table-body').appendChild(row);
+      });
+
+      $('#add-all-rules').addEventListener('click', e => {
+        Array.from(AccessibilityLinter.rules.keys())
+          .forEach(key => {
+             $('#all-rules').value = key;
+             $('#add-rule').click();
+          });
+        e.target.focus();
+      });
+
+      $('#bookmark').addEventListener('click', e => {
+        e.preventDefault();
+
+        const selection = window.getSelection();
+        const range = document.createRange();
+        range.selectNodeContents(e.target);
+        selection.removeAllRanges();
+        selection.addRange(range);
+      });
+
+      $('#form').addEventListener('submit', e => {
+        e.preventDefault();
+        let settings = {
+          whitelist: $('#whitelist').value.trim() || undefined,
+          defaultOff: !$('#enable-all').checked || undefined,
+          ruleSettings: {},
+        };
+
+        Array.from(e.target.querySelectorAll('[name="rule-name"]'))
+          .map((item, i) => {
+            const state = e.target.querySelectorAll('[name="rule-state"]')[i].value;
+            settings.ruleSettings[item.value] = {
+              whitelist: e.target.querySelectorAll('[name="rule-whitelist"]')[i].value.trim() || undefined,
+              enable: state !== 'off',
+              type: state !== 'off' && state || undefined,
+            };
+          });
+
+        if (Object.keys(settings.ruleSettings).length === 0) {
+          settings.ruleSettings = undefined;
+        }
+
+        const url = new URL('build/linter.min.js', location.href);
+
+        const bookmarklet = `javascript:(function() {
+  if (window.accessibilityLinter) {
+    console.log('Linter is already on page');
+    return;
+  }
+  const script = document.createElement('script');
+  script.src = ${JSON.stringify(url.href)};
+  script.textContent = JSON.stringify(${JSON.stringify(settings)});
+  document.head.appendChild(script);
+}());`
+        const a = $('#bookmark');
+        a.href = bookmarklet.replace(/[\n\s]+/g, ' ');
+        a.innerText = bookmarklet;
+      });
+    </script>
+
+  </body>
+</html>
