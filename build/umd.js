@@ -1,8 +1,8 @@
-(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.AccessibilityLinter = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"./tests":[function(require,module,exports){
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.AccessibilityLinter = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"./rules":[function(require,module,exports){
 "use strict";
 
     const { $, $$, cssEscape } = require('./utils');
-    const rules = require('./rules');
+    const standards = require('./standards');
     module.exports = new Map([
       [
         "alt",
@@ -19,19 +19,19 @@
           { name: "aria/roles" },
           ({
   message(el) {
-    const rule = rules.match(el);
+    const rule = standards.aria.match(el);
     const role = el.getAttribute('role');
     if (rule.implicitRoles.includes(role)) {
       return `role "${role}" is implicit for this element and not allowed`;
     }
-    if (!rules.roles.includes(role)) {
+    if (!standards.aria.roles.includes(role)) {
       return `role "${role}" is not a known role`;
     }
     return `role "${role}" is not allowed for this element`;
   },
   selector: '[role]',
   filter(el) {
-    const rule = rules.match(el);
+    const rule = standards.aria.match(el);
     const role = el.getAttribute('role');
     return rule.allowedRoles.includes(role);
   },
@@ -236,6 +236,15 @@
 })
         ),
       ],[
+        "no-button-without-type",
+        Object.assign(
+          { name: "no-button-without-type" },
+          ({
+  message: 'all buttons should have a type attribute',
+  selector: 'button:not([type])',
+})
+        ),
+      ],[
         "no-duplicate-anchor-names",
         Object.assign(
           { name: "no-duplicate-anchor-names" },
@@ -330,9 +339,9 @@
       ]
     ]);
   
-},{"./rules":5,"./utils":7}],"./version":[function(require,module,exports){
+},{"./standards":6,"./utils":7}],"./version":[function(require,module,exports){
 "use strict";
-module.exports = "1.2.0"
+module.exports = "1.3.1"
 },{}],1:[function(require,module,exports){
 "use strict";
 /**
@@ -529,16 +538,16 @@ exports.properties = properties;
 "use strict";
 const Runner = require('./runner');
 const Logger = require('./logger');
-const tests = require('./tests');
+const rules = require('./rules');
 const utils = require('./utils');
 const version = require('./version');
-const rules = require('./rules');
+const standards = require('./standards');
 
 const Linter = module.exports = class AccessibilityLinter extends Runner {
   constructor(options) {
     options = options || {};
     options.logger = options.logger || new Logger();
-    options.tests = options.tests || tests;
+    options.rules = options.rules || rules;
     super(options);
 
     this.root = options.root || document;
@@ -563,11 +572,11 @@ const Linter = module.exports = class AccessibilityLinter extends Runner {
 };
 
 Linter.Logger = Logger;
-Linter.tests = tests;
-Linter.version = version;
 Linter.rules = rules;
+Linter.version = version;
+Linter.standards = standards;
 
-},{"./logger":3,"./rules":5,"./runner":6,"./tests":"./tests","./utils":7,"./version":"./version"}],3:[function(require,module,exports){
+},{"./logger":3,"./rules":"./rules","./runner":5,"./standards":6,"./utils":7,"./version":"./version"}],3:[function(require,module,exports){
 "use strict";
 /* eslint-disable no-console */
 module.exports = class Logger {
@@ -575,28 +584,28 @@ module.exports = class Logger {
     this.docLink = docLink;
   }
 
-  error(test, el) {
-    console.error.apply(console, this.message(test, el));
+  error(rule, el) {
+    console.error.apply(console, this.message(rule, el));
   }
 
-  warn(test, el) {
-    console.warn.apply(console, this.message(test, el));
+  warn(rule, el) {
+    console.warn.apply(console, this.message(rule, el));
   }
 
-  message(test, el) {
+  message(rule, el) {
     return [
-      typeof test.message === 'function' ? test.message(el) : test.message,
+      typeof rule.message === 'function' ? rule.message(el) : rule.message,
       el,
-      this.getLink(test),
+      this.getLink(rule),
     ].filter(Boolean);
   }
 
-  getLink(test) {
-    if (!this.docLink || !test.doc) {
+  getLink(rule) {
+    if (!this.docLink || !rule.doc) {
       return null;
     }
 
-    return `${this.docLink}#${test.doc}`;
+    return `${this.docLink}#${rule.doc}`;
   }
 };
 
@@ -1044,8 +1053,112 @@ exports.rules = {
 
 },{}],5:[function(require,module,exports){
 "use strict";
+const { $$ } = require('./utils');
+
+const dataAttr = 'accessibility-linter';
+
+const addToSetArray = (set, key, value) => set.set(key, (set.get(key) || []).concat(value));
+const isInSetArray = (set, key, value) => (set.get(key) || []).includes(value);
+const cssEscape = value => value.replace(/"/g, '\\"');
+
+module.exports = class Runner {
+  constructor(config) {
+    this.rules = config.rules;
+    this.ruleSettings = config.ruleSettings || {};
+    this.defaultOff = !!config.defaultOff;
+
+    this.whitelist = config.whitelist;
+    this.logger = config.logger;
+
+    // Elements and issues already reported
+    this.reported = new WeakMap();
+    // Elements that are whitelisted
+    this.whitelisted = new WeakMap();
+    // Elements with ignore attributes
+    this.ignored = new WeakMap();
+  }
+
+  settings(name) {
+    return this.ruleSettings[name] || {};
+  }
+
+  /**
+   * Run all the rules
+   * @param {HTMLElement} [context] A context to run the rules within
+   */
+  run(context) {
+    this.rules
+      .forEach((rule, name) => {
+        const enabled = this.settings(name).enabled;
+        if (enabled === false ||
+          (enabled !== true && (this.defaultOff || rule.enabled === false))) {
+          return;
+        }
+        this.runRule(rule, name, context);
+      });
+  }
+
+  /**
+   * Run a single rule
+   * @param {Object} rule The rule to run
+   * @param {HTMLElement} [context] A context to run the rules within
+   */
+  runRule(rule, name, context) {
+    $$(rule.selector, context)
+      .filter(el => this.filterIgnoreAttribute(el, name))
+      .filter(el => this.filterWhitelist(el, name))
+      .filter(el => !isInSetArray(this.reported, el, name))
+      .filter(el => (rule.filter ? !rule.filter(el) : true))
+      .forEach((el) => {
+        const type = this.settings(name).type || rule.type || 'error';
+        this.logger[type](rule, el);
+        addToSetArray(this.reported, el, name);
+      });
+  }
+
+  /**
+   * Filter elements on the whitelist
+   */
+  filterWhitelist(el, name) {
+    if (isInSetArray(this.whitelisted, el, name)) {
+      return false;
+    }
+
+    const globalWhitelist = this.whitelist;
+    const whitelist = this.settings(name).whitelist;
+    const isWhitelisted = (globalWhitelist && el.matches(globalWhitelist)) ||
+      (whitelist || el.matches(whitelist));
+
+    if (isWhitelisted) {
+      addToSetArray(this.whitelisted, el, name);
+      return false;
+    }
+
+    return true;
+  }
+
+  filterIgnoreAttribute(el, ruleName) {
+    if (isInSetArray(this.ignored, el, ruleName)) {
+      return false;
+    }
+
+    const ignore = el.matches(
+      `[data-${dataAttr}-ignore=""],[data-${dataAttr}-ignore~="${cssEscape(ruleName)}"]`
+    );
+
+    if (ignore) {
+      addToSetArray(this.ignored, el, ruleName);
+      return false;
+    }
+
+    return true;
+  }
+};
+
+},{"./utils":7}],6:[function(require,module,exports){
+"use strict";
 /**
- * Rules engine for aria conformance
+ * HTML standards
  *
  * https://w3c.github.io/html-aria/
  */
@@ -1067,117 +1180,26 @@ function getAllowedRoles(rule) {
 /**
  * Given an element, return an object with the aria information
  */
-exports.match = function match(el) {
-  const name = el.nodeName.toLowerCase();
-  let rule = elementRules[name];
-  if (Array.isArray(rule)) {
-    rule = rule.find(item => item.selector === '*' || el.matches(item.selector));
-  }
-  rule = rule || defaultRule;
-  const allowedRoles = getAllowedRoles(rule);
+exports.aria = {
+  match(el) {
+    const name = el.nodeName.toLowerCase();
+    let rule = elementRules[name];
+    if (Array.isArray(rule)) {
+      rule = rule.find(item => item.selector === '*' || el.matches(item.selector));
+    }
+    rule = rule || defaultRule;
+    const allowedRoles = getAllowedRoles(rule);
 
-  return {
-    implicitRoles: rule.implicit,
-    allowedRoles,
-  };
+    return {
+      implicitRoles: rule.implicit,
+      allowedRoles,
+    };
+  },
+
+  roles: allRoles,
 };
 
-exports.roles = allRoles;
-
-},{"./aria-rules":1,"./role-rules":4}],6:[function(require,module,exports){
-"use strict";
-const { $$ } = require('./utils');
-
-const dataAttr = 'allylint';
-
-const addToSetArray = (set, key, value) => set.set(key, (set.get(key) || []).concat(value));
-const isInSetArray = (set, key, value) => (set.get(key) || []).includes(value);
-const cssEscape = value => value.replace(/"/g, '\\"');
-
-module.exports = class Runner {
-  constructor(config) {
-    this.tests = config.tests;
-    this.whitelist = config.whitelist || {};
-    this.logger = config.logger;
-
-    // Elements and issues already reported
-    this.reported = new WeakMap();
-    // Elements that are whitelisted
-    this.whitelisted = new WeakMap();
-    // Elements with ignore attributes
-    this.ignored = new WeakMap();
-  }
-
-  /**
-   * Run all the tests
-   * @param {HTMLElement} [context] A context to run the tests within
-   */
-  run(context) {
-    this.tests
-      .forEach((test, name) => this.runTest(test, name, context));
-  }
-
-  /**
-   * Run a single test
-   * @param {Object} test The test to run
-   * @param {HTMLElement} [context] A context to run the tests within
-   */
-  runTest(test, name, context) {
-    $$(test.selector, context)
-      .filter(el => this.filterIgnoreAttribute(el, name))
-      .filter(el => this.filterWhitelist(el, name))
-      .filter(el => !isInSetArray(this.reported, el, name))
-      .filter(el => (test.filter ? !test.filter(el) : true))
-      .forEach((el) => {
-        this.logger.error(test, el);
-        addToSetArray(this.reported, el, name);
-      });
-  }
-
-  /**
-   * Filter elements on the whitelist
-   */
-  filterWhitelist(el, testName) {
-    const whitelist = this.whitelist;
-
-    if (isInSetArray(this.whitelisted, el, testName)) {
-      return false;
-    }
-
-    const isWhitelisted = Object.keys(whitelist).some((selector) => {
-      const testList = whitelist[selector];
-      if (testList && !testList.includes(testName)) {
-        return false;
-      }
-      return el.matches(selector);
-    });
-
-    if (isWhitelisted) {
-      addToSetArray(this.whitelisted, el, testName);
-      return false;
-    }
-    return true;
-  }
-
-  filterIgnoreAttribute(el, testName) {
-    if (isInSetArray(this.ignored, el, testName)) {
-      return false;
-    }
-
-    const ignore = el.matches(
-      `[data-${dataAttr}-ignore=""],[data-${dataAttr}-ignore~="${cssEscape(testName)}"]`
-    );
-
-    if (ignore) {
-      addToSetArray(this.ignored, el, testName);
-      return false;
-    }
-
-    return true;
-  }
-};
-
-},{"./utils":7}],7:[function(require,module,exports){
+},{"./aria-rules":1,"./role-rules":4}],7:[function(require,module,exports){
 "use strict";
 /**
  * Find DOM nodes from a selector.  The found node can include the supplied context
@@ -1217,6 +1239,6 @@ exports.observe = function mutationObserver(fn, root) {
   return observer;
 };
 
-},{}]},{},["./tests","./version",2])(2)
+},{}]},{},["./rules","./version",2])(2)
 });
 //# sourceMappingURL=umd.js.map
