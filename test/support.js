@@ -100,4 +100,19 @@
       return this;
     },
   });
+
+  // Clean up created elements between tests
+  window.clean = () => {
+    let cleaner;
+
+    before(() => {
+      cleaner = domCleaner({ exclude: '#mocha *' });
+    });
+
+    afterEach(() => Promise.resolve().then(() => cleaner.clean()));
+
+    after(() => {
+      cleaner.stop();
+    });
+  };
 }());
