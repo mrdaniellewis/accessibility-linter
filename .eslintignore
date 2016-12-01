@@ -1,3 +1,3 @@
 **/*.min.js
-spec/rule-specs.js
+test/specs/_rules.js
 node_modules

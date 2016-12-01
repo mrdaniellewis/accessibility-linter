@@ -11,6 +11,8 @@ module.exports = {
     $$: false,
     cssEscape: false,
     standards: false,
+    elements: false,
+    aria: false,
     // Globals for specs
     appendToBody: false,
     when: false,
