@@ -1,5 +1,5 @@
 node_modules
 build/**
 !build/.gitignore
-spec/rule-specs.js
+test/specs/_rules.js
 *.log

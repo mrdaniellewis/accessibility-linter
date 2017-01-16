@@ -11,7 +11,7 @@
     "uglify:standalone": "uglifyjs build/linter.js > build/linter.min.js",
     "build:umd": "node lib/build/umd | exorcist build/umd.js.map > build/umd.js",
     "uglify:umd": "uglifyjs build/umd.js > build/umd.min.js",
-    "build:specs": "node lib/build/specs > spec/rule-specs.js",
+    "build:specs": "node lib/build/specs > test/specs/_rules.js",
     "build:dev": "npm run mkbuild && npm run build:umd && npm run build:specs",
     "build:all": "npm run build:standalone && npm run build:umd && npm run build:specs",
     "gh-pages": "git checkout gh-pages && git merge master -X theirs && npm run build && echo \"!**\" > build/.gitignore && git add -A && git commit -m \"merge master and latest build\" && git push && git checkout master",
