@@ -12,7 +12,8 @@
     "appendToBody": false,
     "domCleaner": false,
     "build": false,
-    "clean": false
+    "clean": false,
+    "uniqueId": false
   },
   "rules": {
     "prefer-arrow-callback": 0,

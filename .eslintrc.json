@@ -13,6 +13,7 @@
     "prefer-spread": 0,
     "no-cond-assign": ["error", "except-parens"],
     "no-plusplus": 0,
+    "no-underscore-dangle": 0,
     "indent": ["error", 2, {
       "SwitchCase": 1,
       "VariableDeclarator": 1,
@@ -31,6 +32,13 @@
       "arrays": "always-multiline",
       "objects": "always-multiline",
       "functions": "never"
+    }],
+    "max-len": ["error", 100, 2, {
+      "ignoreUrls": true,
+      "ignoreComments": true,
+      "ignoreRegExpLiterals": true,
+      "ignoreStrings": true,
+      "ignoreTemplateLiterals": true
     }]
   }
 }
