@@ -11,7 +11,8 @@
     "ruleSpecs": false,
     "appendToBody": false,
     "domCleaner": false,
-    "build": false
+    "build": false,
+    "clean": false
   },
   "rules": {
     "prefer-arrow-callback": 0,
