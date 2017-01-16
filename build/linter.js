@@ -2,7 +2,8 @@
 "use strict";
 
     const { $, $$, cssEscape } = require('./utils');
-    const standards = require('./standards');
+    const aria = require('./aria');
+    const elements = require('./elements');
     module.exports = new Map([
       [
         "alt",
@@ -19,22 +20,57 @@
           { name: "aria/roles" },
           ({
   message(el) {
-    const rule = standards.aria.match(el);
-    const role = el.getAttribute('role');
-    if (rule.implicitRoles.includes(role)) {
-      return `role "${role}" is implicit for this element and not allowed`;
+    return this.check(el);
+  },
+  check(el) {
+    const role = el.getAttribute('role').trim();
+    if (!role) {
+      return 'role attribute should not be empty';
     }
-    if (!standards.aria.roles.includes(role)) {
-      return `role "${role}" is not a known role`;
-    }
-    return `role "${role}" is not allowed for this element`;
+    let error;
+    const rule = aria.match(el);
+    role.split(/\s+/).some((name) => {
+      if (!aria.roles[name]) {
+        error = `"${name}" is not a known role`;
+        return true;
+      }
+
+      if (rule.implicitRoles.includes(name)) {
+        error = `role "${name}" is implicit for this element and should not be specified`;
+        return true;
+      }
+
+      if (!rule.allowedRoles.includes(name)) {
+        error = `role "${name}" is not allowed for this element`;
+      }
+
+      return false;
+    });
+
+    return error;
   },
   selector: '[role]',
   filter(el) {
-    const rule = standards.aria.match(el);
-    const role = el.getAttribute('role');
-    return rule.allowedRoles.includes(role);
+    return !this.check(el);
   },
+})
+        ),
+      ],[
+        "elements/obsolete",
+        Object.assign(
+          { name: "elements/obsolete" },
+          ({
+  message: 'do not use obsolete elements',
+  selector: Object.keys(elements).filter(el => elements[el].obsolete).join(','),
+})
+        ),
+      ],[
+        "elements/unknown",
+        Object.assign(
+          { name: "elements/unknown" },
+          ({
+  message: 'unknown element',
+  selector: Object.keys(elements).map(name => `:not(${name})`).join(''),
 })
         ),
       ],[
@@ -236,6 +272,18 @@
 })
         ),
       ],[
+        "namespace-attributes",
+        Object.assign(
+          { name: "namespace-attributes" },
+          ({
+  message: (el) => {
+    const names = ['data', 'data-', 'aria', 'aria-'].filter(name => el.hasAttribute(name));
+    return `invalid attribute${names.length > 1 ? 's' : ''}: ${names.join(', ')}`;
+  },
+  selector: '[data],[data-],[aria],[aria-]',
+})
+        ),
+      ],[
         "no-button-without-type",
         Object.assign(
           { name: "no-button-without-type" },
@@ -339,10 +387,489 @@
       ]
     ]);
   
-},{"./standards":7,"./utils":8}],"./version":[function(require,module,exports){
+},{"./aria":1,"./elements":4,"./utils":10}],"./version":[function(require,module,exports){
 "use strict";
-module.exports = "1.3.1"
+module.exports = "1.4.0"
 },{}],1:[function(require,module,exports){
+"use strict";
+/**
+ *  Data and functions for aria validation.  Based on
+ *  - https://www.w3.org/TR/wai-aria-1.1/
+ *  - https://www.w3.org/TR/html52/
+ */
+
+// const attributes = require('./attributes');
+const match = require('./match');
+const roles = require('./roles');
+
+/**
+ * All roles
+ * @type {Object}
+ */
+exports.roles = roles;
+
+/**
+ * Get the elements current role based on the role attribute or implicit role
+ * @param {Element} el
+ * @returns {String|null}
+ */
+exports.getRole = (el) => {
+  let role = null;
+  // Should be the first non-abstract role in the list
+  if ((el.getAttribute('role') || '').split(/\s+/).some((name) => {
+    if (roles[name]) {
+      role = name;
+      return true;
+    }
+    return false;
+  })) {
+    return role;
+  }
+  return match(el).implicitRoles[0] || null;
+};
+
+/**
+ * Get the aria rules for an element
+ * @param {Element} el
+ * @returns {Object}
+ */
+exports.getElementRules = el => match(el);
+
+},{"./match":2,"./roles":3}],2:[function(require,module,exports){
+"use strict";
+/**
+ * Aria rules for a HTML element
+ *
+ * https://w3c.github.io/html-aria/
+ */
+
+const allRoles = require('./roles');
+
+class Rule {
+  constructor({ selector = '*', implicit = [], roles = [], anyRole = false }) {
+    this.selector = selector;
+    this.implicitRoles = [].concat(implicit);
+    this.roles = roles;
+    this.anyRole = anyRole;
+  }
+
+  get allowedRoles() {
+    if (this.anyRole) {
+      return Object.keys(allRoles).filter(name => !this.implicitRoles.includes(name));
+    }
+    return this.roles;
+  }
+}
+
+// Common rules
+// TODO: include aria attribute rules
+const noRoleOrAria = new Rule({});
+const noRole = new Rule({});
+const anyRole = new Rule({ anyRole: true });
+
+// Hash of elements and rules
+const rules = {
+  a: [
+    new Rule({
+      selector: '[href]',
+      implicit: 'link',
+      roles: [
+        'button', 'checkbox', 'menuitem', 'menuitemcheckbox',
+        'menuitemradio', 'radio', 'tab', 'switch', 'treeitem',
+      ],
+    }),
+    new Rule({
+      selector: ':not([href])',
+      anyRole: true,
+    }),
+  ],
+  address: new Rule({
+    implicit: ['contentinfo'],
+  }),
+  area: [
+    new Rule({
+      selector: '[href]',
+      implicit: 'link',
+    }),
+  ],
+  article: new Rule({
+    implicit: 'article',
+    roles: ['presentation', 'document', 'application', 'main', 'region'],
+  }),
+  aside: new Rule({
+    implicit: 'complementary',
+    roles: ['note', 'region', 'search'],
+  }),
+  audio: new Rule({
+    roles: ['application'],
+  }),
+  base: noRoleOrAria,
+  body: new Rule({
+    implicit: ['document'],
+  }),
+  button: [
+    new Rule({
+      selector: '[type=menu]',
+      implicit: 'button',
+      roles: ['link', 'menuitem', 'menuitemcheckbox', 'menuitemradio', 'radio'],
+    }),
+    new Rule({
+      implicit: 'button',
+      roles: [
+        'checkbox', 'link', 'menuitem', 'menuitemcheckbox',
+        'menuitemradio', 'radio', 'switch', 'tab',
+      ],
+    }),
+  ],
+  caption: noRole,
+  col: noRoleOrAria,
+  colgroup: noRoleOrAria,
+  datalist: new Rule({
+    implicit: 'listbox',
+  }),
+  dd: new Rule({
+    implicit: 'definition',
+  }),
+  details: new Rule({
+    implicit: 'group',
+  }),
+  dialog: new Rule({
+    implicit: 'dialog',
+    roles: ['alertdialog'],
+  }),
+  div: anyRole,
+  dl: new Rule({
+    implicit: 'list',
+    roles: ['group', 'presentation'],
+  }),
+  dt: new Rule({
+    implicit: 'listitem',
+  }),
+  embed: new Rule({
+    roles: ['application', 'document', 'presentation', 'img'],
+  }),
+  fieldset: new Rule({
+    roles: ['group', 'presentation'],
+  }),
+  figure: new Rule({
+    implicit: 'figure',
+    roles: ['group', 'presentation'],
+  }),
+  footer: [
+    new Rule({
+      selector: 'article footer,section footer',
+      roles: ['group', 'presentation'],
+    }),
+    new Rule({
+      implicit: 'contentinfo',
+      roles: ['group', 'presentation'],
+    }),
+  ],
+  form: new Rule({
+    implicit: 'form',
+    roles: ['search', 'presentation'],
+  }),
+  p: anyRole,
+  pre: anyRole,
+  blockquote: anyRole,
+  h1: new Rule({
+    implicit: 'heading',
+    roles: ['tab', 'presentation'],
+  }),
+  h2: new Rule({
+    implicit: 'heading',
+    roles: ['tab', 'presentation'],
+  }),
+  h3: new Rule({
+    implicit: 'heading',
+    roles: ['tab', 'presentation'],
+  }),
+  h4: new Rule({
+    implicit: 'heading',
+    roles: ['tab', 'presentation'],
+  }),
+  h5: new Rule({
+    implicit: 'heading',
+    roles: ['tab', 'presentation'],
+  }),
+  h6: new Rule({
+    implicit: 'heading',
+    roles: ['tab', 'presentation'],
+  }),
+  head: noRoleOrAria,
+  header: [
+    new Rule({
+      selector: 'article header,section header',
+      roles: ['group', 'presentation'],
+    }),
+    new Rule({
+      implicit: 'banner',
+      roles: ['group', 'presentation'],
+    }),
+  ],
+  hr: new Rule({
+    implicit: 'separator',
+    roles: ['presentation'],
+  }),
+  html: noRoleOrAria,
+  iframe: new Rule({
+    roles: ['application', 'document', 'img'],
+  }),
+  img: [
+    new Rule({
+      selector: '[alt=""]',
+      roles: ['presentation'],
+      aria: false,
+    }),
+    new Rule({
+      implicit: 'img',
+      anyRole: true,
+    }),
+  ],
+  input: [
+    new Rule({
+      selector: '[list]:not([type]),[list][type=text],[list][type=search],[list][type=tel],[list][type=url],[list][type=email]',
+      implicit: 'combobox',
+    }),
+    new Rule({
+      selector: '[type=button]',
+      implicit: 'button',
+      roles: ['link', 'menuitem', 'menuitemcheckbox', 'menuitemradio', 'radio', 'switch', 'tab'],
+    }),
+    new Rule({
+      selector: '[type=image]',
+      implicit: 'button',
+      roles: ['link', 'menuitem', 'menuitemcheckbox', 'menuitemradio', 'radio', 'switch'],
+    }),
+    new Rule({
+      selector: '[type=checkbox]',
+      implicit: 'checkbox',
+      roles: ['button', 'menuitemcheckbox', 'switch'],
+    }),
+    new Rule({
+      selector: ':not([type]),[type=password],[type=tel],[type=text],[type=url]',
+      implicit: 'textbox',
+    }),
+    new Rule({
+      selector: '[type=email]',
+      implicit: 'textbox',
+    }),
+    new Rule({
+      selector: '[type=hidden]',
+      aria: false,
+    }),
+    new Rule({
+      selector: '[type=number]',
+      implicit: 'spinbutton',
+    }),
+    new Rule({
+      selector: '[type=radio]',
+      implicit: 'radio',
+      roles: ['menuitemradio'],
+    }),
+    new Rule({
+      selector: '[type=range]',
+      implicit: 'slider',
+    }),
+    new Rule({
+      selector: '[type=reset],[type=submit]',
+      implicit: 'button',
+    }),
+    new Rule({
+      selector: '[type=search]',
+      implicit: 'searchbox',
+    }),
+    noRole,
+  ],
+  ins: anyRole,
+  del: anyRole,
+  keygen: noRole,
+  label: noRole,
+  legend: noRole,
+  li: [
+    new Rule({
+      selector: 'ol>li,ul>li',
+      implicit: 'listitem',
+      roles: [
+        'menuitem', 'menuitemcheckbox', 'menuitemradio', 'option',
+        'presentation', 'separator', 'tab', 'treeitem',
+      ],
+    }),
+  ],
+  link: [
+    new Rule({
+      selector: '[href]',
+      implicit: 'link',
+      globalAria: false,
+    }),
+  ],
+  main: new Rule({
+    implicit: 'main',
+  }),
+  map: noRoleOrAria,
+  math: new Rule({
+    implicit: 'math',
+  }),
+  menu: [
+    new Rule({
+      selector: '[type=toolbar]',
+      implicit: 'toolbar',
+    }),
+  ],
+  menuitem: [
+    new Rule({
+      selector: '[type=command]',
+      implicit: 'menuitem',
+    }),
+    new Rule({
+      selector: '[type=checkbox]',
+      implicit: 'menuitemcheckbox',
+    }),
+    new Rule({
+      selector: '[type=radio]',
+      implicit: 'menuitemradio',
+    }),
+  ],
+  meta: noRoleOrAria,
+  meter: new Rule({
+    implicit: 'progressbar',
+  }),
+  nav: new Rule({
+    implicit: 'navigation',
+  }),
+  noscript: noRoleOrAria,
+  object: new Rule({
+    roles: ['application', 'document', 'img'],
+  }),
+  ol: new Rule({
+    implicit: 'list',
+    roles: [
+      'directory', 'group', 'listbox', 'menu', 'menubar', 'presentation',
+      'radiogroup', 'tablist', 'toolbar', 'tree',
+    ],
+  }),
+  optgroup: new Rule({
+    implicit: 'group',
+  }),
+  option: [
+    new Rule({
+      selector: 'select>option,select>optgroup>option,datalist>option',
+      implicit: 'option',
+    }),
+    noRoleOrAria,
+  ],
+  output: new Rule({
+    implicit: 'status',
+    anyRole: true,
+  }),
+  param: noRoleOrAria,
+  picture: noRoleOrAria,
+  progress: new Rule({
+    implicit: 'progressbar',
+  }),
+  script: noRoleOrAria,
+  section: new Rule({
+    implicit: 'region',
+    roles: [
+      'alert', 'alertdialog', 'application', 'banner', 'complementary',
+      'contentinfo', 'dialog', 'document', 'log', 'main', 'marquee',
+      'navigation', 'search', 'status',
+    ],
+  }),
+  select: new Rule({
+    implicit: 'listbox',
+  }),
+  source: noRoleOrAria,
+  span: anyRole,
+  style: noRoleOrAria,
+  svg: new Rule({
+    roles: ['application', 'document', 'img'],
+  }),
+  summary: new Rule({
+    implicit: 'button',
+  }),
+  table: new Rule({
+    implicit: 'table',
+    anyRole: true,
+  }),
+  template: noRoleOrAria,
+  textarea: new Rule({
+    implicit: 'textbox',
+  }),
+  tbody: new Rule({
+    implicit: 'rowgroup',
+    anyRole: true,
+  }),
+  thead: new Rule({
+    implicit: 'rowgroup',
+    anyRole: true,
+  }),
+  tfoot: new Rule({
+    implicit: 'rowgroup',
+    anyRole: true,
+  }),
+  title: noRoleOrAria,
+  td: new Rule({
+    implicit: 'cell',
+    anyRole: true,
+  }),
+  em: anyRole,
+  strong: anyRole,
+  small: anyRole,
+  s: anyRole,
+  cite: anyRole,
+  q: anyRole,
+  dfn: anyRole,
+  abbr: anyRole,
+  time: anyRole,
+  code: anyRole,
+  var: anyRole,
+  samp: anyRole,
+  kbd: anyRole,
+  sub: anyRole,
+  sup: anyRole,
+  i: anyRole,
+  b: anyRole,
+  u: anyRole,
+  mark: anyRole,
+  ruby: anyRole,
+  rt: anyRole,
+  rp: anyRole,
+  bdi: anyRole,
+  bdo: anyRole,
+  br: anyRole,
+  wbr: anyRole,
+  th: new Rule({
+    implicit: ['columnheader', 'rowheader'],
+    anyRole: true,
+  }),
+  tr: new Rule({
+    implicit: 'row',
+    anyRole: true,
+  }),
+  track: noRoleOrAria,
+  ul: new Rule({
+    implicit: 'list',
+    roles: [
+      'directory', 'group', 'listbox', 'menu', 'menubar',
+      'tablist', 'toolbar', 'tree', 'presentation',
+    ],
+  }),
+  video: new Rule({
+    roles: ['application'],
+  }),
+};
+
+module.exports = function match(el) {
+  const name = el.nodeName.toLowerCase();
+  let found = rules[name];
+  if (Array.isArray(found)) {
+    found = found.find(item => item.selector === '*' || el.matches(item.selector));
+  }
+  return found || anyRole;
+};
+
+},{"./roles":3}],3:[function(require,module,exports){
 "use strict";
 /**
  * Rules for aria properties
@@ -350,98 +877,137 @@ module.exports = "1.3.1"
  * https://w3c.github.io/html-aria/
  */
 
-// Aria properties that can be used on any HTML element
-const globalAria = [
-  'atomic', 'busy', 'controls', 'current', 'describedby', 'details',
-  'disabled', 'dropeffect', 'errormessage', 'flowto', 'grabbed',
-  'haspopup', 'hidden', 'invalid', 'keyshortcuts', 'label',
-  'labelledby', 'live', 'owns', 'relevant', 'roledescription',
-];
-
-
-// All roles and their allowed aria properties
-const expanded = {
-  allowed: ['expanded'],
-};
-
-const roles = {
-  alert: expanded,
+module.exports = {
+  alert: {
+    allowed: ['expanded'],
+  },
   alertdialog: {
     allowed: ['expanded', 'modal'],
   },
   application: {
     allowed: ['activedescendant'],
   },
-  article: expanded,
-  banner: expanded,
+  article: {
+    allowed: ['expanded'],
+  },
+  banner: {
+    allowed: ['expanded'],
+  },
   button: {
     allowed: ['expanded', 'pressed'],
+    nameFromContent: true,
   },
-  cell: {},
+  cell: {
+    nameFromContent: true,
+  },
   checkbox: {
     required: ['checked'],
+    nameFromContent: true,
   },
   columnheader: {
     allowed: ['sort', 'readonly', 'required', 'selected', 'expanded'],
+    nameFromContent: true,
   },
   combobox: {
     required: ['expanded'],
     allowed: ['autocomplete', 'required', 'activedescendant'],
   },
-  complementary: expanded,
-  contentinfo: expanded,
-  definition: expanded,
-  dialog: expanded,
-  directory: expanded,
-  document: expanded,
+  complementary: {
+    allowed: ['expanded'],
+  },
+  contentinfo: {
+    allowed: ['expanded'],
+  },
+  definition: {
+    allowed: ['expanded'],
+  },
+  dialog: {
+    allowed: ['expanded'],
+  },
+  directory: {
+    allowed: ['expanded'],
+  },
+  document: {
+    allowed: ['expanded'],
+  },
   feed: {
     allowed: ['setsize', 'expanded'],
   },
-  figure: expanded,
-  form: expanded,
+  figure: {
+    allowed: ['expanded'],
+  },
+  form: {
+    allowed: ['expanded'],
+  },
   grid: {
     allowed: ['level', 'multiselectable', 'readonly', 'activedescendant', 'expanded'],
   },
   gridcell: {
     allowed: ['readonly', 'required', 'selected', 'expanded'],
+    nameFromContent: true,
   },
   group: {
     allowed: ['activedescendant', 'expanded'],
   },
   heading: {
     allowed: ['level', 'expanded'],
+    nameFromContent: true,
   },
-  img: expanded,
-  link: expanded,
-  list: expanded,
+  img: {
+    allowed: ['expanded'],
+  },
+  link: {
+    allowed: ['expanded'],
+    nameFromContent: true,
+  },
+  list: {
+    allowed: ['expanded'],
+  },
   listbox: {
     allowed: ['multiselectable', 'required', 'expanded', 'activedescendant', 'expanded'],
   },
   listitem: {
     allowed: ['level', 'posinset', 'setsize', 'expanded'],
   },
-  log: expanded,
-  main: expanded,
-  marquee: expanded,
-  math: expanded,
+  log: {
+    allowed: ['expanded'],
+  },
+  main: {
+    allowed: ['expanded'],
+  },
+  marquee: {
+    allowed: ['expanded'],
+  },
+  math: {
+    allowed: ['expanded'],
+  },
   menu: {
     allowed: ['activedescendant', 'expanded'],
   },
   menubar: {
     allowed: ['activedescendant'],
   },
-  menuitem: {},
+  menuitem: {
+    nameFromContent: true,
+  },
   menuitemcheckbox: {
     required: ['checked'],
+    nameFromContent: true,
   },
   menuitemradio: {
     required: ['checked'],
     allowed: ['posinset', 'selected', 'setsize'],
+    nameFromContent: true,
   },
-  navigation: expanded,
-  note: expanded,
+  navigation: {
+    allowed: ['expanded'],
+  },
+  note: {
+    allowed: ['expanded'],
+  },
   option: {
     allowed: ['checked', 'posinset', 'selected', 'setsize'],
+    nameFromContent: true,
   },
   presentation: {},
   progressbar: {
@@ -450,22 +1016,28 @@ const roles = {
   radio: {
     required: ['checked'],
     allowed: ['posinset', 'selected', 'setsize'],
+    nameFromContent: true,
   },
   radiogroup: {
     allowed: ['required', 'activedescendant', 'expanded'],
   },
-  region: expanded,
+  region: {
+    allowed: ['expanded'],
+  },
   row: {
     allowed: [
       'colindex', 'level', 'rowindex', 'selected', 'level', 'selected',
       'activedescendant', 'expanded',
     ],
+    nameFromContent: true,
   },
   rowgroup: {
     allowed: ['activedescendant', 'expanded'],
+    nameFromContent: true,
   },
   rowheader: {
     allowed: ['sort', 'readonly', 'required', 'selected', 'expanded'],
+    nameFromContent: true,
   },
   scrollbar: {
     required: ['controls', 'orientation', 'valuemax', 'valuemin', 'valuenow'],
@@ -488,12 +1060,16 @@ const roles = {
     required: ['valuemax', 'valuemin', 'valuenow'],
     allowed: ['required', 'valuetext'],
   },
-  status: expanded,
+  status: {
+    allowed: ['expanded'],
+  },
   switch: {
     required: ['checked'],
+    nameFromContent: true,
   },
   tab: {
     allowed: ['selected', 'expanded'],
+    nameFromContent: true,
   },
   table: {
     allowed: ['colcount', 'rowcount'],
@@ -501,40 +1077,191 @@ const roles = {
   tablist: {
     allowed: ['level', 'activedescendant', 'expanded'],
   },
-  tabpanel: expanded,
-  term: expanded,
+  tabpanel: {
+    allowed: ['expanded'],
+  },
+  term: {
+    allowed: ['expanded'],
+  },
   textbox: {
     allowed: ['activedescendant', 'autocomplete', 'multiline', 'placeholder', 'readonly', 'required'],
   },
-  timer: expanded,
+  timer: {
+    allowed: ['expanded'],
+  },
   toolbar: {
     allowed: ['activedescendant', 'expanded'],
+    nameFromContent: true,
   },
-  tooltip: expanded,
+  tooltip: {
+    allowed: ['expanded'],
+  },
   tree: {
     allowed: ['multiselectable', 'required', 'activedescendant', 'expanded'],
+    nameFromContent: true,
   },
-  treegrid: ['level', 'multiselecteable', 'readonly', 'activedescendant', 'expanded', 'required'],
-  treeitem: ['level', 'posinset', 'setsize', 'expanded', 'checked', 'selected'],
+  treegrid: {
+    allowed: ['level', 'multiselecteable', 'readonly', 'activedescendant', 'expanded', 'required'],
+  },
+  treeitem: {
+    allowed: ['level', 'posinset', 'setsize', 'expanded', 'checked', 'selected'],
+  },
 };
 
-const bool = ['true', 'false'];
-const tri = ['true', 'false', 'mixed'];
+},{}],4:[function(require,module,exports){
+"use strict";
+/**
+ * Data for HTML elements.  Based on
+ * - https://www.w3.org/TR/html52/
+ * - https://w3c.github.io/html-aria/
+ */
 
-// Allowed aria property values
-const properties = {
-  activedescendant: 'id',
-  atomic: bool,
-  autocomplete: ['inline', 'list', 'both', 'none'],
-  busy: bool,
-  checked: tri,
+const obsolete = { obsolete: true };
+module.exports = {
+  a: {},
+  abbr: {},
+  acronym: obsolete,
+  address: {},
+  applet: obsolete,
+  area: {},
+  article: {},
+  aside: {},
+  audio: {},
+  b: {},
+  base: {},
+  basefont: obsolete,
+  bdi: {},
+  bdo: {},
+  bgsound: obsolete,
+  big: obsolete,
+  blink: obsolete,
+  blockquote: {},
+  body: {},
+  br: {},
+  button: {},
+  canvas: {},
+  caption: {},
+  center: obsolete,
+  cite: {},
+  code: {},
+  col: {},
+  colgroup: {},
+  command: obsolete,
+  data: {},
+  datalist: {},
+  dd: {},
+  del: {},
+  details: {},
+  dfn: {},
+  dialog: {},
+  dir: obsolete,
+  div: {},
+  dl: {},
+  dt: {},
+  em: {},
+  embed: {},
+  fieldset: {},
+  figcaption: {},
+  figure: {},
+  font: obsolete,
+  footer: {},
+  form: {},
+  frame: obsolete,
+  frameset: obsolete,
+  h1: {},
+  h2: {},
+  h3: {},
+  h4: {},
+  h5: {},
+  h6: {},
+  head: {},
+  header: {},
+  hgroup: obsolete,
+  hr: {},
+  html: {},
+  i: {},
+  iframe: {},
+  image: obsolete,
+  img: {},
+  input: {},
+  ins: {},
+  isindex: obsolete,
+  kbd: {},
+  keygen: obsolete,
+  label: {},
+  legend: {},
+  li: {},
+  link: {},
+  listing: obsolete,
+  main: {},
+  map: {},
+  mark: {},
+  marquee: obsolete,
+  menu: {},
+  menuitem: {},
+  meta: {},
+  meter: {},
+  multicol: obsolete,
+  nav: {},
+  nextid: obsolete,
+  nobr: obsolete,
+  noembed: obsolete,
+  noframes: obsolete,
+  noscript: {},
+  object: {},
+  ol: {},
+  optgroup: {},
+  option: {},
+  output: {},
+  p: {},
+  param: {},
+  picture: {},
+  plaintext: obsolete,
+  pre: {},
+  progress: {},
+  q: {},
+  rb: {},
+  rp: {},
+  rt: {},
+  rtc: {},
+  ruby: {},
+  s: {},
+  samp: {},
+  script: {},
+  section: {},
+  select: {},
+  small: {},
+  source: {},
+  spacer: obsolete,
+  span: {},
+  strike: obsolete,
+  strong: {},
+  style: {},
+  sub: {},
+  summary: {},
+  sup: {},
+  table: {},
+  tbody: {},
+  td: {},
+  template: {},
+  textarea: {},
+  tfoot: {},
+  th: {},
+  thead: {},
+  time: {},
+  title: {},
+  tr: {},
+  track: {},
+  tt: obsolete,
+  u: {},
+  ul: {},
+  var: {},
+  video: {},
+  wbr: {},
+  xmp: obsolete,
 };
 
-exports.globalAria = globalAria;
-exports.roles = roles;
-exports.properties = properties;
-
-},{}],2:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 "use strict";
 /**
  * Entry point for standalone autorunning linter
@@ -567,14 +1294,15 @@ if (/^(:?interactive|complete)$/.test(document.readyState)) {
 
 module.exports = linter;
 
-},{"./linter":3}],3:[function(require,module,exports){
+},{"./linter":6}],6:[function(require,module,exports){
 "use strict";
 const Runner = require('./runner');
 const Logger = require('./logger');
 const rules = require('./rules');
 const utils = require('./utils');
 const version = require('./version');
-const standards = require('./standards');
+const aria = require('./aria');
+const elements = require('./elements');
 
 const Linter = module.exports = class AccessibilityLinter extends Runner {
   constructor(options) {
@@ -607,9 +1335,11 @@ const Linter = module.exports = class AccessibilityLinter extends Runner {
 Linter.Logger = Logger;
 Linter.rules = rules;
 Linter.version = version;
-Linter.standards = standards;
+Linter.aria = aria;
+Linter.elements = elements;
+Linter.utils = utils;
 
-},{"./logger":4,"./rules":"./rules","./runner":6,"./standards":7,"./utils":8,"./version":"./version"}],4:[function(require,module,exports){
+},{"./aria":1,"./elements":4,"./logger":7,"./rules":"./rules","./runner":8,"./utils":10,"./version":"./version"}],7:[function(require,module,exports){
 "use strict";
 /* eslint-disable no-console */
 module.exports = class Logger {
@@ -642,449 +1372,7 @@ module.exports = class Logger {
   }
 };
 
-},{}],5:[function(require,module,exports){
-"use strict";
-/**
- * Rules for what an element allows
- *
- * https://w3c.github.io/html-aria/
- */
-
-function rule(options = {}) {
-  return Object.assign(
-    {
-      roles: false,
-      aria: true,
-      selector: '*',
-      implicitAria: false,
-    },
-    options,
-    {
-      implicit: [].concat(options.implicit || []),
-    }
-  );
-}
-
-// Common rules
-const noRoleOrAria = rule({ aria: false });
-const noRole = rule();
-const anyRole = rule({ roles: true });
-
-exports.defaultRule = anyRole;
-
-// Hash of elements and rules
-exports.rules = {
-  a: [
-    rule({
-      selector: '[href]',
-      implicit: 'link',
-      roles: [
-        'button', 'checkbox', 'menuitem', 'menuitemcheckbox',
-        'menuitemradio', 'radio', 'tab', 'switch', 'treeitem',
-      ],
-      implicitAria: true,
-    }),
-    rule({
-      selector: ':not([href])',
-      roles: true,
-    }),
-  ],
-  address: rule({
-    implicit: ['contentinfo'],
-  }),
-  area: [
-    rule({
-      selector: '[href]',
-      implicit: 'link',
-      implicitAria: true,
-    }),
-  ],
-  article: rule({
-    implicit: 'article',
-    roles: ['presentation', 'document', 'application', 'main', 'region'],
-  }),
-  aside: rule({
-    implicit: 'complementary',
-    roles: ['note', 'region', 'search'],
-  }),
-  audio: rule({
-    roles: ['application'],
-  }),
-  base: noRoleOrAria,
-  body: rule({
-    implicit: ['document'],
-  }),
-  button: [
-    rule({
-      selector: '[type=menu]',
-      implicit: 'button',
-      roles: ['link', 'menuitem', 'menuitemcheckbox', 'menuitemradio', 'radio'],
-    }),
-    rule({
-      implicit: 'button',
-      roles: [
-        'checkbox', 'link', 'menuitem', 'menuitemcheckbox',
-        'menuitemradio', 'radio', 'switch', 'tab',
-      ],
-    }),
-  ],
-  caption: noRole,
-  col: noRoleOrAria,
-  colgroup: noRoleOrAria,
-  datalist: rule({
-    implicit: 'listbox',
-    implicitAria: true,
-  }),
-  dd: rule({
-    implicit: 'definition',
-    implicitAria: true,
-  }),
-  details: rule({
-    implicit: 'group',
-    implicitAria: true,
-  }),
-  dialog: rule({
-    implicit: 'dialog',
-    roles: ['alertdialog'],
-    implicitAria: true,
-  }),
-  div: anyRole,
-  dl: rule({
-    implicit: 'list',
-    roles: ['group', 'presentation'],
-  }),
-  dt: rule({
-    implicit: 'listitem',
-    implicitAria: true,
-  }),
-  embed: rule({
-    roles: ['application', 'document', 'presentation', 'img'],
-  }),
-  fieldset: rule({
-    roles: ['group', 'presentation'],
-  }),
-  figure: rule({
-    implicit: 'figure',
-    roles: ['group', 'presentation'],
-  }),
-  footer: [
-    rule({
-      selector: 'article footer,section footer',
-      roles: ['group', 'presentation'],
-    }),
-    rule({
-      implicit: 'contentinfo',
-      roles: ['group', 'presentation'],
-    }),
-  ],
-  form: rule({
-    implicit: 'form',
-    roles: ['search', 'presentation'],
-  }),
-  p: anyRole,
-  pre: anyRole,
-  blockquote: anyRole,
-  h1: rule({
-    implicit: 'heading',
-    roles: ['tab', 'presentation'],
-  }),
-  h2: rule({
-    implicit: 'heading',
-    roles: ['tab', 'presentation'],
-  }),
-  h3: rule({
-    implicit: 'heading',
-    roles: ['tab', 'presentation'],
-  }),
-  h4: rule({
-    implicit: 'heading',
-    roles: ['tab', 'presentation'],
-  }),
-  h5: rule({
-    implicit: 'heading',
-    roles: ['tab', 'presentation'],
-  }),
-  h6: rule({
-    implicit: 'heading',
-    roles: ['tab', 'presentation'],
-  }),
-  head: noRoleOrAria,
-  header: [
-    rule({
-      selector: 'article header,section header',
-      roles: ['group', 'presentation'],
-    }),
-    rule({
-      implicit: 'banner',
-      roles: ['group', 'presentation'],
-    }),
-  ],
-  hr: rule({
-    implicit: 'separator',
-    roles: ['presentation'],
-    implicitAria: true,
-  }),
-  html: noRoleOrAria,
-  iframe: rule({
-    roles: ['application', 'document', 'img'],
-  }),
-  img: [
-    rule({
-      selector: '[alt=""]',
-      roles: ['presentation'],
-      aria: false,
-    }),
-    rule({
-      implicit: 'img',
-      roles: true,
-    }),
-  ],
-  input: [
-    rule({
-      selector: '[list]:not([type]),[list][type=text],[list][type=search],[list][type=tel],[list][type=url],[list][type=email]',
-      implicit: 'combobox',
-      implicitAria: true,
-    }),
-    rule({
-      selector: '[type=button]',
-      implicit: 'button',
-      roles: ['link', 'menuitem', 'menuitemcheckbox', 'menuitemradio', 'radio', 'switch', 'tab'],
-    }),
-    rule({
-      selector: '[type=image]',
-      implicit: 'button',
-      roles: ['link', 'menuitem', 'menuitemcheckbox', 'menuitemradio', 'radio', 'switch'],
-    }),
-    rule({
-      selector: '[type=checkbox]',
-      implicit: 'checkbox',
-      roles: ['button', 'menuitemcheckbox', 'switch'],
-    }),
-    rule({
-      selector: ':not([type]),[type=password],[type=tel],[type=text],[type=url]',
-      implicit: 'textbox',
-    }),
-    rule({
-      selector: '[type=email]',
-      implicit: 'textbox',
-      implicitAria: true,
-    }),
-    rule({
-      selector: '[type=hidden]',
-      aria: false,
-    }),
-    rule({
-      selector: '[type=number]',
-      implicit: 'spinbutton',
-      implicitAria: true,
-    }),
-    rule({
-      selector: '[type=radio]',
-      implicit: 'radio',
-      roles: ['menuitemradio'],
-    }),
-    rule({
-      selector: '[type=range]',
-      implicit: 'slider',
-    }),
-    rule({
-      selector: '[type=reset],[type=submit]',
-      implicit: 'button',
-      implicitAria: true,
-    }),
-    rule({
-      selector: '[type=search]',
-      implicit: 'searchbox',
-      implicitAria: true,
-    }),
-    noRole,
-  ],
-  ins: anyRole,
-  del: anyRole,
-  keygen: noRole,
-  label: noRole,
-  legend: noRole,
-  li: [
-    rule({
-      selector: 'ol>li,ul>li',
-      implicit: 'listitem',
-      roles: [
-        'menuitem', 'menuitemcheckbox', 'menuitemradio', 'option',
-        'presentation', 'separator', 'tab', 'treeitem',
-      ],
-    }),
-  ],
-  link: [
-    rule({
-      selector: '[href]',
-      implicit: 'link',
-      globalAria: false,
-    }),
-  ],
-  main: rule({
-    implicit: 'main',
-  }),
-  map: noRoleOrAria,
-  math: rule({
-    implicit: 'math',
-  }),
-  menu: [
-    rule({
-      selector: '[type=toolbar]',
-      implicit: 'toolbar',
-      implicitAria: true,
-    }),
-  ],
-  menuitem: [
-    rule({
-      selector: '[type=command]',
-      implicit: 'menuitem',
-      implicitAria: true,
-    }),
-    rule({
-      selector: '[type=checkbox]',
-      implicit: 'menuitemcheckbox',
-      implicitAria: true,
-    }),
-    rule({
-      selector: '[type=radio]',
-      implicit: 'menuitemradio',
-      implicitAria: true,
-    }),
-  ],
-  meta: noRoleOrAria,
-  meter: rule({
-    implicit: 'progressbar',
-  }),
-  nav: rule({
-    implicit: 'navigation',
-  }),
-  noscript: noRoleOrAria,
-  object: rule({
-    roles: ['application', 'document', 'img'],
-  }),
-  ol: rule({
-    implicit: 'list',
-    roles: [
-      'directory', 'group', 'listbox', 'menu', 'menubar', 'presentation',
-      'radiogroup', 'tablist', 'toolbar', 'tree',
-    ],
-  }),
-  optgroup: rule({
-    implicit: 'group',
-  }),
-  option: [
-    rule({
-      selector: 'select>option,select>optgroup>option,datalist>option',
-      implicit: 'option',
-    }),
-    noRoleOrAria,
-  ],
-  output: rule({
-    implicit: 'status',
-    roles: true,
-  }),
-  param: noRoleOrAria,
-  picture: noRoleOrAria,
-  progress: rule({
-    implicit: 'progressbar',
-    implicitAria: true,
-  }),
-  script: noRoleOrAria,
-  section: rule({
-    implicit: 'region',
-    roles: [
-      'alert', 'alertdialog', 'application', 'banner', 'complementary',
-      'contentinfo', 'dialog', 'document', 'log', 'main', 'marquee',
-      'navigation', 'search', 'status',
-    ],
-  }),
-  select: rule({
-    implicit: 'listbox',
-  }),
-  source: noRoleOrAria,
-  span: anyRole,
-  style: noRoleOrAria,
-  svg: rule({
-    roles: ['application', 'document', 'img'],
-  }),
-  summary: rule({
-    implicit: 'button',
-    implicitAria: true,
-  }),
-  table: rule({
-    implicit: 'table',
-    roles: true,
-  }),
-  template: noRoleOrAria,
-  textarea: rule({
-    implicit: 'textbox',
-  }),
-  tbody: rule({
-    implicit: 'rowgroup',
-    roles: true,
-  }),
-  thead: rule({
-    implicit: 'rowgroup',
-    roles: true,
-  }),
-  tfoot: rule({
-    implicit: 'rowgroup',
-    roles: true,
-  }),
-  title: noRoleOrAria,
-  td: rule({
-    implicit: 'cell',
-    roles: true,
-  }),
-  em: anyRole,
-  strong: anyRole,
-  small: anyRole,
-  s: anyRole,
-  cite: anyRole,
-  q: anyRole,
-  dfn: anyRole,
-  abbr: anyRole,
-  time: anyRole,
-  code: anyRole,
-  var: anyRole,
-  samp: anyRole,
-  kbd: anyRole,
-  sub: anyRole,
-  sup: anyRole,
-  i: anyRole,
-  b: anyRole,
-  u: anyRole,
-  mark: anyRole,
-  ruby: anyRole,
-  rt: anyRole,
-  rp: anyRole,
-  bdi: anyRole,
-  bdo: anyRole,
-  br: anyRole,
-  wbr: anyRole,
-  th: rule({
-    implicit: ['columnheader', 'rowheader'],
-    roles: true,
-  }),
-  tr: rule({
-    implicit: 'row',
-    roles: true,
-  }),
-  track: noRoleOrAria,
-  ul: rule({
-    implicit: 'list',
-    roles: [
-      'directory', 'group', 'listbox', 'menu', 'menubar',
-      'tablist', 'toolbar', 'tree', 'presentation',
-    ],
-  }),
-  video: rule({
-    roles: ['application'],
-  }),
-};
-
-},{}],6:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 "use strict";
 const { $$ } = require('./utils');
 
@@ -1188,52 +1476,30 @@ module.exports = class Runner {
   }
 };
 
-},{"./utils":8}],7:[function(require,module,exports){
+},{"./utils":10}],9:[function(require,module,exports){
 "use strict";
-/**
- * HTML standards
- *
- * https://w3c.github.io/html-aria/
- */
-const { rules: elementRules, defaultRule } = require('./role-rules');
-const { roles } = require('./aria-rules');
-
-const allRoles = Object.keys(roles);
-
-function getAllowedRoles(rule) {
-  if (rule.roles === false) {
-    return [];
-  }
-  if (rule.roles === true) {
-    return allRoles.filter(role => !rule.implicit.includes(role));
-  }
-  return rule.roles;
+// Is the element hidden using CSS
+function cssHidden(el) {
+  const style = window.getComputedStyle(el);
+  return style.visibility !== 'visible' || style.display === 'none';
 }
 
-/**
- * Given an element, return an object with the aria information
- */
-exports.aria = {
-  match(el) {
-    const name = el.nodeName.toLowerCase();
-    let rule = elementRules[name];
-    if (Array.isArray(rule)) {
-      rule = rule.find(item => item.selector === '*' || el.matches(item.selector));
-    }
-    rule = rule || defaultRule;
-    const allowedRoles = getAllowedRoles(rule);
-
-    return {
-      implicitRoles: rule.implicit,
-      allowedRoles,
-    };
-  },
-
-  roles: allRoles,
+// Is the element hidden from accessibility software
+module.exports = function hidden(el) {
+  return el.getAttribute('aria-hidden') === 'true'
+    || el.getClientRects().length === 0
+    || !!el.closest('[aria-hidden=true]')
+    || cssHidden(el);
 };
 
-},{"./aria-rules":1,"./role-rules":5}],8:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 "use strict";
+/**
+ * Utils for working with the DOM
+ */
+
+const hidden = require('./hidden');
+
 /**
  * Find DOM nodes from a selector.  The found node can include the supplied context
  * @param {String|NodeList} selector
@@ -1256,6 +1522,8 @@ exports.cssEscape = function cssEscape(name) {
   return name.replace(/["\\]/g, '\\$&');
 };
 
+exports.hidden = hidden;
+
 /**
  * Observe for child list mutations
  * @param {Function} fn function to call for each mutation
@@ -1272,6 +1540,6 @@ exports.observe = function mutationObserver(fn, root) {
   return observer;
 };
 
-},{}]},{},["./rules","./version",2])(2)
+},{"./hidden":9}]},{},["./rules","./version",5])(5)
 });
 //# sourceMappingURL=linter.js.map
