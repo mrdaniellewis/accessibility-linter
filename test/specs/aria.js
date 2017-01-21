@@ -5,80 +5,130 @@ describe('aria', () => {
     expect(aria).toExist();
   });
 
-  const allRoles = [
-    'alert',
-    'alertdialog',
-    'application',
-    'article',
-    'banner',
-    'button',
-    'cell',
-    'checkbox',
-    'columnheader',
-    'combobox',
-    'complementary',
-    'contentinfo',
-    'definition',
-    'dialog',
-    'directory',
-    'document',
-    'feed',
-    'figure',
-    'form',
-    'grid',
-    'gridcell',
-    'group',
-    'heading',
-    'img',
-    'link',
-    'list',
-    'listbox',
-    'listitem',
-    'log',
-    'main',
-    'marquee',
-    'math',
-    'menu',
-    'menubar',
-    'menuitem',
-    'menuitemcheckbox',
-    'menuitemradio',
-    'navigation',
-    'note',
-    'option',
-    'presentation',
-    'progressbar',
-    'radio',
-    'radiogroup',
-    'region',
-    'row',
-    'rowgroup',
-    'rowheader',
-    'scrollbar',
-    'search',
-    'searchbox',
-    'separator',
-    'slider',
-    'spinbutton',
-    'status',
-    'switch',
-    'tab',
-    'table',
-    'tablist',
-    'tabpanel',
-    'term',
-    'textbox',
-    'timer',
-    'toolbar',
-    'tooltip',
-    'tree',
-    'treegrid',
-    'treeitem',
+  const roleHierarchy = {
+    alert: ['section'],
+    alertdialog: ['alert', 'dialog'],
+    application: ['structure'],
+    article: ['document'],
+    banner: ['landmark'],
+    button: ['command'],
+    cell: ['section'],
+    checkbox: ['input'],
+    columnheader: ['cell', 'gridcell', 'sectionhead'],
+    combobox: ['select'],
+    command: ['widget'],
+    complementary: ['landmark'],
+    composite: ['widget'],
+    contentinfo: ['landmark'],
+    definition: ['section'],
+    dialog: ['window'],
+    directory: ['list'],
+    document: ['structure'],
+    feed: ['list'],
+    figure: ['section'],
+    form: ['landmark'],
+    grid: ['composite', 'table'],
+    gridcell: ['cell', 'widget'],
+    group: ['section'],
+    heading: ['sectionhead'],
+    img: ['section'],
+    input: ['widget'],
+    landmark: ['section'],
+    link: ['command'],
+    list: ['section'],
+    listbox: ['select'],
+    listitem: ['section'],
+    log: ['section'],
+    main: ['landmark'],
+    marquee: ['section'],
+    math: ['section'],
+    menu: ['select'],
+    menubar: ['menu'],
+    menuitem: ['command'],
+    menuitemcheckbox: ['checkbox', 'menuitem'],
+    menuitemradio: ['menuitemcheckbox', 'radio'],
+    navigation: ['landmark'],
+    none: ['structure'],
+    note: ['section'],
+    option: ['input'],
+    presentation: ['structure'],
+    progressbar: ['range'],
+    radio: ['input'],
+    radiogroup: ['select'],
+    range: ['widget'],
+    region: ['landmark'],
+    roletype: [],
+    row: ['group', 'widget'],
+    rowgroup: ['structure'],
+    rowheader: ['cell', 'gridcell', 'sectionhead'],
+    scrollbar: ['range'],
+    search: ['landmark'],
+    searchbox: ['textbox'],
+    section: ['structure'],
+    sectionhead: ['structure'],
+    select: ['composite', 'group'],
+    separator: ['structure', 'widget'],
+    slider: ['input', 'range'],
+    spinbutton: ['composite', 'input', 'range'],
+    status: ['section'],
+    structure: ['roletype'],
+    switch: ['checkbox'],
+    tab: ['sectionhead', 'widget'],
+    table: ['section'],
+    tablist: ['composite'],
+    tabpanel: ['section'],
+    term: ['section'],
+    textbox: ['input'],
+    timer: ['status'],
+    toolbar: ['group'],
+    tooltip: ['section'],
+    tree: ['select'],
+    treegrid: ['grid', 'tree'],
+    treeitem: ['listitem', 'option'],
+    widget: ['roletype'],
+    window: ['roletype'],
+  };
+
+  const allRoles = Object.keys(roleHierarchy);
+
+  const abstractRoles = [
+    'command',
+    'composite',
+    'input',
+    'landmark',
+    'range',
+    'roletype',
+    'section',
+    'sectionhead',
+    'select',
+    'structure',
+    'widget',
+    'window',
   ];
 
   describe('#roles', () => {
     it('is an object whose keys are all possible roles', () => {
       expect(Object.keys(aria.roles)).toEqualArray(allRoles);
+    });
+
+    it('has the correct roles marked as abstract', () => {
+      expect(Object.keys(aria.roles).filter(name => aria.roles[name].abstract))
+        .toEqualArray(abstractRoles);
+    });
+
+    describe('role classes', () => {
+      Object.keys(aria.roles).forEach((name) => {
+        it(`has the correct subclass roles for ${name}`, () => {
+          const subclasses = aria.roles[name].subclass || [];
+          Object.keys(roleHierarchy).forEach((roleName) => {
+            if (subclasses.includes(roleName)) {
+              expect(roleHierarchy[roleName]).toInclude(name, `expected ${roleName} to be superclass for ${name}`);
+            } else {
+              expect(roleHierarchy[roleName]).toNotInclude(name, `expected ${roleName} not to be superclass for ${name}`);
+            }
+          });
+        });
+      });
     });
   });
 
@@ -108,6 +158,38 @@ describe('aria', () => {
     it('returns an implicit role if no valid role is provided', () => {
       const el = build('<input role="invalid" />');
       expect(aria.getRole(el)).toEqual('textbox');
+    });
+
+    it('does not return abstract roles', () => {
+      const el = build('<input role="widget alert" />');
+      expect(aria.getRole(el)).toEqual('alert');
+    });
+  });
+
+  describe('#hasRole', () => {
+    it('returns false for an element with no role', () => {
+      const el = build('<div />');
+      expect(aria.hasRole(el, 'none')).toEqual(false);
+    });
+
+    it('returns true for an element with an explicit role', () => {
+      const el = build('<div role="button" />');
+      expect(aria.hasRole(el, 'button')).toEqual(true);
+    });
+
+    it('returns true for an element with an implicit role', () => {
+      const el = build('<button />');
+      expect(aria.hasRole(el, 'button')).toEqual(true);
+    });
+
+    it('returns true for a parent superclass role', () => {
+      const el = build('<button />');
+      expect(aria.hasRole(el, 'command')).toEqual(true);
+    });
+
+    it('returns true for a ancestor superclass role', () => {
+      const el = build('<button />');
+      expect(aria.hasRole(el, 'roletype')).toEqual(true);
     });
   });
 
