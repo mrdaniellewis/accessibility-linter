@@ -15,6 +15,11 @@
         return true;
       }
 
+      if (aria.roles[name].abstract) {
+        error = `"${name}" is an abstract role and should not be used`;
+        return true;
+      }
+
       if (rule.implicitRoles.includes(name)) {
         error = `role "${name}" is implicit for this element and should not be specified`;
         return true;
