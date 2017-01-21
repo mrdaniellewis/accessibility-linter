@@ -16,7 +16,13 @@ before(() => {
     };
   };
 
-  aria.roles = { implicit: {}, allowed1: {}, allowed2: {}, disallowed: {} };
+  aria.roles = {
+    implicit: {},
+    allowed1: {},
+    allowed2: {},
+    disallowed: {},
+    abstract: { abstract: true },
+  };
 });
 
 after(() => {
@@ -70,6 +76,19 @@ context('using an unknown role', () => {
 
   it('adds an error', when(() => {
     el = appendToBody('<test role="unknown" />');
+  }).then(() => {
+    expect(logger).toHaveEntries([rule, el]);
+  }));
+});
+
+context('using an abstract role', () => {
+  it('generates the expected error message', () => {
+    el = appendToBody('<test role="abstract" />');
+    expect(rule).toGenerateErrorMessage({ for: el }, '"abstract" is an abstract role and should not be used');
+  });
+
+  it('adds an error', when(() => {
+    el = appendToBody('<test role="abstract" />');
   }).then(() => {
     expect(logger).toHaveEntries([rule, el]);
   }));
