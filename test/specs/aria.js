@@ -116,9 +116,9 @@ describe('aria', () => {
         .toEqualArray(abstractRoles);
     });
 
-    describe('role classes', () => {
+    describe('has the correct subclass roles for', () => {
       Object.keys(aria.roles).forEach((name) => {
-        it(`has the correct subclass roles for ${name}`, () => {
+        it(name, () => {
           const subclasses = aria.roles[name].subclass || [];
           Object.keys(roleHierarchy).forEach((roleName) => {
             if (subclasses.includes(roleName)) {
@@ -190,6 +190,22 @@ describe('aria', () => {
     it('returns true for a ancestor superclass role', () => {
       const el = build('<button />');
       expect(aria.hasRole(el, 'roletype')).toEqual(true);
+    });
+
+    it('returns false for an invalid string role', () => {
+      expect(aria.hasRole('xxx', 'button')).toEqual(false);
+    });
+
+    it('returns false for an non-matching string role', () => {
+      expect(aria.hasRole('alert', 'button')).toEqual(false);
+    });
+
+    it('returns true for a matching string role', () => {
+      expect(aria.hasRole('button', 'button')).toEqual(true);
+    });
+
+    it('returns true for an matching ancestor string role', () => {
+      expect(aria.hasRole('button', 'roletype')).toEqual(true);
     });
   });
 
