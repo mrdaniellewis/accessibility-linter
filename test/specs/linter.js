@@ -239,46 +239,143 @@ describe('AccessibilityLinter', () => {
     });
   });
 
+  describe('hidden elements', () => {
+    let el, linter;
+
+    afterEach(() => {
+      if (el) {
+        el.remove();
+      }
+      linter = el = null;
+    });
+
+    context('when running a rule with default settings', () => {
+      beforeEach(() => {
+        linter = new AccessibilityLinter({ rules, logger });
+      });
+
+      it('ignores elements that are hidden', () => {
+        el = appendToBody('<accessibility-linter aria-hidden="true" />');
+        linter.run();
+        expect(logger).toNotHaveEntries();
+      });
+
+      it('includes elements that are visible', () => {
+        el = appendToBody('<accessibility-linter />');
+        linter.run();
+        expect(logger).toHaveEntries();
+      });
+    });
+
+    context('when running a rule with includeHidden', () => {
+      const includeHiddenRule = {
+        message: 'foo-bar',
+        selector: 'accessibility-linter',
+        includeHidden: true,
+      };
+
+      beforeEach(() => {
+        linter = new AccessibilityLinter({ rules: new Map([['rule', includeHiddenRule]]), logger });
+      });
+
+      it('includes elements that are hidden', () => {
+        el = appendToBody('<accessibility-linter aria-hidden="true" />');
+        linter.run();
+        expect(logger).toHaveEntries();
+      });
+
+      it('includes elements that are visible', () => {
+        el = appendToBody('<accessibility-linter />');
+        linter.run();
+        expect(logger).toHaveEntries();
+      });
+    });
+  });
+
   describe('#observe', () => {
-    let linter, el;
+    let linter, el, el2, el3, spy;
 
     beforeEach(() => {
       linter = new AccessibilityLinter({ rules, logger });
-      linter.observe();
+      spy = expect.spyOn(linter, 'run').andCallThrough();
     });
 
     afterEach(() => {
       linter.stopObserving();
-      el.remove();
+      [el, el2, el3].filter(Boolean).forEach(elm => elm.remove());
+      linter = spy = el = null;
     });
 
-    it('finds errors when DOM modifications occur', when(() => {
+    it('finds errors when nodes are added to the DOM', when(() => {
+      linter.observe();
       el = document.createElement('accessibility-linter');
       document.body.appendChild(el);
     })
     .then(() => {
+      expect(spy).toHaveBeenCalledWith(document.body);
       expect(logger).toHaveEntries();
-      el.remove();
+    }));
+
+    it('finds errors when DOM attributes are changed', when(() => {
+      el = document.createElement('accessibility-linter');
+      document.body.appendChild(el);
+      linter.observe();
+      el.title = 'foo';
+    })
+    .then(() => {
+      expect(spy).toHaveBeenCalledWith(document.body);
+      expect(logger).toHaveEntries();
+    }));
+
+    it('finds errors when text nodes are changed', when(() => {
+      el = document.createElement('accessibility-linter');
+      document.body.appendChild(el);
+      linter.observe();
+      el.textContent = 'foo';
+      linter.observe();
+    })
+    .then(() => {
+      expect(spy).toHaveBeenCalledWith(el);
+      expect(logger).toHaveEntries();
+    }));
+
+    it('only tests against each DOM element once', when(() => {
+      linter.observe();
+      el = document.createElement('accessibility-linter');
+      document.body.appendChild(el);
+      el2 = document.createElement('accessibility-linter');
+      document.body.appendChild(el2);
+      el3 = document.createElement('accessibility-linter');
+      el.appendChild(el3);
+      el.textContent = 'foo';
+    })
+    .then(() => {
+      expect(spy).toHaveBeenCalledWith(document.body);
+      expect(logger).toHaveEntries();
     }));
 
     describe('#stopObserving', () => {
+      it('does nothing if no observing is happening', () => {
+        linter.stopObserving();
+      });
+
       it('stops finding errors when DOM modifications occur', when(() => {
+        linter.observe();
         linter.stopObserving();
         el = document.createElement('accessibility-linter');
         document.body.appendChild(el);
       }).then(() => {
         expect(logger).toNotHaveEntries();
-        el.remove();
       }));
 
       it('resumes finding errors if #observe is called again', when(() => {
+        linter.observe();
         linter.stopObserving();
         linter.observe();
         el = document.createElement('accessibility-linter');
         document.body.appendChild(el);
       }).then(() => {
         expect(logger).toHaveEntries();
-        el.remove();
       }));
     });
   });
