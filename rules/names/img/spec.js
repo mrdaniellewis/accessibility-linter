@@ -8,6 +8,12 @@ it('adds an error for images without an alt tag', when(() => {
   expect(logger).toHaveEntries([rule, el]);
 }));
 
+it('adds an error for images without an alt tag when hidden', when(() => {
+  el = appendToBody('<img aria-hidden="true">');
+}).then(() => {
+  expect(logger).toHaveEntries([rule, el]);
+}));
+
 it('does not add an error for images with an alt tag', when(() => {
   appendToBody('<img alt="foo">');
 }).then(() => {
