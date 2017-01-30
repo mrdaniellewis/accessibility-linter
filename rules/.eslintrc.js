@@ -13,6 +13,7 @@ module.exports = {
     standards: false,
     elements: false,
     aria: false,
+    utils: false,
     // Globals for specs
     appendToBody: false,
     when: false,
