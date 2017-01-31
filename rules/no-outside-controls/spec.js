@@ -3,15 +3,56 @@ it('generates the expected error message', () => {
 });
 
 ['input', 'textarea', 'select'].forEach((type) => {
-  it(`adds an error if a ${type} is outside a form`, when(() => {
-    el = appendToBody(`<${type} />`);
+  describe(type, () => {
+    it('adds an error outside of a form', when(() => {
+      el = appendToBody(`<${type} />`);
+    }).then(() => {
+      expect(logger).toHaveEntries([rule, el]);
+    }));
+
+    it('does not adds an error inside a form', when(() => {
+      appendToBody(`<form><${type} /></form>`);
+    }).then(() => {
+      expect(logger).toNotHaveEntries();
+    }));
+  });
+});
+
+describe('<button> without a type', () => {
+  it('adds an error outside of a form', when(() => {
+    el = appendToBody('<button></button>');
   }).then(() => {
     expect(logger).toHaveEntries([rule, el]);
   }));
 
-  it(`does not adds an error if a ${type} is inside a form`, when(() => {
-    appendToBody(`<form><${type} /></form>`);
+  it('does not adds an error inside a form', when(() => {
+    appendToBody('<form><button></button></form>');
   }).then(() => {
     expect(logger).toNotHaveEntries();
   }));
 });
+
+['submit', 'reset'].forEach((type) => {
+  describe(`<button type="${type}">`, () => {
+    it('adds an error outside of a form', when(() => {
+      el = appendToBody(`<button type="${type}" />`);
+    }).then(() => {
+      expect(logger).toHaveEntries([rule, el]);
+    }));
+
+    it('does not adds an error inside a form', when(() => {
+      appendToBody(`<form><button type="${type}"></button></form>`);
+    }).then(() => {
+      expect(logger).toNotHaveEntries();
+    }));
+  });
+});
+
+describe('<button type="button">', () => {
+  it('does not adds an error outside a form', when(() => {
+    appendToBody('<button type="button"></button>');
+  }).then(() => {
+    expect(logger).toNotHaveEntries();
+  }));
+});
+
