@@ -23,6 +23,14 @@ it('ignores empty ids', when(() => {
   expect(logger).toNotHaveEntries();
 }));
 
+it('includes hidden elements', when(() => {
+  const id = uniqueId();
+  el = appendToBody(`<div aria-hidden="true" id="${id}" />`);
+  el2 = appendToBody(`<div id="${id}" />`);
+}).then(() => {
+  expect(logger).toHaveEntries([rule, el], [rule, el2]);
+}));
+
 it('does not blow up if an id required escaping', when(() => {
   appendToBody('<div id="&quot; \\" />');
 }).then(() => {
