@@ -5,4 +5,5 @@
     const id = cssEscape(el.name);
     return id && $$(`a[name="${id}"],[id="${id}"]`).length === 1;
   },
+  includeHidden: true,
 });
