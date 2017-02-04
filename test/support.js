@@ -34,17 +34,13 @@
       this.clear();
     }
 
-    error() {
-      this.errors.push(Array.from(arguments));
-    }
-
-    warn() {
-      this.warnings.push(Array.from(arguments));
+    log({ type, el, message }) {
+      this[`${type}s`].push([message, el].filter(Boolean));
     }
 
     clear() {
       this.errors = [];
-      this.warnings = [];
+      this.warns = [];
     }
   };
 
@@ -72,31 +68,23 @@
       return this;
     },
 
-    toGenerateErrorMessage(ob, error) {
-      const rule = this.actual;
-      const expected = error || ob;
-      let message;
-      if (typeof rule.message === 'function') {
-        message = rule.message(ob.for);
-      } else {
-        message = rule.message;
-      }
-      expect(message).toEqual(expected);
-      return this;
-    },
-
-    toEqualArray(array) {
+    toMatchArray(array) {
       try {
-        expect(this.actual).toEqual(array);
+        expect(this.actual.sort()).toEqual(array.sort());
       } catch (e) {
         const missing = array.filter(item => !this.actual.includes(item));
         const additional = this.actual.filter(item => !array.includes(item));
         const parts = [
           missing.length ? `to include ${JSON.stringify(missing)}` : null,
           additional.length ? `not to include ${JSON.stringify(additional)}` : null,
-        ];
+        ].filter(Boolean);
         throw new Error(`Expected array ${parts.join(' and ')}`);
       }
+      return this;
+    },
+
+    toHaveHadCalls() {
+      expect(this.actual.calls.map(call => call.arguments)).toEqual(Array.from(arguments));
       return this;
     },
   });
@@ -115,4 +103,25 @@
       cleaner.stop();
     });
   };
+
+  window.proxy = function (fn) {
+    let ob, prop, originalValue;
+
+    beforeEach(() => {
+      fn((_ob, _prop, newValue) => {
+        ob = _ob;
+        prop = _prop;
+        originalValue = ob[prop];
+        ob[prop] = newValue;
+      });
+    });
+
+    afterEach(() => {
+      ob[prop] = originalValue;
+    });
+  };
+
+  afterEach(() => {
+    expect.restoreSpies();
+  });
 }());
