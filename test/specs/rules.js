@@ -16,7 +16,7 @@ describe('rules', () => {
   });
 
   ruleSpecs.forEach((spec, name) => {
-    let window, rule, rules, cleaner;
+    let window, rule, rules, cleaner, iframeError;
 
     // Make sure everything is setup using the iFrame versions
     describe(name, () => {
@@ -28,12 +28,13 @@ describe('rules', () => {
         if (!rule) {
           throw new Error(`spec for "${name}" not found`);
         }
-        window.onerror = function (message) {
-          throw new Error(`Error in iframe ${message}`);
+        window.onerror = function () {
+          iframeError = true;
         };
       });
 
       beforeEach(() => {
+        iframeError = false;
         const logger = context.logger = new TestLogger();
         const linter = context.linter = new window.AccessibilityLinter({ logger, rules });
         linter.observe();
@@ -45,9 +46,30 @@ describe('rules', () => {
         cleaner.stop();
         cleaner.clean();
         cleaner = null;
+        if (iframeError) {
+          throw new Error('script error in iframe - see browser log');
+        }
       }));
 
-      spec.call(context);
+      // eslint-disable-next-line no-new-func
+      new Function(`
+        let el, el2, rule, logger, linter, window, document, $, appendToBody, location;
+        const when = fn => this.when(fn, this);
+
+        before(() => {
+          ({ window, document, window: { $, appendToBody, location } } = this);
+        });
+
+        beforeEach(() => {
+          ({rule, logger, linter} = this);
+        });
+
+        afterEach(() => {
+          el = el2 = rule = logger = linter = null;
+        });
+
+        ${spec.toString().replace(/^function\s*\(\)\s*{/, '').replace(/}$/, '')}
+      `).call(context);
     });
   });
 });
