@@ -13,12 +13,14 @@
     "domCleaner": false,
     "build": false,
     "clean": false,
-    "uniqueId": false
+    "uniqueId": false,
+    "proxy": false
   },
   "rules": {
     "prefer-arrow-callback": 0,
     "func-names": 0,
     "one-var": 0,
-    "one-var-declaration-per-line": 0
+    "one-var-declaration-per-line": 0,
+    "class-methods-use-this": 0
   }
 }
