@@ -119,13 +119,27 @@ describe('utils', () => {
       expect(utils.hidden(utils.$('p', el))).toEqual(true);
     });
 
-    it('accepts a second style parameter', () => {
-      const el = appendToBody('<div style="display: none">foo</div>');
-      const style = window.getComputedStyle(el);
-      const spy = expect.spyOn(window, 'getComputedStyle');
-      expect(utils.hidden(el, style)).toEqual(true);
-      expect(spy).toNotHaveBeenCalled();
-      spy.restore();
+    describe('style option', () => {
+      it('accepts a computed style', () => {
+        const el = appendToBody('<div style="display: none">foo</div>');
+        const style = window.getComputedStyle(el);
+        const spy = expect.spyOn(window, 'getComputedStyle');
+        expect(utils.hidden(el, { style })).toEqual(true);
+        expect(spy).toNotHaveBeenCalled();
+        spy.restore();
+      });
+    });
+
+    describe('noAria option', () => {
+      it('ignores an aria-hidden element if true', () => {
+        const el = appendToBody('<div aria-hidden="true">foo</div>');
+        expect(utils.hidden(el, { noAria: true })).toEqual(false);
+      });
+
+      it('does not ignore a aria-hidden element if false', () => {
+        const el = appendToBody('<div aria-hidden="true">foo</div>');
+        expect(utils.hidden(el, { noAria: false })).toEqual(true);
+      });
     });
   });
 
