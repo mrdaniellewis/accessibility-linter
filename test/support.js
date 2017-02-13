@@ -20,7 +20,10 @@
             observer.disconnect();
             resolve(mutations);
           });
-          observer.observe(global.document, { subtree: true, childList: true });
+          observer.observe(
+            global.document,
+            { subtree: true, childList: true, attributes: true, characterData: true }
+          );
           this.setup();
         })
         .then(this.test);
