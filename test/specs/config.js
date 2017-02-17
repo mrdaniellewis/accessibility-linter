@@ -388,18 +388,23 @@ describe('config', () => {
       });
 
       describe('elements with a native label', () => {
+        let utils;
         clean();
+
+        beforeEach(() => {
+          utils = new AccessibilityLinter.Utils();
+        });
 
         ['img', 'area'].forEach((name) => {
           describe(`<${name}>`, () => {
             it('uses the alt attribute as text alternative', () => {
               const el = appendToBody(`<${name} alt="foo" />`);
-              expect(elements[name].nativeLabel(el)).toEqual('foo');
+              expect(elements[name].nativeLabel(el, utils)).toEqual('foo');
             });
 
             it('it defaults to an empty string', () => {
               const el = appendToBody(`<${name} />`);
-              expect(elements[name].nativeLabel(el)).toEqual('');
+              expect(elements[name].nativeLabel(el, utils)).toEqual('');
             });
           });
         });
@@ -410,18 +415,18 @@ describe('config', () => {
             const label1 = appendToBody(`<label for="${id}">foo</label>`);
             const label2 = appendToBody(`<label for="${id}">foo</label>`);
             const el = appendToBody(`<${name} id="${id}" ${attrs}></${name}>`);
-            expect(elements[name].nativeLabel(el)).toEqual([label1, label2]);
+            expect(elements[name].nativeLabel(el, utils)).toEqual([label1, label2]);
           });
 
           it('uses an ancestor label without the "for" attribute', () => {
             const label = appendToBody(`<label><${name} ${attrs}></${name}>foo</label>`);
-            expect(elements[name].nativeLabel(label.querySelector(name))).toEqual([label]);
+            expect(elements[name].nativeLabel(label.querySelector(name), utils)).toEqual([label]);
           });
 
           it('does not use an ancestor label with the "for" attribute', () => {
             const id = uniqueId();
             const label = appendToBody(`<label for="${id}"><${name} ${attrs}></${name}>foo</label>`);
-            expect(elements[name].nativeLabel(label.querySelector(name))).toEqual([]);
+            expect(elements[name].nativeLabel(label.querySelector(name), utils)).toEqual([]);
           });
 
           it('uses for associated labels and ancestor labels', () => {
@@ -429,7 +434,7 @@ describe('config', () => {
             const label1 = appendToBody(`<label for="${id}">foo</label>`);
             const label2 = appendToBody(`<label for="${id}">foo</label>`);
             const label3 = appendToBody(`<label><${name} id="${id}" ${attrs}></${name}>fee</label>`);
-            expect(elements[name].nativeLabel(label3.querySelector(name)))
+            expect(elements[name].nativeLabel(label3.querySelector(name), utils))
               .toEqual([label1, label2, label3]);
           });
 
@@ -438,14 +443,14 @@ describe('config', () => {
             appendToBody(`<label for="${id}">foo</label>`);
             appendToBody(`<${name} id="${id}"></${name}>`);
             const el = appendToBody(`<${name} id="${id}" ${attrs}></${name}>`);
-            expect(elements[name].nativeLabel(el)).toEqual([]);
+            expect(elements[name].nativeLabel(el, utils)).toEqual([]);
           });
 
           it('does not use hidden labels', () => {
             const id = uniqueId();
             appendToBody(`<label for="${id}" aria-hidden="true">foo</label>`);
             const el = appendToBody(`<${name} id="${id}"></${name}>`);
-            expect(elements[name].nativeLabel(el)).toEqual([]);
+            expect(elements[name].nativeLabel(el, utils)).toEqual([]);
           });
         };
 
@@ -458,19 +463,19 @@ describe('config', () => {
         describe('<input[type=hidden]>', () => {
           it('has no nativeLabel', () => {
             const label = appendToBody('<label><input type="hidden" alt="xx">foo</label>');
-            expect(elements.input.nativeLabel(label.querySelector('input'))).toEqual(null);
+            expect(elements.input.nativeLabel(label.querySelector('input'), utils)).toEqual(null);
           });
         });
 
         describe('<input[type=image]>', () => {
           it('uses the alt text as a native label', () => {
             const label = appendToBody('<label><input type="image" alt="bar">foo</label>');
-            expect(elements.input.nativeLabel(label.querySelector('input'))).toEqual('bar');
+            expect(elements.input.nativeLabel(label.querySelector('input'), utils)).toEqual('bar');
           });
 
           it('uses the value text as a native label if there is no alt', () => {
             const label = appendToBody('<label><input type="image" value="bar">foo</label>');
-            expect(elements.input.nativeLabel(label.querySelector('input'))).toEqual('bar');
+            expect(elements.input.nativeLabel(label.querySelector('input'), utils)).toEqual('bar');
           });
         });
 
