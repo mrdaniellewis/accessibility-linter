@@ -43,7 +43,7 @@
 
     clear() {
       this.errors = [];
-      this.warns = [];
+      this.warns = this.warnings = [];
     }
   };
 
@@ -51,7 +51,7 @@
   expect.extend({
     toNotHaveEntries() {
       expect.assert(
-        this.actual.errors.length === 0,
+        this.actual.errors.length === 0 && this.actual.warnings.length === 0,
         'expected %s to have no logged entries',
         this.actual.errors
       );
@@ -68,6 +68,19 @@
         return this;
       }
       expect(this.actual.errors).toEqual(Array.from(arguments));
+      return this;
+    },
+
+    toHaveWarnings() {
+      if (arguments.length === 0) {
+        expect.assert(
+          this.actual.warnings.length > 0,
+          'expected %s to have logged entries',
+          this.actual.warnings.length
+        );
+        return this;
+      }
+      expect(this.actual.warnings).toEqual(Array.from(arguments));
       return this;
     },
 
