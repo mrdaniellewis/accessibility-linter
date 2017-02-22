@@ -1,8 +1,13 @@
-describe('utils', () => {
-  const utils = AccessibilityLinter.utils;
+describe('Utils', () => {
+  const Utils = AccessibilityLinter.Utils;
+  let utils;
 
   it('is a property of AccessibilityLinter', () => {
     expect(utils).toExist();
+  });
+
+  beforeEach(() => {
+    utils = new Utils();
   });
 
   describe('#$$', () => {
@@ -71,6 +76,64 @@ describe('utils', () => {
     });
   });
 
+  describe('#style', () => {
+    clean();
+
+    context('element styles', () => {
+      it('returns computed styles', () => {
+        const el = appendToBody('<div style="color: #f00;">x</div>');
+        expect(utils.style(el, 'color')).toEqual('rgb(255, 0, 0)');
+      });
+
+      it('caches a computed style', () => {
+        const el = appendToBody('<div style="color: #f00;">x</div>');
+        const spy = expect.spyOn(window, 'getComputedStyle').andCallThrough();
+        utils.style(el, 'color');
+        expect(utils.style(el, 'color')).toEqual('rgb(255, 0, 0)');
+        expect(spy.calls.length).toEqual(1);
+      });
+
+      it('caches per element', () => {
+        const el = appendToBody('<div style="color: #f00;">x</div>');
+        const el2 = appendToBody('<div style="color: #0f0;">x</div>');
+        utils.style(el, 'color');
+        expect(utils.style(el2, 'color')).toEqual('rgb(0, 255, 0)');
+      });
+    });
+
+    context('pseudo element styles', () => {
+      it('returns computed pseudo element styles', () => {
+        appendToBody('<style>.pseudo-test::before { color: #00f; content: "x"; }</style>');
+        const el = appendToBody('<div class="pseudo-test">x</div>');
+        expect(utils.style(el, 'color', 'before')).toEqual('rgb(0, 0, 255)');
+      });
+
+      it('caches a computed style', () => {
+        appendToBody('<style>.pseudo-test::before { color: #00f; content: "x"; }</style>');
+        const el = appendToBody('<div class="pseudo-test">x</div>');
+        const spy = expect.spyOn(window, 'getComputedStyle').andCallThrough();
+        utils.style(el, 'color', 'before');
+        expect(utils.style(el, 'color', 'before')).toEqual('rgb(0, 0, 255)');
+        expect(spy.calls.length).toEqual(1);
+      });
+
+      it('caches separately to element styles', () => {
+        appendToBody('<style>.pseudo-test::before { color: #00f; content: "x"; }</style>');
+        const el = appendToBody('<div class="pseudo-test">x</div>');
+        utils.style(el, 'color');
+        expect(utils.style(el, 'color', 'before')).toEqual('rgb(0, 0, 255)');
+      });
+
+      it('caches per element', () => {
+        appendToBody('<style>.pseudo-test::before { color: #00f; content: "x"; }</style>');
+        const el = appendToBody('<div class="pseudo-test">x</div>');
+        const el2 = appendToBody('<div style="color: #f00">x</div>');
+        utils.style(el, 'color', 'before');
+        expect(utils.style(el2, 'color', 'before')).toEqual('rgb(255, 0, 0)');
+      });
+    });
+  });
+
   describe('#hidden', () => {
     clean();
 
@@ -119,15 +182,19 @@ describe('utils', () => {
       expect(utils.hidden(utils.$('p', el))).toEqual(true);
     });
 
-    describe('style option', () => {
-      it('accepts a computed style', () => {
-        const el = appendToBody('<div style="display: none">foo</div>');
-        const style = window.getComputedStyle(el);
-        const spy = expect.spyOn(window, 'getComputedStyle');
-        expect(utils.hidden(el, { style })).toEqual(true);
-        expect(spy).toNotHaveBeenCalled();
-        spy.restore();
-      });
+    it('caches the hidden status', () => {
+      const el = appendToBody('<div style="display: none">foo</div>');
+      const spy = expect.spyOn(el, 'getAttribute').andCallThrough();
+      utils.hidden(el);
+      expect(utils.hidden(el)).toEqual(true);
+      expect(spy.calls.length).toEqual(1);
+    });
+
+    it('caches per element', () => {
+      const el = appendToBody('<div style="display: none">foo</div>');
+      const el2 = appendToBody('<div>foo</div>');
+      utils.hidden(el);
+      expect(utils.hidden(el2)).toEqual(false);
     });
 
     describe('noAria option', () => {
@@ -139,6 +206,27 @@ describe('utils', () => {
       it('does not ignore a aria-hidden element if false', () => {
         const el = appendToBody('<div aria-hidden="true">foo</div>');
         expect(utils.hidden(el, { noAria: false })).toEqual(true);
+      });
+
+      it('caches the hidden status', () => {
+        const el = appendToBody('<div aria-hidden="true">foo</div>');
+        const spy = expect.spyOn(el, 'getClientRects').andCallThrough();
+        utils.hidden(el, { noAria: true });
+        expect(utils.hidden(el, { noAria: true })).toEqual(false);
+        expect(spy.calls.length).toEqual(1);
+      });
+
+      it('caches per element', () => {
+        const el = appendToBody('<div style="display: none">foo</div>');
+        const el2 = appendToBody('<div>foo</div>');
+        utils.hidden(el, { noAria: true });
+        expect(utils.hidden(el2, { noAria: true })).toEqual(false);
+      });
+
+      it('caches aria and not aria separately', () => {
+        const el = appendToBody('<div aria-hidden="true">foo</div>');
+        utils.hidden(el, { noAria: false });
+        expect(utils.hidden(el)).toEqual(true);
       });
     });
   });
@@ -669,8 +757,12 @@ describe('utils', () => {
   });
 
   describe('#aria', () => {
-    const aria = utils.aria;
+    let aria;
     clean();
+
+    before(() => {
+      aria = utils.aria;
+    });
 
     it('is a property of utils', () => {
       expect(aria).toExist();

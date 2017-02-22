@@ -1,10 +1,7 @@
 /* eslint-disable class-methods-use-this */
 describe('Rule', () => {
-  let Rule, Test;
-
-  before(() => {
-    Rule = AccessibilityLinter.Rule;
-  });
+  const Rule = AccessibilityLinter.Rule;
+  let Test;
 
   it('is a property of AccessibilityLinter', () => {
     expect(Rule).toBeA(Function);
@@ -67,7 +64,13 @@ describe('Rule', () => {
   });
 
   describe('#run', () => {
+    let utils;
+
     clean();
+
+    beforeEach(() => {
+      utils = new AccessibilityLinter.Utils();
+    });
 
     before(() => {
       Test = class extends Rule {
@@ -83,9 +86,9 @@ describe('Rule', () => {
       appendToBody('<thumb />');
       const test = new Test();
       const spy = expect.spyOn(test, 'test');
-      test.run();
+      test.run(null, () => true, utils);
 
-      expect(spy).toHaveHadCalls([foo], [bar]);
+      expect(spy).toHaveHadCalls([foo, utils], [bar, utils]);
     });
 
     describe('context parameter', () => {
@@ -95,9 +98,9 @@ describe('Rule', () => {
         appendToBody('<bar />');
         const test = new Test();
         const spy = expect.spyOn(test, 'test');
-        test.run(foo);
+        test.run(foo, () => true, utils);
 
-        expect(spy).toHaveHadCalls([foo], [bar]);
+        expect(spy).toHaveHadCalls([foo, utils], [bar, utils]);
       });
     });
 
@@ -107,9 +110,9 @@ describe('Rule', () => {
         appendToBody('<bar />');
         const test = new Test();
         const spy = expect.spyOn(test, 'test');
-        test.run(document, el => el.nodeName.toLowerCase() === 'foo');
+        test.run(document, el => el.nodeName.toLowerCase() === 'foo', utils);
 
-        expect(spy).toHaveHadCalls([foo]);
+        expect(spy).toHaveHadCalls([foo, utils]);
       });
     });
 
@@ -122,9 +125,9 @@ describe('Rule', () => {
           return [thumb];
         };
         const spy = expect.spyOn(test, 'test');
-        test.run();
+        test.run(null, () => true, utils);
 
-        expect(spy).toHaveHadCalls([thumb]);
+        expect(spy).toHaveHadCalls([thumb, utils]);
       });
     });
 
@@ -133,7 +136,7 @@ describe('Rule', () => {
         appendToBody('<foo aria-hidden="true" />');
         const test = new Test({ includeHidden: false });
         const spy = expect.spyOn(test, 'test');
-        test.run();
+        test.run(null, () => true, utils);
 
         expect(spy).toNotHaveBeenCalled();
       });
@@ -142,9 +145,9 @@ describe('Rule', () => {
         const foo = appendToBody('<foo aria-hidden="true" />');
         const test = new Test({ includeHidden: true });
         const spy = expect.spyOn(test, 'test');
-        test.run();
+        test.run(null, () => true, utils);
 
-        expect(spy).toHaveHadCalls([foo]);
+        expect(spy).toHaveHadCalls([foo, utils]);
       });
     });
 
@@ -155,7 +158,7 @@ describe('Rule', () => {
         test.test = function () {
           return null;
         };
-        expect(test.run()).toEqual([]);
+        expect(test.run(null, () => true, utils)).toEqual([]);
       });
 
       it('can return an empty array to produce no error messages', () => {
@@ -164,7 +167,7 @@ describe('Rule', () => {
         test.test = function () {
           return [];
         };
-        expect(test.run()).toEqual([]);
+        expect(test.run(null, () => true, utils)).toEqual([]);
       });
 
       it('can return a string to produce one error message', () => {
@@ -173,7 +176,7 @@ describe('Rule', () => {
         test.test = function () {
           return 'error';
         };
-        expect(test.run()).toEqual([{ el, message: 'error', type: 'error' }]);
+        expect(test.run(null, () => true, utils)).toEqual([{ el, message: 'error', type: 'error' }]);
       });
 
       it('can return an array of strings to produce multiple error messages', () => {
@@ -183,7 +186,7 @@ describe('Rule', () => {
         test.test = function () {
           return ['error', 'error2'];
         };
-        expect(test.run()).toEqual([
+        expect(test.run(null, () => true, utils)).toEqual([
           { el: foo, message: 'error', type: 'error' },
           { el: foo, message: 'error2', type: 'error' },
           { el: bar, message: 'error', type: 'error' },
@@ -197,7 +200,7 @@ describe('Rule', () => {
         test.test = function () {
           return 'error';
         };
-        expect(test.run()).toEqual([{ el: foo, message: 'error', type: 'warn' }]);
+        expect(test.run(null, () => true, utils)).toEqual([{ el: foo, message: 'error', type: 'warn' }]);
       });
     });
   });
