@@ -16,16 +16,16 @@ describe('rules', () => {
   });
 
   ruleSpecs.forEach((spec, name) => {
-    let window, rule, rules, cleaner, iframeError;
+    let window, linter, Rule, rules, cleaner, iframeError;
 
     // Make sure everything is setup using the iFrame versions
     describe(name, () => {
       before(() => {
         window = context.window = frame.contentWindow;
         context.document = window.document;
-        rule = context.rule = window.AccessibilityLinter.rules.get(name);
-        rules = new Map([[name, rule]]);
-        if (!rule) {
+        Rule = context.Rule = window.AccessibilityLinter.rules.get(name);
+        rules = new Map([[name, Rule]]);
+        if (!Rule) {
           throw new Error(`spec for "${name}" not found`);
         }
         window.onerror = function () {
@@ -36,13 +36,19 @@ describe('rules', () => {
       beforeEach(() => {
         iframeError = false;
         const logger = context.logger = new TestLogger();
-        const linter = context.linter = new window.AccessibilityLinter({ logger, rules });
+        linter = context.linter = new window.AccessibilityLinter({
+          logger,
+          rules,
+          ruleSettings: { [name]: { enabled: true, type: 'error' } },
+        });
         linter.observe();
         cleaner = window.domCleaner();
       });
 
       // Execute in a promise so it runs next tick after any dom mutations
       afterEach(() => Promise.resolve().then(() => {
+        linter.stopObserving();
+        linter = null;
         cleaner.stop();
         cleaner.clean();
         cleaner = null;
@@ -53,7 +59,7 @@ describe('rules', () => {
 
       // eslint-disable-next-line no-new-func
       new Function(`
-        let el, el2, rule, logger, linter, window, document, $, appendToBody, location;
+        let el, el2, Rule, logger, linter, window, document, $, appendToBody, location;
         const when = fn => this.when(fn, this);
 
         before(() => {
@@ -61,11 +67,11 @@ describe('rules', () => {
         });
 
         beforeEach(() => {
-          ({rule, logger, linter} = this);
+          ({Rule, logger, linter} = this);
         });
 
         afterEach(() => {
-          el = el2 = rule = logger = linter = null;
+          el = el2 = Rule = logger = linter = null;
         });
 
         ${spec.toString().replace(/^function\s*\(\)\s*{/, '').replace(/}$/, '')}

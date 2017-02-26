@@ -26,7 +26,7 @@ describe('AccessibilityLinter', () => {
     linter = new AccessibilityLinter({ rules, logger });
   });
 
-  context('running rules', () => {
+  context('#run', () => {
     it('calls the logger with the rule and element', () => {
       el = appendToBody('<foo />');
       linter.run();
@@ -41,17 +41,10 @@ describe('AccessibilityLinter', () => {
     });
 
     context('limiting scope', () => {
-      let div, el2;
-
-      beforeEach(() => {
-        div = appendToBody('<div />');
-        el2 = document.createElement('foo');
-        div.appendChild(el2);
-      });
-
       it('limits the rules to the provided scope', () => {
-        linter.run(div);
-        expect(logger).toHaveEntries(['foo-bar', el2]);
+        el = appendToBody('<div><foo></div><foo />');
+        linter.run(el);
+        expect(logger).toHaveEntries(['foo-bar', el.firstChild]);
       });
     });
 
@@ -247,6 +240,47 @@ describe('AccessibilityLinter', () => {
         linter.run();
         expect(logger).toHaveEntries(['foo-bar', el]);
       });
+    });
+  });
+
+  context('#runRule', () => {
+    beforeEach(() => {
+      linter = new AccessibilityLinter({
+        rules,
+        logger,
+        whitelist: '.old-whitelist',
+      });
+    });
+
+    it('runs a single rule by name', () => {
+      el = appendToBody('<foo />');
+      linter.runRule('rule');
+      expect(logger).toHaveEntries(['foo-bar', el]);
+    });
+
+    it('runs a single rule by object', () => {
+      el = appendToBody('<foo />');
+      linter.runRule(linter.rules.get('rule'));
+      expect(logger).toHaveEntries(['foo-bar', el]);
+    });
+
+    it('it allows a context', () => {
+      el = appendToBody('<div><foo></div><foo />');
+      linter.runRule('rule', el);
+      expect(logger).toHaveEntries(['foo-bar', el.firstChild]);
+    });
+
+    it('it allows a custom whitelist', () => {
+      el = appendToBody('<foo /><foo class="new-whitelist">');
+      linter.runRule('rule', null, '.new-whitelist');
+      expect(logger).toHaveEntries(['foo-bar', el]);
+    });
+
+    it('it shows previous reported errors', () => {
+      el = appendToBody('<foo />');
+      linter.runRule('rule');
+      linter.runRule('rule');
+      expect(logger).toHaveEntries(['foo-bar', el], ['foo-bar', el]);
     });
   });
 
