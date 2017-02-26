@@ -7,7 +7,7 @@
     "lint": "eslint . --ext .js",
     "mkbuild": "mkdir -p build",
     "clean": "rm -f build/* build/.gitignore",
-    "build:standalone": "node lib/build/standalone | exorcist build/linter.js.map > build/linter.js",
+    "build:standalone": "node lib/build/standalone | derequire | exorcist build/linter.js.map > build/linter.js",
     "uglify:standalone": "uglifyjs build/linter.js > build/linter.min.js",
     "build:umd": "node lib/build/umd | exorcist build/umd.js.map > build/umd.js",
     "uglify:umd": "uglifyjs build/umd.js > build/umd.min.js",
