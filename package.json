@@ -1,6 +1,6 @@
 {
   "name": "accessibility-linter",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "Accessibility test a web page or web application",
   "main": "lib/index.js",
   "scripts": {
