@@ -201,6 +201,29 @@ describe('AccessibilityLinter', () => {
       });
     });
 
+    describe('logging to the console', () => {
+      it('logs errors', () => {
+        linter = new AccessibilityLinter({ rules });
+        el = appendToBody('<foo />');
+        const spy = expect.spyOn(console, 'error');
+        linter.run();
+        expect(spy.calls.length).toEqual(1);
+        expect(spy).toHaveBeenCalledWith('foo-bar', el, 'rule');
+      });
+
+      it('logs warnings', () => {
+        linter = new AccessibilityLinter({
+          rules,
+          ruleSettings: { rule: { type: 'warn' } },
+        });
+        el = appendToBody('<foo />');
+        const spy = expect.spyOn(console, 'warn');
+        linter.run();
+        expect(spy.calls.length).toEqual(1);
+        expect(spy).toHaveBeenCalledWith('foo-bar', el, 'rule');
+      });
+    });
+
     context('cacheReported', () => {
       it('adds the same error twice if cacheReported is false', () => {
         el = appendToBody('<foo />');

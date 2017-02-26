@@ -29,9 +29,14 @@ describe('Logger', () => {
           expect(spy).toHaveBeenCalledWith('bar');
         });
 
-        it('outputs a  message and element', () => {
+        it('outputs a message and element', () => {
           logger.log({ type, message: 'bar', el });
           expect(spy).toHaveBeenCalledWith('bar', el);
+        });
+
+        it('outputs a message, element and rule name', () => {
+          logger.log({ type, message: 'bar', el, name: 'foo' });
+          expect(spy).toHaveBeenCalledWith('bar', el, 'foo');
         });
       });
     });
