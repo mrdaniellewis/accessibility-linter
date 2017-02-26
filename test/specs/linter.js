@@ -1,10 +1,5 @@
 describe('AccessibilityLinter', () => {
-  const rule = {
-    message: 'foo-bar',
-    selector: 'accessibility-linter',
-  };
-
-  const rules = new Map([['rule', rule]]);
+  clean();
 
   it('is a property of window', () => {
     expect(window.AccessibilityLinter).toBeA(Function);
@@ -14,271 +9,377 @@ describe('AccessibilityLinter', () => {
     expect(window.AccessibilityLinter.version).toExist();
   });
 
-  let logger;
+  let Test, rules, logger, linter, el;
 
   beforeEach(() => {
+    Test = class extends AccessibilityLinter.Rule {
+      selector() {
+        return 'foo';
+      }
+
+      test() {
+        return 'foo-bar';
+      }
+    };
+    rules = new Map([['rule', Test]]);
     logger = new TestLogger();
+    linter = new AccessibilityLinter({ rules, logger });
   });
 
-  context('running a rule', () => {
-    let linter, el;
-
-    beforeEach(() => {
-      linter = new AccessibilityLinter({ rules, logger });
-      el = document.createElement('accessibility-linter');
-      document.body.appendChild(el);
-    });
-
-    afterEach(() => {
-      el.remove();
-    });
-
+  context('#run', () => {
     it('calls the logger with the rule and element', () => {
+      el = appendToBody('<foo />');
       linter.run();
-      expect(logger).toHaveEntries([rule, el]);
+      expect(logger).toHaveEntries(['foo-bar', el]);
     });
 
-    it('does not add the same error twice', () => {
+    it('it does not add the same error twice', () => {
+      el = appendToBody('<foo />');
       linter.run();
       linter.run();
-      expect(logger).toHaveEntries([rule, el]);
+      expect(logger).toHaveEntries(['foo-bar', el]);
     });
 
     context('limiting scope', () => {
-      let div, el2;
-
-      before(() => {
-        div = document.createElement('div');
-        document.body.appendChild(div);
-        el2 = document.createElement('accessibility-linter');
-        div.appendChild(el2);
-      });
-
-      after(() => {
-        div.remove();
-      });
-
       it('limits the rules to the provided scope', () => {
-        linter.run(div);
-        expect(logger).toHaveEntries([rule, el2]);
+        el = appendToBody('<div><foo></div><foo />');
+        linter.run(el);
+        expect(logger).toHaveEntries(['foo-bar', el.firstChild]);
+      });
+    });
+
+    describe('whitelist', () => {
+      beforeEach(() => {
+        linter = new AccessibilityLinter({
+          rules,
+          logger,
+          whitelist: '.whitelist-global',
+          ruleSettings: {
+            rule: {
+              whitelist: '.whitelist-rule',
+            },
+          },
+        });
+      });
+
+      it('it adds errors for elements not on a whitelist', () => {
+        el = appendToBody('<foo />');
+        linter.run();
+        expect(logger).toHaveEntries(['foo-bar', el]);
+      });
+
+      it('does not add errors for elements on the global whitelist', () => {
+        appendToBody('<foo class="whitelist-global" />');
+        linter.run();
+        expect(logger).toNotHaveEntries();
+      });
+
+      it('does not add errors for elements on a rule whitelist', () => {
+        appendToBody('<foo class="whitelist-rule" />');
+        linter.run();
+        expect(logger).toNotHaveEntries();
+      });
+
+      it('ignores changes to already whitelisted elements', () => {
+        el = appendToBody('<foo class="whitelist-global" />');
+        linter.run();
+        el.classList.remove('whitelist-global');
+        linter.run();
+        expect(logger).toNotHaveEntries();
+      });
+    });
+
+    describe('enabled rules', () => {
+      beforeEach(() => {
+        el = appendToBody('<foo />');
+      });
+
+      it('runs enabled rules', () => {
+        linter = new AccessibilityLinter({
+          logger,
+          rules,
+          ruleSettings: { rule: { enabled: true } },
+        });
+        linter.run();
+        expect(logger).toHaveEntries(['foo-bar', el]);
+      });
+
+      it('does not run disabled rules', () => {
+        linter = new AccessibilityLinter({
+          logger,
+          rules,
+          ruleSettings: { rule: { enabled: false } },
+        });
+        linter.run();
+        expect(logger).toNotHaveEntries();
+      });
+
+      it('disables rules by default if defaultOff is true', () => {
+        linter = new AccessibilityLinter({
+          logger,
+          rules,
+          defaultOff: true,
+        });
+        linter.run();
+        expect(logger).toNotHaveEntries();
+      });
+
+      it('allows rules to be enabled explicitly when defaultOff is true', () => {
+        linter = new AccessibilityLinter({
+          logger,
+          rules,
+          defaultOff: true,
+          ruleSettings: { rule: { enabled: true } },
+        });
+        linter.run();
+        expect(logger).toHaveEntries(['foo-bar', el]);
+      });
+    });
+
+    describe('ignoring rules', () => {
+      it('ignores elements with an empty ignore data attribute', () => {
+        appendToBody('<foo data-accessibility-linter-ignore />');
+        linter.run();
+        expect(logger).toNotHaveEntries();
+      });
+
+      it('ignores rules listed in a string ignore data attribute', () => {
+        appendToBody('<foo data-accessibility-linter-ignore="foo rule" />');
+        linter.run();
+        expect(logger).toNotHaveEntries();
+      });
+
+      it('does not ignore rules not listed in a string ignore data attribute', () => {
+        appendToBody('<foo data-accessibility-linter-ignore="foo" />');
+        linter.run();
+        expect(logger).toHaveEntries(['foo-bar', el]);
+      });
+
+      it('allows a custom ignore attribute', () => {
+        linter = new AccessibilityLinter({
+          logger,
+          rules,
+          ignoreAttribute: 'foo-bar',
+        });
+        appendToBody('<foo foo-bar />');
+        linter.run();
+        expect(logger).toNotHaveEntries();
+      });
+
+      it('ignores modifications to the data ignore attribute', () => {
+        el = appendToBody('<foo data-accessibility-linter-ignore />');
+        linter.run();
+        delete el.dataset.accessibilityLinterIgnore;
+        linter.run();
+        expect(logger).toNotHaveEntries();
+      });
+    });
+
+    describe('error types', () => {
+      beforeEach(() => {
+        el = appendToBody('<foo />');
+      });
+
+      it('logs issues with a type "error" as an error', () => {
+        linter = new AccessibilityLinter({
+          logger,
+          rules,
+          ruleSettings: { rule: { type: 'error' } },
+        });
+        linter.run();
+        expect(logger).toHaveEntries(['foo-bar', el]);
+      });
+
+      it('logs issues with a type "warn" as a warning', () => {
+        linter = new AccessibilityLinter({
+          logger,
+          rules,
+          ruleSettings: { rule: { type: 'warn' } },
+        });
+        linter.run();
+        expect(logger.warns).toEqual([['foo-bar', el]]);
+      });
+    });
+
+    describe('logging to the console', () => {
+      it('logs errors', () => {
+        linter = new AccessibilityLinter({ rules });
+        el = appendToBody('<foo />');
+        const spy = expect.spyOn(console, 'error');
+        linter.run();
+        expect(spy.calls.length).toEqual(1);
+        expect(spy).toHaveBeenCalledWith('foo-bar', el, 'rule');
+      });
+
+      it('logs warnings', () => {
+        linter = new AccessibilityLinter({
+          rules,
+          ruleSettings: { rule: { type: 'warn' } },
+        });
+        el = appendToBody('<foo />');
+        const spy = expect.spyOn(console, 'warn');
+        linter.run();
+        expect(spy.calls.length).toEqual(1);
+        expect(spy).toHaveBeenCalledWith('foo-bar', el, 'rule');
+      });
+    });
+
+    context('cacheReported', () => {
+      it('adds the same error twice if cacheReported is false', () => {
+        el = appendToBody('<foo />');
+        linter = new AccessibilityLinter({
+          logger,
+          rules,
+          cacheReported: false,
+        });
+        linter.run();
+        linter.run();
+        expect(logger).toHaveEntries(['foo-bar', el], ['foo-bar', el]);
+      });
+
+      it('does not ignore changes to the data ignore attribute', () => {
+        el = appendToBody('<foo data-accessibility-linter-ignore />');
+        linter = new AccessibilityLinter({
+          logger,
+          rules,
+          cacheReported: false,
+        });
+        linter.run();
+        delete el.dataset.accessibilityLinterIgnore;
+        linter.run();
+        expect(logger).toHaveEntries(['foo-bar', el]);
+      });
+
+      it('does not ignore changes to whitelisted elements', () => {
+        el = appendToBody('<foo class="ignore" />');
+        linter = new AccessibilityLinter({
+          logger,
+          rules,
+          whitelist: 'foo.ignore',
+          cacheReported: false,
+        });
+        linter.run();
+        el.classList.remove('ignore');
+        linter.run();
+        expect(logger).toHaveEntries(['foo-bar', el]);
       });
     });
   });
 
-  describe('filter', () => {
-    let linter, el, el2;
-    const filterRule = {
-      selector: 'accessibility-linter',
-      filter: match => match.hasAttribute('data-test'),
-    };
-
+  context('#runRule', () => {
     beforeEach(() => {
-      linter = new AccessibilityLinter({ rules: new Map([['rule', filterRule]]), logger });
-      el = document.createElement('accessibility-linter');
-      document.body.appendChild(el);
-      el2 = document.createElement('accessibility-linter');
-      el2.setAttribute('data-test', '');
-      document.body.appendChild(el2);
-    });
-
-    afterEach(() => {
-      el.remove();
-      el2.remove();
-    });
-
-    it('filters out elements', () => {
-      linter.run();
-      expect(logger).toHaveEntries([filterRule, el2]);
-    });
-  });
-
-  describe('whitelist', () => {
-    let el;
-
-    beforeEach(() => {
-      el = document.createElement('accessibility-linter');
-      document.body.appendChild(el);
-    });
-
-    afterEach(() => {
-      el.remove();
-    });
-
-    it('it adds errors for elements not on a whitelist', () => {
-      const linter = new AccessibilityLinter({
+      linter = new AccessibilityLinter({
         rules,
         logger,
+        whitelist: '.old-whitelist',
       });
-
-      linter.run();
-      expect(logger).toHaveEntries([rule, el]);
     });
 
-    it('does not add errors to elements on the global whitelist', () => {
-      const linter = new AccessibilityLinter({
-        rules,
-        logger,
-        whitelist: 'accessibility-linter',
-      });
-
-      linter.run();
-      expect(logger).toNotHaveEntries();
+    it('runs a single rule by name', () => {
+      el = appendToBody('<foo />');
+      linter.runRule('rule');
+      expect(logger).toHaveEntries(['foo-bar', el]);
     });
 
-    it('does not add errors to elements on a test whitelist', () => {
-      const linter = new AccessibilityLinter({
-        rules,
-        ruleSettings: {
-          rule: { whitelist: 'accessibility-linter' },
-        },
-        logger,
-      });
-
-      linter.run();
-      expect(logger).toNotHaveEntries();
-    });
-  });
-
-  describe('enable', () => {
-    let el;
-
-    beforeEach(() => {
-      el = document.createElement('accessibility-linter');
-      document.body.appendChild(el);
+    it('runs a single rule by object', () => {
+      el = appendToBody('<foo />');
+      linter.runRule(linter.rules.get('rule'));
+      expect(logger).toHaveEntries(['foo-bar', el]);
     });
 
-    afterEach(() => {
-      el.remove();
+    it('it allows a context', () => {
+      el = appendToBody('<div><foo></div><foo />');
+      linter.runRule('rule', el);
+      expect(logger).toHaveEntries(['foo-bar', el.firstChild]);
     });
 
-    it('enables a rule by default', () => {
-      const linter = new AccessibilityLinter({
-        rules,
-        logger,
-      });
-
-      linter.run();
-      expect(logger).toHaveEntries([rule, el]);
+    it('it allows a custom whitelist', () => {
+      el = appendToBody('<foo /><foo class="new-whitelist">');
+      linter.runRule('rule', null, '.new-whitelist');
+      expect(logger).toHaveEntries(['foo-bar', el]);
     });
 
-    it('disables a rule if the rule has enabled=false', () => {
-      const linter = new AccessibilityLinter({
-        rules: new Map([['rule', Object.assign({ enabled: false }, rule)]]),
-        logger,
-      });
-
-      linter.run();
-      expect(logger).toNotHaveEntries();
-    });
-
-    it('disables a rule if defaultOff is true', () => {
-      const linter = new AccessibilityLinter({
-        rules,
-        logger,
-        defaultOff: true,
-      });
-
-      linter.run();
-      expect(logger).toNotHaveEntries();
-    });
-
-    it('disables a rule if defaultOff is true and the rule has enabled=true', () => {
-      const linter = new AccessibilityLinter({
-        rules: new Map([['rule', Object.assign({ enabled: true }, rule)]]),
-        logger,
-        defaultOff: true,
-      });
-
-      linter.run();
-      expect(logger).toNotHaveEntries();
-    });
-
-    it('enables a rule if defaultOff is true and the rule settings have enabled=true', () => {
-      const linter = new AccessibilityLinter({
-        rules,
-        logger,
-        defaultOff: true,
-        ruleSettings: { rule: { enabled: true } },
-      });
-
-      linter.run();
-      expect(logger).toHaveEntries([rule, el]);
-    });
-  });
-
-  describe('data-ignore attributes', () => {
-    let linter, el;
-
-    beforeEach(() => {
-      linter = new AccessibilityLinter({ rules, logger });
-      el = document.createElement('accessibility-linter');
-      document.body.appendChild(el);
-    });
-
-    afterEach(() => {
-      el.remove();
-    });
-
-    it('ignores errors where there is a data-ignore attribute', () => {
-      el.setAttribute('data-accessibility-linter-ignore', '');
-      linter.run();
-      linter.run(); // Run twice as ignore matching is cached
-      expect(logger).toNotHaveEntries();
-    });
-
-    it('ignores named errors where there is a data-ignore attribute', () => {
-      el.setAttribute('data-accessibility-linter-ignore', 'rule foo');
-      linter.run();
-      expect(logger).toNotHaveEntries();
-    });
-
-    it('does not ignore unnamed errors where there is a data-ignore attribute', () => {
-      el.setAttribute('data-accessibility-linter-ignore', 'foo');
-      linter.run();
-      expect(logger).toHaveEntries();
+    it('it shows previous reported errors', () => {
+      el = appendToBody('<foo />');
+      linter.runRule('rule');
+      linter.runRule('rule');
+      expect(logger).toHaveEntries(['foo-bar', el], ['foo-bar', el]);
     });
   });
 
   describe('#observe', () => {
-    let linter, el;
+    let el2, spy;
 
     beforeEach(() => {
-      linter = new AccessibilityLinter({ rules, logger });
-      linter.observe();
+      spy = expect.spyOn(linter, 'run').andCallThrough();
     });
 
     afterEach(() => {
       linter.stopObserving();
-      el.remove();
     });
 
-    it('finds errors when DOM modifications occur', when(() => {
-      el = document.createElement('accessibility-linter');
-      document.body.appendChild(el);
+    it('finds errors when nodes are added to the DOM', when(() => {
+      linter.observe();
+      el = appendToBody('<foo />');
     })
     .then(() => {
+      expect(spy).toHaveBeenCalledWith(document.body);
       expect(logger).toHaveEntries();
-      el.remove();
+    }));
+
+    it('finds errors when DOM attributes are changed', when(() => {
+      el = appendToBody('<foo />');
+      linter.observe();
+      el.title = 'foo';
+    })
+    .then(() => {
+      expect(spy).toHaveBeenCalledWith(document.body);
+      expect(logger).toHaveEntries();
+    }));
+
+    it('finds errors when text nodes are changed', when(() => {
+      el = appendToBody('<foo />');
+      linter.observe();
+      el.textContent = 'foo';
+    })
+    .then(() => {
+      expect(spy).toHaveBeenCalledWith(el);
+      expect(logger).toHaveEntries();
+    }));
+
+    it('only tests against each DOM element once', when(() => {
+      linter.observe();
+      el = appendToBody('<foo />');
+      appendToBody('<foo />');
+      el2 = document.createElement('foo');
+      el.appendChild(el2);
+      el.textContent = 'foo';
+    })
+    .then(() => {
+      expect(spy).toHaveBeenCalledWith(document.body);
+      expect(logger).toHaveEntries();
     }));
 
     describe('#stopObserving', () => {
-      it('stops finding errors when DOM modifications occur', when(() => {
+      it('does nothing if no observing is happening', () => {
         linter.stopObserving();
-        el = document.createElement('accessibility-linter');
-        document.body.appendChild(el);
+      });
+
+      it('stops finding errors when DOM modifications occur', when(() => {
+        linter.observe();
+        linter.stopObserving();
+        appendToBody('<foo />');
       }).then(() => {
         expect(logger).toNotHaveEntries();
-        el.remove();
       }));
 
       it('resumes finding errors if #observe is called again', when(() => {
+        linter.observe();
         linter.stopObserving();
         linter.observe();
-        el = document.createElement('accessibility-linter');
-        document.body.appendChild(el);
+        el = appendToBody('<foo />');
       }).then(() => {
         expect(logger).toHaveEntries();
-        el.remove();
       }));
     });
   });
