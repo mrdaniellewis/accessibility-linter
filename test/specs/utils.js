@@ -335,6 +335,15 @@ describe('Utils', () => {
           expect(utils.accessibleName(el)).toEqual('');
         });
 
+        it('passes the element and utils to the native label function', () => {
+          const spy = expect.spyOn(AccessibilityLinter.config.elements['native-text'], 'nativeLabel').andCallThrough();
+          const el = appendToBody('<native-text data-alt="alt" />');
+          utils.accessibleName(el);
+          expect(spy.calls.length).toEqual(1);
+          expect(spy.calls[0].arguments[0]).toEqual(el);
+          expect(spy.calls[0].arguments[1]).toBeA(AccessibilityLinter.Utils);
+        });
+
         context('native label returns text', () => {
           it('returns the native label of an element', () => {
             const el = appendToBody('<native-text data-alt="alt" />');
