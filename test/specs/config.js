@@ -263,19 +263,19 @@ describe('config', () => {
     describe('allowed values', () => {
       ['atomic', 'busy', 'disabled', 'modal', 'multiline', 'multiselectable', 'readonly', 'required'].forEach((name) => {
         it(`allows true/false for ${name}`, () => {
-          expect(ariaAttributes[name].values).toEqual({ type: 'true/false', tokens: ['true', 'false'] });
+          expect(ariaAttributes[name].values).toEqual({ type: 'token', tokens: ['true', 'false'] });
         });
       });
 
       ['checked', 'pressed'].forEach((name) => {
         it(`allows true/false/mixed/undefined for ${name}`, () => {
-          expect(ariaAttributes[name].values).toEqual({ type: 'tristate', tokens: ['true', 'false', 'mixed', 'undefined'] });
+          expect(ariaAttributes[name].values).toEqual({ type: 'token', tokens: ['true', 'false', 'mixed', 'undefined'] });
         });
       });
 
       ['expanded', 'grabbed', 'hidden', 'selected'].forEach((name) => {
         it(`allows true/false/undefined for ${name}`, () => {
-          expect(ariaAttributes[name].values).toEqual({ type: 'true/false/undefined', tokens: ['true', 'false', 'undefined'] });
+          expect(ariaAttributes[name].values).toEqual({ type: 'token', tokens: ['true', 'false', 'undefined'] });
         });
       });
 
