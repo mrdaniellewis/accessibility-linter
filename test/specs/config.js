@@ -467,6 +467,15 @@ describe('config', () => {
           });
         });
 
+        ['submit', 'reset', 'button'].forEach((type) => {
+          describe(`<input[type=${type}]>`, () => {
+            it('uses value as the native label', () => {
+              const label = appendToBody(`<label><input type="${type}" value="bar">foo</label>`);
+              expect(elements.input.nativeLabel(label.querySelector('input'), utils)).toEqual('bar');
+            });
+          });
+        });
+
         describe('<input[type=image]>', () => {
           it('uses the alt text as a native label', () => {
             const label = appendToBody('<label><input type="image" alt="bar">foo</label>');
