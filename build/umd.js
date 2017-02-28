@@ -40,7 +40,7 @@ module.exports = new Map([
 ]);
 },{"./rules/aria/attribute-values/rule.js":8,"./rules/aria/deprecated-attributes/rule.js":9,"./rules/aria/immutable-role/rule.js":10,"./rules/aria/invalid-attributes/rule.js":11,"./rules/aria/no-focusable-hidden/rule.js":12,"./rules/aria/no-none-without-presentation/rule.js":13,"./rules/aria/roles/rule.js":14,"./rules/colour-contrast/aa/rule.js":15,"./rules/colour-contrast/aaa/rule.js":16,"./rules/data-attributes/rule.js":17,"./rules/elements/obsolete/rule.js":18,"./rules/elements/unknown/rule.js":19,"./rules/fieldset/fieldset-has-legend/rule.js":20,"./rules/fieldset/legend-has-fieldset/rule.js":21,"./rules/fieldset/multiple-in-fieldset/rule.js":22,"./rules/headings/rule.js":23,"./rules/ids/imagemap-ids/rule.js":24,"./rules/ids/labels-have-inputs/rule.js":25,"./rules/ids/list-id/rule.js":26,"./rules/ids/no-duplicate-anchor-names/rule.js":27,"./rules/ids/unique-id/rule.js":28,"./rules/labels/area/rule.js":29,"./rules/labels/aria-command/rule.js":30,"./rules/labels/controls/rule.js":31,"./rules/labels/headings/rule.js":32,"./rules/labels/img/rule.js":33,"./rules/labels/links/rule.js":34,"./rules/labels/tabindex/rule.js":35,"./rules/lang/rule.js":36,"./rules/no-button-without-type/rule.js":37,"./rules/no-empty-select/rule.js":38,"./rules/no-links-to-missing-fragments/rule.js":39,"./rules/no-multiple-select/rule.js":40,"./rules/no-outside-controls/rule.js":41,"./rules/no-reset/rule.js":42,"./rules/title/rule.js":44}],"./version":[function(require,module,exports){
 "use strict";
-module.exports = "1.5.2"
+module.exports = "1.5.3"
 },{}],1:[function(require,module,exports){
 "use strict";
 /**
@@ -1613,6 +1613,7 @@ module.exports = class extends Rule {
   }
 
   run(context, filter = () => true, utils) {
+    context = context || document;
     return this.iterate(context, utils, false)
       .filter(filter)
       .map(el => this.findAncestor(el, utils))
@@ -1627,16 +1628,14 @@ module.exports = class extends Rule {
     const found = [];
     let cursor = node;
     while (cursor) {
-      if (utils.hidden(cursor, { noAria: true })) {
-        break;
-      }
+      if (!utils.hidden(cursor, { noAria: true })) {
+        if (this.hasTextNode(cursor)) {
+          found.push(cursor);
+        }
 
-      if (this.hasTextNode(cursor)) {
-        found.push(cursor);
-      }
-
-      if (cursor.firstElementChild) {
-        found.push.apply(found, this.iterate(cursor.firstElementChild, utils, true));
+        if (cursor.firstElementChild) {
+          found.push.apply(found, this.iterate(cursor.firstElementChild, utils, true));
+        }
       }
 
       if (iterateSiblings) {
@@ -1790,9 +1789,12 @@ module.exports = class extends Rule {
 "use strict";
 const Rule = require('../../rule');
 
+const excludeTypes = ['hidden', 'image', 'submit', 'reset', 'button'];
+const excludeSelector = excludeTypes.map(type => `:not([type=${type}])`).join('');
+
 module.exports = class extends Rule {
   selector() {
-    return 'input[name]:not([type=hidden]),textarea[name],select[name]';
+    return `input[name]${excludeSelector},textarea[name],select[name]`;
   }
 
   test(el, utils) {
@@ -1803,10 +1805,10 @@ module.exports = class extends Rule {
       if (elements instanceof Node) {
         return null;
       }
-      group = Array.from(elements).filter(elm => elm.type !== 'hidden');
+      group = Array.from(elements).filter(elm => excludeTypes.includes(elm.type));
     } else {
       const namePart = `[name="${utils.cssEscape(el.name)}"]`;
-      group = utils.$$(`input${namePart}:not([type=hidden]),textarea${namePart},select${namePart}`).filter(elm => !elm.form);
+      group = utils.$$(`input${namePart}${excludeSelector},textarea${namePart},select${namePart}`).filter(elm => !elm.form);
     }
 
     if (group.length === 1 || el.closest('fieldset')) {
