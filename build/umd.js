@@ -17,6 +17,7 @@ module.exports = new Map([
   ["fieldset-legend-has-fieldset", require("./rules/fieldset/legend-has-fieldset/rule.js")],
   ["fieldset-multiple-in-fieldset", require("./rules/fieldset/multiple-in-fieldset/rule.js")],
   ["headings", require("./rules/headings/rule.js")],
+  ["ids-form-attribute", require("./rules/ids/form-attribute/rule.js")],
   ["ids-imagemap-ids", require("./rules/ids/imagemap-ids/rule.js")],
   ["ids-labels-have-inputs", require("./rules/ids/labels-have-inputs/rule.js")],
   ["ids-list-id", require("./rules/ids/list-id/rule.js")],
@@ -32,15 +33,16 @@ module.exports = new Map([
   ["lang", require("./rules/lang/rule.js")],
   ["no-button-without-type", require("./rules/no-button-without-type/rule.js")],
   ["no-empty-select", require("./rules/no-empty-select/rule.js")],
+  ["no-links-as-buttons", require("./rules/no-links-as-buttons/rule.js")],
   ["no-links-to-missing-fragments", require("./rules/no-links-to-missing-fragments/rule.js")],
   ["no-multiple-select", require("./rules/no-multiple-select/rule.js")],
   ["no-outside-controls", require("./rules/no-outside-controls/rule.js")],
   ["no-reset", require("./rules/no-reset/rule.js")],
   ["title", require("./rules/title/rule.js")],
 ]);
-},{"./rules/aria/attribute-values/rule.js":8,"./rules/aria/deprecated-attributes/rule.js":9,"./rules/aria/immutable-role/rule.js":10,"./rules/aria/invalid-attributes/rule.js":11,"./rules/aria/no-focusable-hidden/rule.js":12,"./rules/aria/no-none-without-presentation/rule.js":13,"./rules/aria/roles/rule.js":14,"./rules/colour-contrast/aa/rule.js":15,"./rules/colour-contrast/aaa/rule.js":16,"./rules/data-attributes/rule.js":17,"./rules/elements/obsolete/rule.js":18,"./rules/elements/unknown/rule.js":19,"./rules/fieldset/fieldset-has-legend/rule.js":20,"./rules/fieldset/legend-has-fieldset/rule.js":21,"./rules/fieldset/multiple-in-fieldset/rule.js":22,"./rules/headings/rule.js":23,"./rules/ids/imagemap-ids/rule.js":24,"./rules/ids/labels-have-inputs/rule.js":25,"./rules/ids/list-id/rule.js":26,"./rules/ids/no-duplicate-anchor-names/rule.js":27,"./rules/ids/unique-id/rule.js":28,"./rules/labels/area/rule.js":29,"./rules/labels/aria-command/rule.js":30,"./rules/labels/controls/rule.js":31,"./rules/labels/headings/rule.js":32,"./rules/labels/img/rule.js":33,"./rules/labels/links/rule.js":34,"./rules/labels/tabindex/rule.js":35,"./rules/lang/rule.js":36,"./rules/no-button-without-type/rule.js":37,"./rules/no-empty-select/rule.js":38,"./rules/no-links-to-missing-fragments/rule.js":39,"./rules/no-multiple-select/rule.js":40,"./rules/no-outside-controls/rule.js":41,"./rules/no-reset/rule.js":42,"./rules/title/rule.js":44}],"./version":[function(require,module,exports){
+},{"./rules/aria/attribute-values/rule.js":8,"./rules/aria/deprecated-attributes/rule.js":9,"./rules/aria/immutable-role/rule.js":10,"./rules/aria/invalid-attributes/rule.js":11,"./rules/aria/no-focusable-hidden/rule.js":12,"./rules/aria/no-none-without-presentation/rule.js":13,"./rules/aria/roles/rule.js":14,"./rules/colour-contrast/aa/rule.js":15,"./rules/colour-contrast/aaa/rule.js":16,"./rules/data-attributes/rule.js":17,"./rules/elements/obsolete/rule.js":18,"./rules/elements/unknown/rule.js":19,"./rules/fieldset/fieldset-has-legend/rule.js":20,"./rules/fieldset/legend-has-fieldset/rule.js":21,"./rules/fieldset/multiple-in-fieldset/rule.js":22,"./rules/headings/rule.js":23,"./rules/ids/form-attribute/rule.js":24,"./rules/ids/imagemap-ids/rule.js":25,"./rules/ids/labels-have-inputs/rule.js":26,"./rules/ids/list-id/rule.js":27,"./rules/ids/no-duplicate-anchor-names/rule.js":28,"./rules/ids/unique-id/rule.js":29,"./rules/labels/area/rule.js":30,"./rules/labels/aria-command/rule.js":31,"./rules/labels/controls/rule.js":32,"./rules/labels/headings/rule.js":33,"./rules/labels/img/rule.js":34,"./rules/labels/links/rule.js":35,"./rules/labels/tabindex/rule.js":36,"./rules/lang/rule.js":37,"./rules/no-button-without-type/rule.js":38,"./rules/no-empty-select/rule.js":39,"./rules/no-links-as-buttons/rule.js":40,"./rules/no-links-to-missing-fragments/rule.js":41,"./rules/no-multiple-select/rule.js":42,"./rules/no-outside-controls/rule.js":43,"./rules/no-reset/rule.js":44,"./rules/title/rule.js":46}],"./version":[function(require,module,exports){
 "use strict";
-module.exports = "1.5.3"
+module.exports = "1.6.0"
 },{}],1:[function(require,module,exports){
 "use strict";
 /**
@@ -1326,7 +1328,7 @@ Linter.Utils = Utils;
 Linter.version = version;
 Linter.colourContrast = Contrast.colourContrast;
 
-},{"./config":4,"./logger":7,"./rules":"./rules","./rules/rule":43,"./runner":45,"./utils":51,"./utils/contrast":48,"./version":"./version"}],7:[function(require,module,exports){
+},{"./config":4,"./logger":7,"./rules":"./rules","./rules/rule":45,"./runner":47,"./utils":53,"./utils/contrast":50,"./version":"./version"}],7:[function(require,module,exports){
 "use strict";
 /* eslint-disable no-console, class-methods-use-this */
 module.exports = class Logger {
@@ -1422,7 +1424,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../../../config":4,"../../rule":43}],9:[function(require,module,exports){
+},{"../../../config":4,"../../rule":45}],9:[function(require,module,exports){
 "use strict";
 const Rule = require('../../rule');
 const config = require('../../../config');
@@ -1449,7 +1451,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../../../config":4,"../../rule":43}],10:[function(require,module,exports){
+},{"../../../config":4,"../../rule":45}],10:[function(require,module,exports){
 "use strict";
 const Rule = require('../../rule');
 
@@ -1476,7 +1478,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../../rule":43}],11:[function(require,module,exports){
+},{"../../rule":45}],11:[function(require,module,exports){
 "use strict";
 const Rule = require('../../rule');
 const config = require('../../../config');
@@ -1505,7 +1507,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../../../config":4,"../../rule":43}],12:[function(require,module,exports){
+},{"../../../config":4,"../../rule":45}],12:[function(require,module,exports){
 "use strict";
 const Rule = require('../../rule');
 
@@ -1528,7 +1530,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../../rule":43}],13:[function(require,module,exports){
+},{"../../rule":45}],13:[function(require,module,exports){
 "use strict";
 const Rule = require('../../rule');
 
@@ -1546,7 +1548,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../../rule":43}],14:[function(require,module,exports){
+},{"../../rule":45}],14:[function(require,module,exports){
 "use strict";
 const Rule = require('../../rule');
 const config = require('../../../config');
@@ -1598,7 +1600,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../../../config":4,"../../rule":43}],15:[function(require,module,exports){
+},{"../../../config":4,"../../rule":45}],15:[function(require,module,exports){
 "use strict";
 const Rule = require('../../rule');
 
@@ -1696,7 +1698,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../../rule":43}],16:[function(require,module,exports){
+},{"../../rule":45}],16:[function(require,module,exports){
 "use strict";
 const ColourContrastAARule = require('../aa/rule.js');
 
@@ -1704,7 +1706,6 @@ module.exports = class extends ColourContrastAARule {
   setDefaults() {
     this.min = 7;
     this.minLarge = 4.5;
-    this.type = 'warn';
     this.enabled = false;
   }
 };
@@ -1723,7 +1724,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../rule":43}],18:[function(require,module,exports){
+},{"../rule":45}],18:[function(require,module,exports){
 "use strict";
 const Rule = require('../../rule');
 const config = require('../../../config');
@@ -1738,7 +1739,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../../../config":4,"../../rule":43}],19:[function(require,module,exports){
+},{"../../../config":4,"../../rule":45}],19:[function(require,module,exports){
 "use strict";
 const Rule = require('../../rule');
 const config = require('../../../config');
@@ -1748,12 +1749,15 @@ module.exports = class extends Rule {
     return this._selector || (this._selector = Object.keys(config.elements).map(name => `:not(${name})`).join(''));
   }
 
-  test() {
+  test(el) {
+    if (el.closest('svg,math')) {
+      return null;
+    }
     return 'unknown element';
   }
 };
 
-},{"../../../config":4,"../../rule":43}],20:[function(require,module,exports){
+},{"../../../config":4,"../../rule":45}],20:[function(require,module,exports){
 "use strict";
 const Rule = require('../../rule');
 
@@ -1771,7 +1775,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../../rule":43}],21:[function(require,module,exports){
+},{"../../rule":45}],21:[function(require,module,exports){
 "use strict";
 const Rule = require('../../rule');
 
@@ -1785,7 +1789,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../../rule":43}],22:[function(require,module,exports){
+},{"../../rule":45}],22:[function(require,module,exports){
 "use strict";
 const Rule = require('../../rule');
 
@@ -1819,7 +1823,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../../rule":43}],23:[function(require,module,exports){
+},{"../../rule":45}],23:[function(require,module,exports){
 "use strict";
 const Rule = require('../rule');
 
@@ -1854,7 +1858,45 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../rule":43}],24:[function(require,module,exports){
+},{"../rule":45}],24:[function(require,module,exports){
+"use strict";
+const Rule = require('../../rule');
+
+const selector = ['button', 'fieldset', 'input', 'object', 'output', 'select', 'textarea'].map(name => `${name}[form]`).join(',');
+
+module.exports = class extends Rule {
+  setDefaults() {
+    this.includeHidden = true;
+  }
+
+  selector() {
+    return selector;
+  }
+
+  test(el) {
+    const formId = el.getAttribute('form');
+    if (!formId) {
+      return 'form attribute should be an id';
+    }
+
+    if (/\s/.test(formId)) {
+      return 'form attribute should not contain spaces';
+    }
+
+    const form = document.getElementById(formId);
+    if (!form) {
+      return `cannot find element for form attribute with id "${formId}"`;
+    }
+
+    if (form.nodeName.toLowerCase() !== 'form') {
+      return 'form attribute does not point to a form';
+    }
+
+    return null;
+  }
+};
+
+},{"../../rule":45}],25:[function(require,module,exports){
 "use strict";
 const Rule = require('../../rule');
 
@@ -1887,7 +1929,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../../rule":43}],25:[function(require,module,exports){
+},{"../../rule":45}],26:[function(require,module,exports){
 "use strict";
 const Rule = require('../../rule');
 
@@ -1904,7 +1946,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../../rule":43}],26:[function(require,module,exports){
+},{"../../rule":45}],27:[function(require,module,exports){
 "use strict";
 const Rule = require('../../rule');
 
@@ -1922,7 +1964,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../../rule":43}],27:[function(require,module,exports){
+},{"../../rule":45}],28:[function(require,module,exports){
 "use strict";
 const Rule = require('../../rule');
 
@@ -1950,7 +1992,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../../rule":43}],28:[function(require,module,exports){
+},{"../../rule":45}],29:[function(require,module,exports){
 "use strict";
 const Rule = require('../../rule');
 
@@ -1979,7 +2021,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../../rule":43}],29:[function(require,module,exports){
+},{"../../rule":45}],30:[function(require,module,exports){
 "use strict";
 const Rule = require('../../rule');
 
@@ -2008,7 +2050,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../../rule":43}],30:[function(require,module,exports){
+},{"../../rule":45}],31:[function(require,module,exports){
 "use strict";
 const Rule = require('../../rule');
 
@@ -2025,7 +2067,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../../rule":43}],31:[function(require,module,exports){
+},{"../../rule":45}],32:[function(require,module,exports){
 "use strict";
 const Rule = require('../../rule');
 
@@ -2042,7 +2084,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../../rule":43}],32:[function(require,module,exports){
+},{"../../rule":45}],33:[function(require,module,exports){
 "use strict";
 const Rule = require('../../rule');
 
@@ -2059,7 +2101,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../../rule":43}],33:[function(require,module,exports){
+},{"../../rule":45}],34:[function(require,module,exports){
 "use strict";
 const Rule = require('../../rule');
 
@@ -2077,7 +2119,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../../rule":43}],34:[function(require,module,exports){
+},{"../../rule":45}],35:[function(require,module,exports){
 "use strict";
 const Rule = require('../../rule');
 
@@ -2094,7 +2136,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../../rule":43}],35:[function(require,module,exports){
+},{"../../rule":45}],36:[function(require,module,exports){
 "use strict";
 const Rule = require('../../rule');
 
@@ -2111,7 +2153,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../../rule":43}],36:[function(require,module,exports){
+},{"../../rule":45}],37:[function(require,module,exports){
 "use strict";
 const Rule = require('../rule');
 
@@ -2138,7 +2180,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../rule":43}],37:[function(require,module,exports){
+},{"../rule":45}],38:[function(require,module,exports){
 "use strict";
 const Rule = require('../rule');
 
@@ -2152,7 +2194,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../rule":43}],38:[function(require,module,exports){
+},{"../rule":45}],39:[function(require,module,exports){
 "use strict";
 const Rule = require('../rule');
 
@@ -2169,7 +2211,21 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../rule":43}],39:[function(require,module,exports){
+},{"../rule":45}],40:[function(require,module,exports){
+"use strict";
+const Rule = require('../rule');
+
+module.exports = class extends Rule {
+  selector() {
+    return 'a[role=button],a[href="#"],a[href="#!"],a[href^="javascript:"]';
+  }
+
+  test() {
+    return 'use a button instead of a link';
+  }
+};
+
+},{"../rule":45}],41:[function(require,module,exports){
 "use strict";
 const Rule = require('../rule');
 
@@ -2195,7 +2251,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../rule":43}],40:[function(require,module,exports){
+},{"../rule":45}],42:[function(require,module,exports){
 "use strict";
 const Rule = require('../rule');
 
@@ -2209,7 +2265,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../rule":43}],41:[function(require,module,exports){
+},{"../rule":45}],43:[function(require,module,exports){
 "use strict";
 const Rule = require('../rule');
 
@@ -2226,7 +2282,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../rule":43}],42:[function(require,module,exports){
+},{"../rule":45}],44:[function(require,module,exports){
 "use strict";
 const Rule = require('../rule');
 
@@ -2240,7 +2296,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../rule":43}],43:[function(require,module,exports){
+},{"../rule":45}],45:[function(require,module,exports){
 "use strict";
 module.exports = class Rule {
   constructor(settings) {
@@ -2303,7 +2359,7 @@ module.exports = class Rule {
   }
 };
 
-},{}],44:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 "use strict";
 const Rule = require('../rule');
 
@@ -2320,7 +2376,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../rule":43}],45:[function(require,module,exports){
+},{"../rule":45}],47:[function(require,module,exports){
 "use strict";
 const Utils = require('./utils');
 
@@ -2468,7 +2524,7 @@ module.exports = class Runner {
   }
 };
 
-},{"./utils":51}],46:[function(require,module,exports){
+},{"./utils":53}],48:[function(require,module,exports){
 "use strict";
 /**
  *  Data and functions for aria validation.  Based on
@@ -2529,7 +2585,7 @@ exports.hasRole = (target, name) => {
   });
 };
 
-},{"../config":4}],47:[function(require,module,exports){
+},{"../config":4}],49:[function(require,module,exports){
 "use strict";
 /**
  * Caching for element values
@@ -2572,7 +2628,7 @@ module.exports = class Cache {
   }
 };
 
-},{}],48:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 "use strict";
 // Luminosity calculation
 /* eslint-disable class-methods-use-this */
@@ -2718,13 +2774,13 @@ module.exports.prototype._luminosity = luminosity;
 module.exports.prototype._colourParts = colourParts;
 module.exports.prototype._contrastRatio = contrastRatio;
 
-},{}],49:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 "use strict";
 module.exports = function cssEscape(name) {
   return name.replace(/["\\]/g, '\\$&');
 };
 
-},{}],50:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 "use strict";
 /**
  *  Determine if an element is hidden or not
@@ -2767,7 +2823,7 @@ module.exports = class HiddenCache extends Cache {
   }
 };
 
-},{"./cache":47}],51:[function(require,module,exports){
+},{"./cache":49}],53:[function(require,module,exports){
 "use strict";
 const { $, $$ } = require('./selectors');
 const { accessibleName, accessibleDescription } = require('./name');
@@ -2831,7 +2887,7 @@ Utils.prototype.cssEscape = cssEscape;
 
 module.exports = Utils;
 
-},{"./aria":46,"./contrast":48,"./cssEscape":49,"./hidden-cache":50,"./name":52,"./selectors":53,"./style-cache":54}],52:[function(require,module,exports){
+},{"./aria":48,"./contrast":50,"./cssEscape":51,"./hidden-cache":52,"./name":54,"./selectors":55,"./style-cache":56}],54:[function(require,module,exports){
 "use strict";
 // An implementation of the text alternative computation
 // https://www.w3.org/TR/accname-aam-1.1/#mapping_additional_nd_te
@@ -3058,7 +3114,7 @@ class AccessibleDescription extends AccessibleName {
 exports.accessibleName = (el, options) => new AccessibleName(el, options).build();
 exports.accessibleDescription = (el, options) => new AccessibleDescription(el, options).build();
 
-},{"../config":4,"./aria":46,"./selectors":53}],53:[function(require,module,exports){
+},{"../config":4,"./aria":48,"./selectors":55}],55:[function(require,module,exports){
 "use strict";
 exports.$$ = function $$(selector, context) {
   const root = context || document;
@@ -3073,7 +3129,7 @@ exports.$ = function $(selector, context) {
   return exports.$$(selector, context)[0];
 };
 
-},{}],54:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 "use strict";
 /**
  * A cache of computed style properties
@@ -3095,6 +3151,6 @@ module.exports = class StyleCache extends Cache {
   }
 };
 
-},{"./cache":47}]},{},["./rules","./version",6])(6)
+},{"./cache":49}]},{},["./rules","./version",6])(6)
 });
 //# sourceMappingURL=umd.js.map

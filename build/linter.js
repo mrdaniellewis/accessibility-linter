@@ -17,6 +17,7 @@ module.exports = new Map([
   ["fieldset-legend-has-fieldset", _dereq_("./rules/fieldset/legend-has-fieldset/rule.js")],
   ["fieldset-multiple-in-fieldset", _dereq_("./rules/fieldset/multiple-in-fieldset/rule.js")],
   ["headings", _dereq_("./rules/headings/rule.js")],
+  ["ids-form-attribute", _dereq_("./rules/ids/form-attribute/rule.js")],
   ["ids-imagemap-ids", _dereq_("./rules/ids/imagemap-ids/rule.js")],
   ["ids-labels-have-inputs", _dereq_("./rules/ids/labels-have-inputs/rule.js")],
   ["ids-list-id", _dereq_("./rules/ids/list-id/rule.js")],
@@ -32,15 +33,16 @@ module.exports = new Map([
   ["lang", _dereq_("./rules/lang/rule.js")],
   ["no-button-without-type", _dereq_("./rules/no-button-without-type/rule.js")],
   ["no-empty-select", _dereq_("./rules/no-empty-select/rule.js")],
+  ["no-links-as-buttons", _dereq_("./rules/no-links-as-buttons/rule.js")],
   ["no-links-to-missing-fragments", _dereq_("./rules/no-links-to-missing-fragments/rule.js")],
   ["no-multiple-select", _dereq_("./rules/no-multiple-select/rule.js")],
   ["no-outside-controls", _dereq_("./rules/no-outside-controls/rule.js")],
   ["no-reset", _dereq_("./rules/no-reset/rule.js")],
   ["title", _dereq_("./rules/title/rule.js")],
 ]);
-},{"./rules/aria/attribute-values/rule.js":9,"./rules/aria/deprecated-attributes/rule.js":10,"./rules/aria/immutable-role/rule.js":11,"./rules/aria/invalid-attributes/rule.js":12,"./rules/aria/no-focusable-hidden/rule.js":13,"./rules/aria/no-none-without-presentation/rule.js":14,"./rules/aria/roles/rule.js":15,"./rules/colour-contrast/aa/rule.js":16,"./rules/colour-contrast/aaa/rule.js":17,"./rules/data-attributes/rule.js":18,"./rules/elements/obsolete/rule.js":19,"./rules/elements/unknown/rule.js":20,"./rules/fieldset/fieldset-has-legend/rule.js":21,"./rules/fieldset/legend-has-fieldset/rule.js":22,"./rules/fieldset/multiple-in-fieldset/rule.js":23,"./rules/headings/rule.js":24,"./rules/ids/imagemap-ids/rule.js":25,"./rules/ids/labels-have-inputs/rule.js":26,"./rules/ids/list-id/rule.js":27,"./rules/ids/no-duplicate-anchor-names/rule.js":28,"./rules/ids/unique-id/rule.js":29,"./rules/labels/area/rule.js":30,"./rules/labels/aria-command/rule.js":31,"./rules/labels/controls/rule.js":32,"./rules/labels/headings/rule.js":33,"./rules/labels/img/rule.js":34,"./rules/labels/links/rule.js":35,"./rules/labels/tabindex/rule.js":36,"./rules/lang/rule.js":37,"./rules/no-button-without-type/rule.js":38,"./rules/no-empty-select/rule.js":39,"./rules/no-links-to-missing-fragments/rule.js":40,"./rules/no-multiple-select/rule.js":41,"./rules/no-outside-controls/rule.js":42,"./rules/no-reset/rule.js":43,"./rules/title/rule.js":45}],"./version":[function(_dereq_,module,exports){
+},{"./rules/aria/attribute-values/rule.js":9,"./rules/aria/deprecated-attributes/rule.js":10,"./rules/aria/immutable-role/rule.js":11,"./rules/aria/invalid-attributes/rule.js":12,"./rules/aria/no-focusable-hidden/rule.js":13,"./rules/aria/no-none-without-presentation/rule.js":14,"./rules/aria/roles/rule.js":15,"./rules/colour-contrast/aa/rule.js":16,"./rules/colour-contrast/aaa/rule.js":17,"./rules/data-attributes/rule.js":18,"./rules/elements/obsolete/rule.js":19,"./rules/elements/unknown/rule.js":20,"./rules/fieldset/fieldset-has-legend/rule.js":21,"./rules/fieldset/legend-has-fieldset/rule.js":22,"./rules/fieldset/multiple-in-fieldset/rule.js":23,"./rules/headings/rule.js":24,"./rules/ids/form-attribute/rule.js":25,"./rules/ids/imagemap-ids/rule.js":26,"./rules/ids/labels-have-inputs/rule.js":27,"./rules/ids/list-id/rule.js":28,"./rules/ids/no-duplicate-anchor-names/rule.js":29,"./rules/ids/unique-id/rule.js":30,"./rules/labels/area/rule.js":31,"./rules/labels/aria-command/rule.js":32,"./rules/labels/controls/rule.js":33,"./rules/labels/headings/rule.js":34,"./rules/labels/img/rule.js":35,"./rules/labels/links/rule.js":36,"./rules/labels/tabindex/rule.js":37,"./rules/lang/rule.js":38,"./rules/no-button-without-type/rule.js":39,"./rules/no-empty-select/rule.js":40,"./rules/no-links-as-buttons/rule.js":41,"./rules/no-links-to-missing-fragments/rule.js":42,"./rules/no-multiple-select/rule.js":43,"./rules/no-outside-controls/rule.js":44,"./rules/no-reset/rule.js":45,"./rules/title/rule.js":47}],"./version":[function(_dereq_,module,exports){
 "use strict";
-module.exports = "1.5.3"
+module.exports = "1.6.0"
 },{}],1:[function(_dereq_,module,exports){
 "use strict";
 /**
@@ -1360,7 +1362,7 @@ Linter.Utils = Utils;
 Linter.version = version;
 Linter.colourContrast = Contrast.colourContrast;
 
-},{"./config":4,"./logger":8,"./rules":"./rules","./rules/rule":44,"./runner":46,"./utils":52,"./utils/contrast":49,"./version":"./version"}],8:[function(_dereq_,module,exports){
+},{"./config":4,"./logger":8,"./rules":"./rules","./rules/rule":46,"./runner":48,"./utils":54,"./utils/contrast":51,"./version":"./version"}],8:[function(_dereq_,module,exports){
 "use strict";
 /* eslint-disable no-console, class-methods-use-this */
 module.exports = class Logger {
@@ -1456,7 +1458,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../../../config":4,"../../rule":44}],10:[function(_dereq_,module,exports){
+},{"../../../config":4,"../../rule":46}],10:[function(_dereq_,module,exports){
 "use strict";
 const Rule = _dereq_('../../rule');
 const config = _dereq_('../../../config');
@@ -1483,7 +1485,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../../../config":4,"../../rule":44}],11:[function(_dereq_,module,exports){
+},{"../../../config":4,"../../rule":46}],11:[function(_dereq_,module,exports){
 "use strict";
 const Rule = _dereq_('../../rule');
 
@@ -1510,7 +1512,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../../rule":44}],12:[function(_dereq_,module,exports){
+},{"../../rule":46}],12:[function(_dereq_,module,exports){
 "use strict";
 const Rule = _dereq_('../../rule');
 const config = _dereq_('../../../config');
@@ -1539,7 +1541,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../../../config":4,"../../rule":44}],13:[function(_dereq_,module,exports){
+},{"../../../config":4,"../../rule":46}],13:[function(_dereq_,module,exports){
 "use strict";
 const Rule = _dereq_('../../rule');
 
@@ -1562,7 +1564,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../../rule":44}],14:[function(_dereq_,module,exports){
+},{"../../rule":46}],14:[function(_dereq_,module,exports){
 "use strict";
 const Rule = _dereq_('../../rule');
 
@@ -1580,7 +1582,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../../rule":44}],15:[function(_dereq_,module,exports){
+},{"../../rule":46}],15:[function(_dereq_,module,exports){
 "use strict";
 const Rule = _dereq_('../../rule');
 const config = _dereq_('../../../config');
@@ -1632,7 +1634,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../../../config":4,"../../rule":44}],16:[function(_dereq_,module,exports){
+},{"../../../config":4,"../../rule":46}],16:[function(_dereq_,module,exports){
 "use strict";
 const Rule = _dereq_('../../rule');
 
@@ -1730,7 +1732,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../../rule":44}],17:[function(_dereq_,module,exports){
+},{"../../rule":46}],17:[function(_dereq_,module,exports){
 "use strict";
 const ColourContrastAARule = _dereq_('../aa/rule.js');
 
@@ -1738,7 +1740,6 @@ module.exports = class extends ColourContrastAARule {
   setDefaults() {
     this.min = 7;
     this.minLarge = 4.5;
-    this.type = 'warn';
     this.enabled = false;
   }
 };
@@ -1757,7 +1758,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../rule":44}],19:[function(_dereq_,module,exports){
+},{"../rule":46}],19:[function(_dereq_,module,exports){
 "use strict";
 const Rule = _dereq_('../../rule');
 const config = _dereq_('../../../config');
@@ -1772,7 +1773,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../../../config":4,"../../rule":44}],20:[function(_dereq_,module,exports){
+},{"../../../config":4,"../../rule":46}],20:[function(_dereq_,module,exports){
 "use strict";
 const Rule = _dereq_('../../rule');
 const config = _dereq_('../../../config');
@@ -1782,12 +1783,15 @@ module.exports = class extends Rule {
     return this._selector || (this._selector = Object.keys(config.elements).map(name => `:not(${name})`).join(''));
   }
 
-  test() {
+  test(el) {
+    if (el.closest('svg,math')) {
+      return null;
+    }
     return 'unknown element';
   }
 };
 
-},{"../../../config":4,"../../rule":44}],21:[function(_dereq_,module,exports){
+},{"../../../config":4,"../../rule":46}],21:[function(_dereq_,module,exports){
 "use strict";
 const Rule = _dereq_('../../rule');
 
@@ -1805,7 +1809,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../../rule":44}],22:[function(_dereq_,module,exports){
+},{"../../rule":46}],22:[function(_dereq_,module,exports){
 "use strict";
 const Rule = _dereq_('../../rule');
 
@@ -1819,7 +1823,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../../rule":44}],23:[function(_dereq_,module,exports){
+},{"../../rule":46}],23:[function(_dereq_,module,exports){
 "use strict";
 const Rule = _dereq_('../../rule');
 
@@ -1853,7 +1857,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../../rule":44}],24:[function(_dereq_,module,exports){
+},{"../../rule":46}],24:[function(_dereq_,module,exports){
 "use strict";
 const Rule = _dereq_('../rule');
 
@@ -1888,7 +1892,45 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../rule":44}],25:[function(_dereq_,module,exports){
+},{"../rule":46}],25:[function(_dereq_,module,exports){
+"use strict";
+const Rule = _dereq_('../../rule');
+
+const selector = ['button', 'fieldset', 'input', 'object', 'output', 'select', 'textarea'].map(name => `${name}[form]`).join(',');
+
+module.exports = class extends Rule {
+  setDefaults() {
+    this.includeHidden = true;
+  }
+
+  selector() {
+    return selector;
+  }
+
+  test(el) {
+    const formId = el.getAttribute('form');
+    if (!formId) {
+      return 'form attribute should be an id';
+    }
+
+    if (/\s/.test(formId)) {
+      return 'form attribute should not contain spaces';
+    }
+
+    const form = document.getElementById(formId);
+    if (!form) {
+      return `cannot find element for form attribute with id "${formId}"`;
+    }
+
+    if (form.nodeName.toLowerCase() !== 'form') {
+      return 'form attribute does not point to a form';
+    }
+
+    return null;
+  }
+};
+
+},{"../../rule":46}],26:[function(_dereq_,module,exports){
 "use strict";
 const Rule = _dereq_('../../rule');
 
@@ -1921,7 +1963,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../../rule":44}],26:[function(_dereq_,module,exports){
+},{"../../rule":46}],27:[function(_dereq_,module,exports){
 "use strict";
 const Rule = _dereq_('../../rule');
 
@@ -1938,7 +1980,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../../rule":44}],27:[function(_dereq_,module,exports){
+},{"../../rule":46}],28:[function(_dereq_,module,exports){
 "use strict";
 const Rule = _dereq_('../../rule');
 
@@ -1956,7 +1998,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../../rule":44}],28:[function(_dereq_,module,exports){
+},{"../../rule":46}],29:[function(_dereq_,module,exports){
 "use strict";
 const Rule = _dereq_('../../rule');
 
@@ -1984,7 +2026,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../../rule":44}],29:[function(_dereq_,module,exports){
+},{"../../rule":46}],30:[function(_dereq_,module,exports){
 "use strict";
 const Rule = _dereq_('../../rule');
 
@@ -2013,7 +2055,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../../rule":44}],30:[function(_dereq_,module,exports){
+},{"../../rule":46}],31:[function(_dereq_,module,exports){
 "use strict";
 const Rule = _dereq_('../../rule');
 
@@ -2042,7 +2084,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../../rule":44}],31:[function(_dereq_,module,exports){
+},{"../../rule":46}],32:[function(_dereq_,module,exports){
 "use strict";
 const Rule = _dereq_('../../rule');
 
@@ -2059,7 +2101,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../../rule":44}],32:[function(_dereq_,module,exports){
+},{"../../rule":46}],33:[function(_dereq_,module,exports){
 "use strict";
 const Rule = _dereq_('../../rule');
 
@@ -2076,7 +2118,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../../rule":44}],33:[function(_dereq_,module,exports){
+},{"../../rule":46}],34:[function(_dereq_,module,exports){
 "use strict";
 const Rule = _dereq_('../../rule');
 
@@ -2093,7 +2135,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../../rule":44}],34:[function(_dereq_,module,exports){
+},{"../../rule":46}],35:[function(_dereq_,module,exports){
 "use strict";
 const Rule = _dereq_('../../rule');
 
@@ -2111,7 +2153,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../../rule":44}],35:[function(_dereq_,module,exports){
+},{"../../rule":46}],36:[function(_dereq_,module,exports){
 "use strict";
 const Rule = _dereq_('../../rule');
 
@@ -2128,7 +2170,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../../rule":44}],36:[function(_dereq_,module,exports){
+},{"../../rule":46}],37:[function(_dereq_,module,exports){
 "use strict";
 const Rule = _dereq_('../../rule');
 
@@ -2145,7 +2187,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../../rule":44}],37:[function(_dereq_,module,exports){
+},{"../../rule":46}],38:[function(_dereq_,module,exports){
 "use strict";
 const Rule = _dereq_('../rule');
 
@@ -2172,7 +2214,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../rule":44}],38:[function(_dereq_,module,exports){
+},{"../rule":46}],39:[function(_dereq_,module,exports){
 "use strict";
 const Rule = _dereq_('../rule');
 
@@ -2186,7 +2228,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../rule":44}],39:[function(_dereq_,module,exports){
+},{"../rule":46}],40:[function(_dereq_,module,exports){
 "use strict";
 const Rule = _dereq_('../rule');
 
@@ -2203,7 +2245,21 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../rule":44}],40:[function(_dereq_,module,exports){
+},{"../rule":46}],41:[function(_dereq_,module,exports){
+"use strict";
+const Rule = _dereq_('../rule');
+
+module.exports = class extends Rule {
+  selector() {
+    return 'a[role=button],a[href="#"],a[href="#!"],a[href^="javascript:"]';
+  }
+
+  test() {
+    return 'use a button instead of a link';
+  }
+};
+
+},{"../rule":46}],42:[function(_dereq_,module,exports){
 "use strict";
 const Rule = _dereq_('../rule');
 
@@ -2229,7 +2285,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../rule":44}],41:[function(_dereq_,module,exports){
+},{"../rule":46}],43:[function(_dereq_,module,exports){
 "use strict";
 const Rule = _dereq_('../rule');
 
@@ -2243,7 +2299,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../rule":44}],42:[function(_dereq_,module,exports){
+},{"../rule":46}],44:[function(_dereq_,module,exports){
 "use strict";
 const Rule = _dereq_('../rule');
 
@@ -2260,7 +2316,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../rule":44}],43:[function(_dereq_,module,exports){
+},{"../rule":46}],45:[function(_dereq_,module,exports){
 "use strict";
 const Rule = _dereq_('../rule');
 
@@ -2274,7 +2330,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../rule":44}],44:[function(_dereq_,module,exports){
+},{"../rule":46}],46:[function(_dereq_,module,exports){
 "use strict";
 module.exports = class Rule {
   constructor(settings) {
@@ -2337,7 +2393,7 @@ module.exports = class Rule {
   }
 };
 
-},{}],45:[function(_dereq_,module,exports){
+},{}],47:[function(_dereq_,module,exports){
 "use strict";
 const Rule = _dereq_('../rule');
 
@@ -2354,7 +2410,7 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../rule":44}],46:[function(_dereq_,module,exports){
+},{"../rule":46}],48:[function(_dereq_,module,exports){
 "use strict";
 const Utils = _dereq_('./utils');
 
@@ -2502,7 +2558,7 @@ module.exports = class Runner {
   }
 };
 
-},{"./utils":52}],47:[function(_dereq_,module,exports){
+},{"./utils":54}],49:[function(_dereq_,module,exports){
 "use strict";
 /**
  *  Data and functions for aria validation.  Based on
@@ -2563,7 +2619,7 @@ exports.hasRole = (target, name) => {
   });
 };
 
-},{"../config":4}],48:[function(_dereq_,module,exports){
+},{"../config":4}],50:[function(_dereq_,module,exports){
 "use strict";
 /**
  * Caching for element values
@@ -2606,7 +2662,7 @@ module.exports = class Cache {
   }
 };
 
-},{}],49:[function(_dereq_,module,exports){
+},{}],51:[function(_dereq_,module,exports){
 "use strict";
 // Luminosity calculation
 /* eslint-disable class-methods-use-this */
@@ -2752,13 +2808,13 @@ module.exports.prototype._luminosity = luminosity;
 module.exports.prototype._colourParts = colourParts;
 module.exports.prototype._contrastRatio = contrastRatio;
 
-},{}],50:[function(_dereq_,module,exports){
+},{}],52:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function cssEscape(name) {
   return name.replace(/["\\]/g, '\\$&');
 };
 
-},{}],51:[function(_dereq_,module,exports){
+},{}],53:[function(_dereq_,module,exports){
 "use strict";
 /**
  *  Determine if an element is hidden or not
@@ -2801,7 +2857,7 @@ module.exports = class HiddenCache extends Cache {
   }
 };
 
-},{"./cache":48}],52:[function(_dereq_,module,exports){
+},{"./cache":50}],54:[function(_dereq_,module,exports){
 "use strict";
 const { $, $$ } = _dereq_('./selectors');
 const { accessibleName, accessibleDescription } = _dereq_('./name');
@@ -2865,7 +2921,7 @@ Utils.prototype.cssEscape = cssEscape;
 
 module.exports = Utils;
 
-},{"./aria":47,"./contrast":49,"./cssEscape":50,"./hidden-cache":51,"./name":53,"./selectors":54,"./style-cache":55}],53:[function(_dereq_,module,exports){
+},{"./aria":49,"./contrast":51,"./cssEscape":52,"./hidden-cache":53,"./name":55,"./selectors":56,"./style-cache":57}],55:[function(_dereq_,module,exports){
 "use strict";
 // An implementation of the text alternative computation
 // https://www.w3.org/TR/accname-aam-1.1/#mapping_additional_nd_te
@@ -3092,7 +3148,7 @@ class AccessibleDescription extends AccessibleName {
 exports.accessibleName = (el, options) => new AccessibleName(el, options).build();
 exports.accessibleDescription = (el, options) => new AccessibleDescription(el, options).build();
 
-},{"../config":4,"./aria":47,"./selectors":54}],54:[function(_dereq_,module,exports){
+},{"../config":4,"./aria":49,"./selectors":56}],56:[function(_dereq_,module,exports){
 "use strict";
 exports.$$ = function $$(selector, context) {
   const root = context || document;
@@ -3107,7 +3163,7 @@ exports.$ = function $(selector, context) {
   return exports.$$(selector, context)[0];
 };
 
-},{}],55:[function(_dereq_,module,exports){
+},{}],57:[function(_dereq_,module,exports){
 "use strict";
 /**
  * A cache of computed style properties
@@ -3129,5 +3185,5 @@ module.exports = class StyleCache extends Cache {
   }
 };
 
-},{"./cache":48}]},{},["./rules","./version",6])
+},{"./cache":50}]},{},["./rules","./version",6])
 //# sourceMappingURL=linter.js.map
