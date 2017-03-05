@@ -122,7 +122,7 @@ describe('Rule', () => {
         const thumb = appendToBody('<thumb />');
         const test = new Test();
         test.select = function () {
-          return [thumb];
+          return AccessibilityLinter.Utils.ExtendedArray.of(thumb);
         };
         const spy = expect.spyOn(test, 'test');
         test.run(null, () => true, utils);
