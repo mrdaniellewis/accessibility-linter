@@ -3,7 +3,7 @@ describe('rules', () => {
   const context = { when };
   let frame;
 
-  before((done) => {
+  beforeAll((done) => {
     frame = document.createElement('iframe');
     frame.src = 'frame.htm';
     frame.style = 'border: 0; height: 0; width: 0;';
@@ -11,16 +11,17 @@ describe('rules', () => {
     frame.contentWindow.addEventListener('load', () => done());
   });
 
-  after(() => {
+  afterAll(() => {
     frame.remove();
   });
 
-  ruleSpecs.forEach((spec, name) => {
+  ruleSpecs.forEach((path) => {
     let window, linter, Rule, rules, cleaner, iframeError;
+    const name = path.replace(/\//g, '-');
 
     // Make sure everything is setup using the iFrame versions
-    describe(name, () => {
-      before(() => {
+    describe(name, function () {
+      beforeAll(() => {
         window = context.window = frame.contentWindow;
         context.document = window.document;
         Rule = context.Rule = window.AccessibilityLinter.rules.get(name);
@@ -57,25 +58,27 @@ describe('rules', () => {
         }
       }));
 
-      // eslint-disable-next-line no-new-func
-      new Function(`
-        let el, el2, Rule, logger, linter, window, document, $, appendToBody, location;
-        const when = fn => this.when(fn, this);
+      this.requireTests(`../lib/rules/${path}/spec.js`, (content) => {
+        // eslint-disable-next-line no-new-func
+        new Function(`
+          let el, el2, Rule, logger, linter, window, document, $, appendToBody, location;
+          const when = fn => this.when(fn, this);
 
-        before(() => {
-          ({ window, document, window: { $, appendToBody, location } } = this);
-        });
+          beforeAll(() => {
+            ({ window, document, window: { $, appendToBody, location } } = this);
+          });
 
-        beforeEach(() => {
-          ({Rule, logger, linter} = this);
-        });
+          beforeEach(() => {
+            ({Rule, logger, linter} = this);
+          });
 
-        afterEach(() => {
-          el = el2 = Rule = logger = linter = null;
-        });
+          afterEach(() => {
+            el = el2 = Rule = logger = linter = null;
+          });
 
-        ${spec.toString().replace(/^function\s*\(\)\s*{/, '').replace(/}$/, '')}
-      `).call(context);
+          ${content}
+        `).call(context);
+      });
     });
   });
 });

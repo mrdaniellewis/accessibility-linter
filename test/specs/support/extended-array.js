@@ -1,5 +1,10 @@
 describe('ExtendedArray', () => {
-  const ExtendedArray = AccessibilityLinter.Utils.ExtendedArray;
+  let ExtendedArray;
+
+  beforeAll(() => (
+    requireModule('../lib/support/extended-array.js')
+      .then(ob => (ExtendedArray = ob))
+  ));
 
   it('extends array', () => {
     expect(new ExtendedArray()).toBeAn(Array);

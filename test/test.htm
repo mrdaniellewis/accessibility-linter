@@ -13,7 +13,7 @@
   <script src="../build/umd.js"></script>
   <script src="support.js"></script>
   <script src="utils.js"></script>
-  <script src="specs/extended-array.js"></script>
+  <script src="specs/support.js"></script>
   <script src="specs/config.js"></script>
   <script src="specs/logger.js"></script>
   <script src="specs/utils.js"></script>
@@ -23,6 +23,7 @@
   <script src="specs/rules.js"></script>
   <script>
     mocha.checkLeaks();
-    mocha.run();
+    Promise.all(window.loadingTests)
+      .then(() => mocha.run());
   </script>
 </body>

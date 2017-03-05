@@ -1,4 +1,10 @@
 (function () {
+  // Make before/after more explicit
+  window.beforeAll = before;
+  window.afterAll = after;
+  window.before = () => { throw new Error('use `beforeAll`'); };
+  window.after = () => { throw new Error('use `afterAll`'); };
+
   // Run an assertion after a DOM modification has completed
   // Remove any DOM modifications once completed
   // Usage
@@ -109,13 +115,13 @@
   window.clean = () => {
     let cleaner;
 
-    before(() => {
+    beforeAll(() => {
       cleaner = domCleaner({ exclude: '#mocha *' });
     });
 
     afterEach(() => Promise.resolve().then(() => cleaner.clean()));
 
-    after(() => {
+    afterAll(() => {
       cleaner.stop();
     });
   };
@@ -140,4 +146,63 @@
   afterEach(() => {
     expect.restoreSpies();
   });
+
+  window.requireScript = function (url) {
+    return fetch(url)
+      .then((response) => {
+        if (response.ok) {
+          return response.text();
+        }
+        throw new Error(`${url} returned ${response.status}`);
+      });
+  };
+
+  window.requireModule = function (url) {
+    const module = { exports: {} };
+    return requireScript(url)
+      .then((content) => {
+        new Function('module', content)(module); // eslint-disable-line no-new-func
+        return module.exports;
+      });
+  };
+
+  window.loadingTests = [];
+  Mocha.Suite.prototype.requireTests = function requireTests(url, run) {
+    run = run || (content => new Function(content)()); // eslint-disable-line no-new-func
+
+    const loading = requireScript(url)
+      .then((content) => {
+        const stack = [this];
+        const hooks = ['beforeAll', 'beforeEach', 'afterAll', 'afterEach', 'describe', 'context', 'it'];
+        const oldHooks = {};
+        hooks.forEach(name => (oldHooks[name] = window[name]));
+
+        window.describe = window.context = (title, fn) => {
+          const block = new Mocha.Suite(title);
+          stack[0].addSuite(block);
+          stack.unshift(block);
+          fn();
+          stack.shift();
+        };
+
+        window.it = (title, fn) => {
+          stack[0].addTest(new Mocha.Test(title, fn));
+        };
+
+        ['beforeAll', 'beforeEach', 'afterAll', 'afterEach'].forEach((name) => {
+          window[name] = fn => stack[0][name](fn);
+        });
+
+        run(content);
+
+        hooks.forEach(name => (oldHooks[name] = oldHooks[name]));
+      })
+      .catch((e) => {
+        this.beforeAll(() => {
+          throw new Error(`cannot load ${url}: ${e}`);
+        });
+      });
+
+    window.loadingTests.push(loading);
+  };
 }());

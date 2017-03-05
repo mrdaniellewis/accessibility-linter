@@ -26,7 +26,7 @@ describe('Rule', () => {
   });
 
   describe('custom settings', () => {
-    before(() => {
+    beforeAll(() => {
       Test = class extends Rule {
         setDefaults() {
           this.enabled = false;
@@ -72,7 +72,7 @@ describe('Rule', () => {
       utils = new AccessibilityLinter.Utils();
     });
 
-    before(() => {
+    beforeAll(() => {
       Test = class extends Rule {
         selector() {
           return 'foo,bar';
@@ -113,21 +113,6 @@ describe('Rule', () => {
         test.run(document, el => el.nodeName.toLowerCase() === 'foo', utils);
 
         expect(spy).toHaveHadCalls([foo, utils]);
-      });
-    });
-
-    describe('#select', () => {
-      it('can be overridden to return arbitrary elements', () => {
-        appendToBody('<foo />');
-        const thumb = appendToBody('<thumb />');
-        const test = new Test();
-        test.select = function () {
-          return AccessibilityLinter.Utils.ExtendedArray.of(thumb);
-        };
-        const spy = expect.spyOn(test, 'test');
-        test.run(null, () => true, utils);
-
-        expect(spy).toHaveHadCalls([thumb, utils]);
       });
     });
 

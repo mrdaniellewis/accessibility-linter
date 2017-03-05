@@ -272,6 +272,7 @@ describe('AccessibilityLinter', () => {
         rules,
         logger,
         whitelist: '.old-whitelist',
+        ruleSettings: { rule: { whitelist: '.rule-whitelist' } },
       });
     });
 
@@ -289,13 +290,32 @@ describe('AccessibilityLinter', () => {
 
     it('it allows a context', () => {
       el = appendToBody('<div><foo></div><foo />');
-      linter.runRule('rule', el);
+      linter.runRule('rule', { context: el });
       expect(logger).toHaveEntries(['foo-bar', el.firstChild]);
+    });
+
+    it('it uses an existing whitelist', () => {
+      el = appendToBody('<foo class="old-whitelist"/>');
+      linter.runRule('rule');
+      expect(logger).toNotHaveEntries();
     });
 
     it('it allows a custom whitelist', () => {
       el = appendToBody('<foo /><foo class="new-whitelist">');
-      linter.runRule('rule', null, '.new-whitelist');
+      linter.runRule('rule', { whitelist: '.new-whitelist' });
+      expect(logger).toHaveEntries(['foo-bar', el]);
+    });
+
+    it('it uses existing rule settings', () => {
+      el = appendToBody('<foo class="rule-whitelist"/>');
+      linter.runRule('rule');
+      expect(logger).toNotHaveEntries();
+    });
+
+    it('it uses custom rule settings', () => {
+      appendToBody('<foo class="rule-whitelist"/>');
+      el = appendToBody('<foo class="new-whitelist"/>');
+      linter.runRule('rule', { ruleSettings: { whitelist: '.new-whitelist' } });
       expect(logger).toHaveEntries(['foo-bar', el]);
     });
 

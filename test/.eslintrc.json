@@ -14,7 +14,13 @@
     "build": false,
     "clean": false,
     "uniqueId": false,
-    "proxy": false
+    "proxy": false,
+    "Mocha": false,
+    "requireScript": false,
+    "requireModule": false,
+    "requireTests": false,
+    "beforeAll": false,
+    "afterAll": false
   },
   "rules": {
     "prefer-arrow-callback": 0,
