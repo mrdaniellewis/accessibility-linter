@@ -1,11 +1,15 @@
 (function () {
+  // -------------------------------------
   // Make before/after names more explicit
+  // -------------------------------------
   window.beforeAll = before;
   window.afterAll = after;
   window.before = () => { throw new Error('use `beforeAll`'); };
   window.after = () => { throw new Error('use `afterAll`'); };
 
+  // -------------------------------------
   // A test logger that just saves the log messages
+  // -------------------------------------
   window.TestLogger = class {
     constructor() {
       this.clear();
@@ -21,7 +25,9 @@
     }
   };
 
+  // -------------------------------------
   // Custom assertions
+  // -------------------------------------
   expect.extend({
     toNotHaveEntries() {
       expect.assert(
@@ -79,7 +85,39 @@
     },
   });
 
+  // -------------------------------------
+  // Ensure each test has assertions
+  // -------------------------------------
+  let hasAssertions = false;
+  const originalExpect = expect;
+  Object.defineProperty(window, 'expect', {
+    get() {
+      hasAssertions = true;
+      return originalExpect;
+    },
+    enumerable: true,
+  });
+
+  beforeEach(() => {
+    hasAssertions = false;
+  });
+
+  afterEach(function () {
+    if (!hasAssertions) {
+      this.test.error(new Error('test has no assertions'));
+    }
+  });
+
+  // -------------------------------------
+  // Clean up spies
+  // -------------------------------------
+  afterEach(() => {
+    expect.restoreSpies();
+  });
+
+  // -------------------------------------
   // Clean up created elements between tests
+  // -------------------------------------
   window.whenDomUpdates = null;
   window.clean = (context = () => window) => {
     let cleaner;
@@ -105,6 +143,9 @@
     });
   };
 
+  // -------------------------------------
+  // Swap an object property for the duration of a test
+  // -------------------------------------
   window.proxy = function (fn) {
     let ob, prop, originalValue;
 
@@ -122,10 +163,9 @@
     });
   };
 
-  afterEach(() => {
-    expect.restoreSpies();
-  });
-
+  // -------------------------------------
+  // Asynchronously load scripts and tests
+  // -------------------------------------
   window.requireScript = function (url) {
     return fetch(url)
       .then((response) => {
