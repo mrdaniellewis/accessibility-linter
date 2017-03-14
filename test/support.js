@@ -29,6 +29,7 @@
   // Custom assertions
   // -------------------------------------
   expect.extend({
+    // Test logger to have no entries
     toNotHaveEntries() {
       expect.assert(
         this.actual.errors.length === 0 && this.actual.warnings.length === 0,
@@ -38,7 +39,8 @@
       return this;
     },
 
-    toHaveEntries() {
+    // Test logger to have errors
+    toHaveErrors() {
       if (arguments.length === 0) {
         expect.assert(
           this.actual.errors.length > 0,
@@ -51,6 +53,7 @@
       return this;
     },
 
+    // Test logger to have warnings
     toHaveWarnings() {
       if (arguments.length === 0) {
         expect.assert(
@@ -64,6 +67,7 @@
       return this;
     },
 
+    // Like toEqual, but tells you what is wrong
     toMatchArray(array) {
       try {
         expect(this.actual.sort()).toEqual(array.sort());
@@ -79,6 +83,7 @@
       return this;
     },
 
+    // Matches the arguments in each call made to a spy
     toHaveHadCalls() {
       expect(this.actual.calls.map(call => call.arguments)).toEqual(Array.from(arguments));
       return this;
@@ -145,6 +150,9 @@
 
   // -------------------------------------
   // Swap an object property for the duration of a test
+  //
+  // proxy(fn => fn(object, propertyName, newValue));
+  //
   // -------------------------------------
   window.proxy = function (fn) {
     let ob, prop, originalValue;
