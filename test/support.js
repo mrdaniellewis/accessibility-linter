@@ -1,41 +1,9 @@
 (function () {
-  // Make before/after more explicit
+  // Make before/after names more explicit
   window.beforeAll = before;
   window.afterAll = after;
   window.before = () => { throw new Error('use `beforeAll`'); };
   window.after = () => { throw new Error('use `afterAll`'); };
-
-  // Run an assertion after a DOM modification has completed
-  // Remove any DOM modifications once completed
-  // Usage
-  // it('does stuff', when(() => change DOM...).then(() => run tests...))
-  window.when = function when(setup, global = window) {
-    return {
-      setup,
-
-      global,
-
-      then(test) {
-        this.test = test;
-        return this.run.bind(this);
-      },
-
-      run() {
-        return new Promise((resolve) => {
-          const observer = new MutationObserver((mutations) => {
-            observer.disconnect();
-            resolve(mutations);
-          });
-          observer.observe(
-            global.document,
-            { subtree: true, childList: true, attributes: true, characterData: true }
-          );
-          this.setup();
-        })
-        .then(this.test);
-      },
-    };
-  };
 
   // A test logger that just saves the log messages
   window.TestLogger = class {
@@ -53,7 +21,7 @@
     }
   };
 
-  // Assertions for the logger
+  // Custom assertions
   expect.extend({
     toNotHaveEntries() {
       expect.assert(
@@ -112,14 +80,25 @@
   });
 
   // Clean up created elements between tests
-  window.clean = () => {
+  window.whenDomUpdates = null;
+  window.clean = (context = () => window) => {
     let cleaner;
 
     beforeAll(() => {
-      cleaner = domCleaner({ exclude: '#mocha *' });
+      cleaner = context().domCleaner({ exclude: '#mocha *' });
     });
 
-    afterEach(() => Promise.resolve().then(() => cleaner.clean()));
+    beforeEach(() => {
+      window.whenDomUpdates = function (fn) {
+        return new Promise(resolve => cleaner.onUpdate(resolve))
+          .then(fn);
+      };
+    });
+
+    afterEach(() => {
+      window.whenDomUpdates = null;
+      return Promise.resolve().then(() => cleaner.clean());
+    });
 
     afterAll(() => {
       cleaner.stop();

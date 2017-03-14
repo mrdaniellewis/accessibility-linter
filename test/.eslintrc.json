@@ -5,7 +5,6 @@
   "globals": {
     "expect": false,
     "$": false,
-    "when": false,
     "AccessibilityLinter": false,
     "TestLogger": false,
     "ruleSpecs": false,
@@ -20,7 +19,8 @@
     "requireModule": false,
     "requireTests": false,
     "beforeAll": false,
-    "afterAll": false
+    "afterAll": false,
+    "whenDomUpdates": false
   },
   "rules": {
     "prefer-arrow-callback": 0,

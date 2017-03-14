@@ -12,10 +12,11 @@
   window.build = html => $(html)[0];
 
   window.domCleaner = function ({ exclude } = {}) {
+    let updateCallback = null;
     const additions = [];
     const observer = new MutationObserver((mutations) => {
-      mutations.forEach(
-        mutation => Array.from(mutation.addedNodes)
+      mutations.forEach((mutation) => {
+        Array.from(mutation.addedNodes)
           .filter((node) => {
             if (!exclude) {
               return true;
@@ -28,15 +29,27 @@
             }
             return true;
           })
-          .forEach(node => additions.push(node))
-      );
+          .forEach(node => additions.push(node));
+
+        if (updateCallback) {
+          updateCallback();
+        }
+      });
     });
 
-    observer.observe(this.document, { subtree: true, childList: true });
+    observer.observe(
+      this.document,
+      { subtree: true, childList: true, attributes: true, characterData: true }
+    );
 
     return {
+      onUpdate(fn) {
+        updateCallback = fn;
+      },
+
       clean() {
         additions.splice(0).forEach(el => el.remove());
+        updateCallback = null;
       },
 
       stop() {
