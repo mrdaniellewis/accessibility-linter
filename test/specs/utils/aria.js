@@ -13,7 +13,7 @@ describe('#aria', () => {
   describe('#allowed', () => {
     describe('it has the expected return for', () => {
       it('an unknown element', () => {
-        const el = build('<frank />');
+        const el = buildHtml('<frank />');
         expect(aria.allowed(el)).toInclude({
           roles: '*',
           implicit: [],
@@ -21,7 +21,7 @@ describe('#aria', () => {
       });
 
       it('a element with a href', () => {
-        const el = build('<a href="#" />');
+        const el = buildHtml('<a href="#" />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['link'],
           roles: [
@@ -32,7 +32,7 @@ describe('#aria', () => {
       });
 
       it('a element without a href', () => {
-        const el = build('<a />');
+        const el = buildHtml('<a />');
         expect(aria.allowed(el)).toInclude({
           implicit: [],
           roles: '*',
@@ -40,7 +40,7 @@ describe('#aria', () => {
       });
 
       it('address', () => {
-        const el = build('<address />');
+        const el = buildHtml('<address />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['contentinfo'],
           roles: [],
@@ -48,7 +48,7 @@ describe('#aria', () => {
       });
 
       it('area element with a href', () => {
-        const el = build('<area href="#" />');
+        const el = buildHtml('<area href="#" />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['link'],
           roles: [],
@@ -56,7 +56,7 @@ describe('#aria', () => {
       });
 
       it('article', () => {
-        const el = build('<article />');
+        const el = buildHtml('<article />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['article'],
           roles: ['presentation', 'document', 'application', 'main', 'region'],
@@ -64,7 +64,7 @@ describe('#aria', () => {
       });
 
       it('aside', () => {
-        const el = build('<aside />');
+        const el = buildHtml('<aside />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['complementary'],
           roles: ['note', 'region', 'search'],
@@ -72,7 +72,7 @@ describe('#aria', () => {
       });
 
       it('audio', () => {
-        const el = build('<audio />');
+        const el = buildHtml('<audio />');
         expect(aria.allowed(el)).toInclude({
           implicit: [],
           roles: ['application'],
@@ -80,7 +80,7 @@ describe('#aria', () => {
       });
 
       it('base', () => {
-        const el = build('<base />');
+        const el = buildHtml('<base />');
         expect(aria.allowed(el)).toInclude({
           implicit: [],
           roles: [],
@@ -88,7 +88,7 @@ describe('#aria', () => {
       });
 
       it('body', () => {
-        const el = build('<body />');
+        const el = buildHtml('<body />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['document'],
           roles: [],
@@ -96,7 +96,7 @@ describe('#aria', () => {
       });
 
       it('button', () => {
-        const el = build('<button />');
+        const el = buildHtml('<button />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['button'],
           roles: ['checkbox', 'link', 'menuitem', 'menuitemcheckbox', 'menuitemradio', 'radio', 'switch', 'tab'],
@@ -104,7 +104,7 @@ describe('#aria', () => {
       });
 
       it('button type="menu"', () => {
-        const el = build('<button type="menu" />');
+        const el = buildHtml('<button type="menu" />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['button'],
           roles: ['link', 'menuitem', 'menuitemcheckbox', 'menuitemradio', 'radio'],
@@ -112,7 +112,7 @@ describe('#aria', () => {
       });
 
       it('caption', () => {
-        const el = build('<caption />');
+        const el = buildHtml('<caption />');
         expect(aria.allowed(el)).toInclude({
           implicit: [],
           roles: [],
@@ -120,7 +120,7 @@ describe('#aria', () => {
       });
 
       it('col', () => {
-        const el = build('<col />');
+        const el = buildHtml('<col />');
         expect(aria.allowed(el)).toInclude({
           implicit: [],
           roles: [],
@@ -128,7 +128,7 @@ describe('#aria', () => {
       });
 
       it('colgroup', () => {
-        const el = build('<colgroup />');
+        const el = buildHtml('<colgroup />');
         expect(aria.allowed(el)).toInclude({
           implicit: [],
           roles: [],
@@ -136,7 +136,7 @@ describe('#aria', () => {
       });
 
       it('data', () => {
-        const el = build('<data />');
+        const el = buildHtml('<data />');
         expect(aria.allowed(el)).toInclude({
           implicit: [],
           roles: '*',
@@ -144,7 +144,7 @@ describe('#aria', () => {
       });
 
       it('datalist', () => {
-        const el = build('<datalist />');
+        const el = buildHtml('<datalist />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['listbox'],
           roles: [],
@@ -152,7 +152,7 @@ describe('#aria', () => {
       });
 
       it('dd', () => {
-        const el = build('<dd />');
+        const el = buildHtml('<dd />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['definition'],
           roles: [],
@@ -160,7 +160,7 @@ describe('#aria', () => {
       });
 
       it('details', () => {
-        const el = build('<details />');
+        const el = buildHtml('<details />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['group'],
           roles: [],
@@ -168,7 +168,7 @@ describe('#aria', () => {
       });
 
       it('dialog', () => {
-        const el = build('<dialog />');
+        const el = buildHtml('<dialog />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['dialog'],
           roles: ['alertdialog'],
@@ -176,7 +176,7 @@ describe('#aria', () => {
       });
 
       it('div', () => {
-        const el = build('<div />');
+        const el = buildHtml('<div />');
         expect(aria.allowed(el)).toInclude({
           implicit: [],
           roles: '*',
@@ -184,7 +184,7 @@ describe('#aria', () => {
       });
 
       it('dl', () => {
-        const el = build('<dl />');
+        const el = buildHtml('<dl />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['list'],
           roles: ['group', 'presentation'],
@@ -192,7 +192,7 @@ describe('#aria', () => {
       });
 
       it('dt', () => {
-        const el = build('<dt />');
+        const el = buildHtml('<dt />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['listitem'],
           roles: [],
@@ -200,7 +200,7 @@ describe('#aria', () => {
       });
 
       it('embed', () => {
-        const el = build('<embed />');
+        const el = buildHtml('<embed />');
         expect(aria.allowed(el)).toInclude({
           implicit: [],
           roles: ['application', 'document', 'presentation', 'img'],
@@ -208,7 +208,7 @@ describe('#aria', () => {
       });
 
       it('fieldset', () => {
-        const el = build('<fieldset />');
+        const el = buildHtml('<fieldset />');
         expect(aria.allowed(el)).toInclude({
           implicit: [],
           roles: ['group', 'presentation'],
@@ -216,7 +216,7 @@ describe('#aria', () => {
       });
 
       it('figcaption', () => {
-        const el = build('<figcaption />');
+        const el = buildHtml('<figcaption />');
         expect(aria.allowed(el)).toInclude({
           implicit: [],
           roles: ['group', 'presentation'],
@@ -224,7 +224,7 @@ describe('#aria', () => {
       });
 
       it('figure', () => {
-        const el = build('<figure />');
+        const el = buildHtml('<figure />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['figure'],
           roles: ['group', 'presentation'],
@@ -232,7 +232,7 @@ describe('#aria', () => {
       });
 
       it('footer descendant of article or section', () => {
-        const el = $('<article><footer /></article>').find('footer')[0];
+        const el = buildHtml('<article><footer /></article>').querySelector('footer');
         expect(aria.allowed(el)).toInclude({
           implicit: [],
           roles: ['group', 'presentation'],
@@ -240,7 +240,7 @@ describe('#aria', () => {
       });
 
       it('footer', () => {
-        const el = build('<footer />');
+        const el = buildHtml('<footer />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['contentinfo'],
           roles: ['group', 'presentation'],
@@ -248,7 +248,7 @@ describe('#aria', () => {
       });
 
       it('form', () => {
-        const el = build('<form />');
+        const el = buildHtml('<form />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['form'],
           roles: ['search', 'presentation'],
@@ -256,7 +256,7 @@ describe('#aria', () => {
       });
 
       it('p', () => {
-        const el = build('<p />');
+        const el = buildHtml('<p />');
         expect(aria.allowed(el)).toInclude({
           implicit: [],
           roles: '*',
@@ -264,7 +264,7 @@ describe('#aria', () => {
       });
 
       it('pre', () => {
-        const el = build('<pre />');
+        const el = buildHtml('<pre />');
         expect(aria.allowed(el)).toInclude({
           implicit: [],
           roles: '*',
@@ -272,7 +272,7 @@ describe('#aria', () => {
       });
 
       it('blockquote', () => {
-        const el = build('<blockquote />');
+        const el = buildHtml('<blockquote />');
         expect(aria.allowed(el)).toInclude({
           implicit: [],
           roles: '*',
@@ -280,7 +280,7 @@ describe('#aria', () => {
       });
 
       it('h1', () => {
-        const el = build('<h1 />');
+        const el = buildHtml('<h1 />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['heading'],
           roles: ['tab', 'presentation'],
@@ -288,7 +288,7 @@ describe('#aria', () => {
       });
 
       it('h2', () => {
-        const el = build('<h2 />');
+        const el = buildHtml('<h2 />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['heading'],
           roles: ['tab', 'presentation'],
@@ -296,7 +296,7 @@ describe('#aria', () => {
       });
 
       it('h3', () => {
-        const el = build('<h3 />');
+        const el = buildHtml('<h3 />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['heading'],
           roles: ['tab', 'presentation'],
@@ -304,7 +304,7 @@ describe('#aria', () => {
       });
 
       it('h4', () => {
-        const el = build('<h4 />');
+        const el = buildHtml('<h4 />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['heading'],
           roles: ['tab', 'presentation'],
@@ -312,7 +312,7 @@ describe('#aria', () => {
       });
 
       it('h5', () => {
-        const el = build('<h5 />');
+        const el = buildHtml('<h5 />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['heading'],
           roles: ['tab', 'presentation'],
@@ -320,7 +320,7 @@ describe('#aria', () => {
       });
 
       it('h6', () => {
-        const el = build('<h6 />');
+        const el = buildHtml('<h6 />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['heading'],
           roles: ['tab', 'presentation'],
@@ -328,7 +328,7 @@ describe('#aria', () => {
       });
 
       it('head', () => {
-        const el = build('<head />');
+        const el = buildHtml('<head />');
         expect(aria.allowed(el)).toInclude({
           implicit: [],
           roles: [],
@@ -336,7 +336,7 @@ describe('#aria', () => {
       });
 
       it('header descendant of article or section', () => {
-        const el = $('<article><header /></article>').find('header')[0];
+        const el = buildHtml('<article><header /></article>').querySelector('header');
         expect(aria.allowed(el)).toInclude({
           implicit: [],
           roles: ['group', 'presentation'],
@@ -344,7 +344,7 @@ describe('#aria', () => {
       });
 
       it('header', () => {
-        const el = build('<header />');
+        const el = buildHtml('<header />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['banner'],
           roles: ['group', 'presentation'],
@@ -352,7 +352,7 @@ describe('#aria', () => {
       });
 
       it('hr', () => {
-        const el = build('<hr />');
+        const el = buildHtml('<hr />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['separator'],
           roles: ['presentation'],
@@ -360,7 +360,7 @@ describe('#aria', () => {
       });
 
       it('html', () => {
-        const el = build('<html />');
+        const el = buildHtml('<html />');
         expect(aria.allowed(el)).toInclude({
           implicit: [],
           roles: [],
@@ -368,7 +368,7 @@ describe('#aria', () => {
       });
 
       it('iframe', () => {
-        const el = build('<iframe />');
+        const el = buildHtml('<iframe />');
         expect(aria.allowed(el)).toInclude({
           implicit: [],
           roles: ['application', 'document', 'img'],
@@ -376,7 +376,7 @@ describe('#aria', () => {
       });
 
       it('img with alt=""', () => {
-        const el = build('<img alt="" />');
+        const el = buildHtml('<img alt="" />');
         expect(aria.allowed(el)).toInclude({
           implicit: [],
           roles: ['presentation'],
@@ -384,7 +384,7 @@ describe('#aria', () => {
       });
 
       it('img', () => {
-        const el = build('<img />');
+        const el = buildHtml('<img />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['img'],
           roles: '*',
@@ -392,7 +392,7 @@ describe('#aria', () => {
       });
 
       it('input type="button"', () => {
-        const el = build('<input type="button" />');
+        const el = buildHtml('<input type="button" />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['button'],
           roles: ['link', 'menuitem', 'menuitemcheckbox', 'menuitemradio', 'radio', 'switch', 'tab'],
@@ -400,7 +400,7 @@ describe('#aria', () => {
       });
 
       it('input type="checkbox"', () => {
-        const el = build('<input type="checkbox" />');
+        const el = buildHtml('<input type="checkbox" />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['checkbox'],
           roles: ['button', 'menuitemcheckbox', 'switch'],
@@ -408,7 +408,7 @@ describe('#aria', () => {
       });
 
       it('input type="color"', () => {
-        const el = build('<input type="color" />');
+        const el = buildHtml('<input type="color" />');
         expect(aria.allowed(el)).toInclude({
           implicit: [],
           roles: [],
@@ -416,7 +416,7 @@ describe('#aria', () => {
       });
 
       it('input type="date"', () => {
-        const el = build('<input type="date" />');
+        const el = buildHtml('<input type="date" />');
         expect(aria.allowed(el)).toInclude({
           implicit: [],
           roles: [],
@@ -424,7 +424,7 @@ describe('#aria', () => {
       });
 
       it('input type="datetime"', () => {
-        const el = build('<input type="datetime" />');
+        const el = buildHtml('<input type="datetime" />');
         expect(aria.allowed(el)).toInclude({
           implicit: [],
           roles: [],
@@ -432,7 +432,7 @@ describe('#aria', () => {
       });
 
       it('input type="datetime-local"', () => {
-        const el = build('<input type="datetime-local" />');
+        const el = buildHtml('<input type="datetime-local" />');
         expect(aria.allowed(el)).toInclude({
           implicit: [],
           roles: [],
@@ -440,7 +440,7 @@ describe('#aria', () => {
       });
 
       it('input type="list" without list attribute', () => {
-        const el = build('<input type="email" />');
+        const el = buildHtml('<input type="email" />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['textbox'],
           roles: [],
@@ -448,7 +448,7 @@ describe('#aria', () => {
       });
 
       it('input type="file"', () => {
-        const el = build('<input type="file" />');
+        const el = buildHtml('<input type="file" />');
         expect(aria.allowed(el)).toInclude({
           implicit: [],
           roles: [],
@@ -456,7 +456,7 @@ describe('#aria', () => {
       });
 
       it('input type="hidden"', () => {
-        const el = build('<input type="hidden" />');
+        const el = buildHtml('<input type="hidden" />');
         expect(aria.allowed(el)).toInclude({
           implicit: [],
           roles: [],
@@ -464,7 +464,7 @@ describe('#aria', () => {
       });
 
       it('input type="image"', () => {
-        const el = build('<input type="image" />');
+        const el = buildHtml('<input type="image" />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['button'],
           roles: ['link', 'menuitem', 'menuitemcheckbox', 'menuitemradio', 'radio', 'switch'],
@@ -472,7 +472,7 @@ describe('#aria', () => {
       });
 
       it('input type="month"', () => {
-        const el = build('<input type="month" />');
+        const el = buildHtml('<input type="month" />');
         expect(aria.allowed(el)).toInclude({
           implicit: [],
           roles: [],
@@ -480,7 +480,7 @@ describe('#aria', () => {
       });
 
       it('input type="number"', () => {
-        const el = build('<input type="number" />');
+        const el = buildHtml('<input type="number" />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['spinbutton'],
           roles: [],
@@ -488,7 +488,7 @@ describe('#aria', () => {
       });
 
       it('input type="password"', () => {
-        const el = build('<input type="password" />');
+        const el = buildHtml('<input type="password" />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['textbox'],
           roles: [],
@@ -496,7 +496,7 @@ describe('#aria', () => {
       });
 
       it('input type="radio"', () => {
-        const el = build('<input type="radio" />');
+        const el = buildHtml('<input type="radio" />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['radio'],
           roles: ['menuitemradio'],
@@ -504,7 +504,7 @@ describe('#aria', () => {
       });
 
       it('input type="range"', () => {
-        const el = build('<input type="range" />');
+        const el = buildHtml('<input type="range" />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['slider'],
           roles: [],
@@ -512,7 +512,7 @@ describe('#aria', () => {
       });
 
       it('input type="reset"', () => {
-        const el = build('<input type="reset" />');
+        const el = buildHtml('<input type="reset" />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['button'],
           roles: [],
@@ -520,7 +520,7 @@ describe('#aria', () => {
       });
 
       it('input type="search" with no list attribute', () => {
-        const el = build('<input type="search" />');
+        const el = buildHtml('<input type="search" />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['searchbox'],
           roles: [],
@@ -528,7 +528,7 @@ describe('#aria', () => {
       });
 
       it('input type="submit"', () => {
-        const el = build('<input type="submit" />');
+        const el = buildHtml('<input type="submit" />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['button'],
           roles: [],
@@ -536,7 +536,7 @@ describe('#aria', () => {
       });
 
       it('input type="tel" with no list attribute', () => {
-        const el = build('<input type="tel" />');
+        const el = buildHtml('<input type="tel" />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['textbox'],
           roles: [],
@@ -544,7 +544,7 @@ describe('#aria', () => {
       });
 
       it('input type="text" with no list attribute', () => {
-        const el = build('<input type="text" />');
+        const el = buildHtml('<input type="text" />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['textbox'],
           roles: [],
@@ -552,7 +552,7 @@ describe('#aria', () => {
       });
 
       it('input type="text" with a list attribute', () => {
-        const el = build('<input type="text" list="list" />');
+        const el = buildHtml('<input type="text" list="list" />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['combobox'],
           roles: [],
@@ -560,7 +560,7 @@ describe('#aria', () => {
       });
 
       it('input type="search" with a list attribute', () => {
-        const el = build('<input type="search" list="list" />');
+        const el = buildHtml('<input type="search" list="list" />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['combobox'],
           roles: [],
@@ -568,7 +568,7 @@ describe('#aria', () => {
       });
 
       it('input type="tel" with a list attribute', () => {
-        const el = build('<input type="tel" list="list" />');
+        const el = buildHtml('<input type="tel" list="list" />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['combobox'],
           roles: [],
@@ -576,7 +576,7 @@ describe('#aria', () => {
       });
 
       it('input type="url" with a list attribute', () => {
-        const el = build('<input type="url" list="list" />');
+        const el = buildHtml('<input type="url" list="list" />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['combobox'],
           roles: [],
@@ -584,7 +584,7 @@ describe('#aria', () => {
       });
 
       it('input type="email" with a list attribute', () => {
-        const el = build('<input type="email" list="list" />');
+        const el = buildHtml('<input type="email" list="list" />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['combobox'],
           roles: [],
@@ -592,7 +592,7 @@ describe('#aria', () => {
       });
 
       it('input type="time"', () => {
-        const el = build('<input type="time" />');
+        const el = buildHtml('<input type="time" />');
         expect(aria.allowed(el)).toInclude({
           implicit: [],
           roles: [],
@@ -600,7 +600,7 @@ describe('#aria', () => {
       });
 
       it('input type="url" with no list attribute', () => {
-        const el = build('<input type="url" />');
+        const el = buildHtml('<input type="url" />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['textbox'],
           roles: [],
@@ -608,7 +608,7 @@ describe('#aria', () => {
       });
 
       it('input type="week"', () => {
-        const el = build('<input type="week" />');
+        const el = buildHtml('<input type="week" />');
         expect(aria.allowed(el)).toInclude({
           implicit: [],
           roles: [],
@@ -616,7 +616,7 @@ describe('#aria', () => {
       });
 
       it('ins', () => {
-        const el = build('<ins />');
+        const el = buildHtml('<ins />');
         expect(aria.allowed(el)).toInclude({
           implicit: [],
           roles: '*',
@@ -624,7 +624,7 @@ describe('#aria', () => {
       });
 
       it('del', () => {
-        const el = build('<del />');
+        const el = buildHtml('<del />');
         expect(aria.allowed(el)).toInclude({
           implicit: [],
           roles: '*',
@@ -632,7 +632,7 @@ describe('#aria', () => {
       });
 
       it('label', () => {
-        const el = build('<label />');
+        const el = buildHtml('<label />');
         expect(aria.allowed(el)).toInclude({
           implicit: [],
           roles: [],
@@ -640,7 +640,7 @@ describe('#aria', () => {
       });
 
       it('legend', () => {
-        const el = build('<legend />');
+        const el = buildHtml('<legend />');
         expect(aria.allowed(el)).toInclude({
           implicit: [],
           roles: [],
@@ -648,7 +648,7 @@ describe('#aria', () => {
       });
 
       it('li whose parent is an ol', () => {
-        const el = $('<ol><li /></ol>').find('li')[0];
+        const el = buildHtml('<ol><li /></ol>').querySelector('li');
         expect(aria.allowed(el)).toInclude({
           implicit: ['listitem'],
           roles: ['menuitem', 'menuitemcheckbox', 'menuitemradio', 'option', 'presentation', 'separator', 'tab', 'treeitem'],
@@ -656,7 +656,7 @@ describe('#aria', () => {
       });
 
       it('li whose parent is a ul', () => {
-        const el = $('<ul><li /></ul>').find('li')[0];
+        const el = buildHtml('<ul><li /></ul>').querySelector('li');
         expect(aria.allowed(el)).toInclude({
           implicit: ['listitem'],
           roles: ['menuitem', 'menuitemcheckbox', 'menuitemradio', 'option', 'presentation', 'separator', 'tab', 'treeitem'],
@@ -664,7 +664,7 @@ describe('#aria', () => {
       });
 
       it('link with a href', () => {
-        const el = build('<link href="#" />');
+        const el = buildHtml('<link href="#" />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['link'],
           roles: [],
@@ -672,7 +672,7 @@ describe('#aria', () => {
       });
 
       it('main', () => {
-        const el = build('<main />');
+        const el = buildHtml('<main />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['main'],
           roles: [],
@@ -680,7 +680,7 @@ describe('#aria', () => {
       });
 
       it('map', () => {
-        const el = build('<map />');
+        const el = buildHtml('<map />');
         expect(aria.allowed(el)).toInclude({
           implicit: [],
           roles: [],
@@ -688,7 +688,7 @@ describe('#aria', () => {
       });
 
       it('math', () => {
-        const el = build('<math />');
+        const el = buildHtml('<math />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['math'],
           roles: [],
@@ -696,7 +696,7 @@ describe('#aria', () => {
       });
 
       it('menu type="toolbar"', () => {
-        const el = build('<menu type="toolbar" />');
+        const el = buildHtml('<menu type="toolbar" />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['toolbar'],
           roles: [],
@@ -704,7 +704,7 @@ describe('#aria', () => {
       });
 
       it('menuitem type="command"', () => {
-        const el = build('<menuitem type="command" />');
+        const el = buildHtml('<menuitem type="command" />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['menuitem'],
           roles: [],
@@ -712,7 +712,7 @@ describe('#aria', () => {
       });
 
       it('menuitem type="checkbox"', () => {
-        const el = build('<menuitem type="checkbox" />');
+        const el = buildHtml('<menuitem type="checkbox" />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['menuitemcheckbox'],
           roles: [],
@@ -720,7 +720,7 @@ describe('#aria', () => {
       });
 
       it('menuitem type="radio"', () => {
-        const el = build('<menuitem type="radio" />');
+        const el = buildHtml('<menuitem type="radio" />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['menuitemradio'],
           roles: [],
@@ -728,7 +728,7 @@ describe('#aria', () => {
       });
 
       it('meta', () => {
-        const el = build('<meta />');
+        const el = buildHtml('<meta />');
         expect(aria.allowed(el)).toInclude({
           implicit: [],
           roles: [],
@@ -736,7 +736,7 @@ describe('#aria', () => {
       });
 
       it('meter', () => {
-        const el = build('<meter />');
+        const el = buildHtml('<meter />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['progressbar'],
           roles: [],
@@ -744,7 +744,7 @@ describe('#aria', () => {
       });
 
       it('nav', () => {
-        const el = build('<nav />');
+        const el = buildHtml('<nav />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['navigation'],
           roles: [],
@@ -752,7 +752,7 @@ describe('#aria', () => {
       });
 
       it('noscript', () => {
-        const el = build('<noscript />');
+        const el = buildHtml('<noscript />');
         expect(aria.allowed(el)).toInclude({
           implicit: [],
           roles: [],
@@ -760,7 +760,7 @@ describe('#aria', () => {
       });
 
       it('object', () => {
-        const el = build('<object />');
+        const el = buildHtml('<object />');
         expect(aria.allowed(el)).toInclude({
           implicit: [],
           roles: ['application', 'document', 'img'],
@@ -768,7 +768,7 @@ describe('#aria', () => {
       });
 
       it('ol', () => {
-        const el = build('<ol />');
+        const el = buildHtml('<ol />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['list'],
           roles: ['directory', 'group', 'listbox', 'menu', 'menubar', 'presentation', 'radiogroup', 'tablist', 'toolbar', 'tree'],
@@ -776,7 +776,7 @@ describe('#aria', () => {
       });
 
       it('optgroup', () => {
-        const el = build('<optgroup />');
+        const el = buildHtml('<optgroup />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['group'],
           roles: [],
@@ -784,7 +784,7 @@ describe('#aria', () => {
       });
 
       it('option within a list of options', () => {
-        const el = $('<select><option /></select>').find('option')[0];
+        const el = buildHtml('<select><option /></select>').querySelector('option');
         expect(aria.allowed(el)).toInclude({
           implicit: ['option'],
           roles: [],
@@ -792,7 +792,7 @@ describe('#aria', () => {
       });
 
       it('option within a list of options in an optgroup', () => {
-        const el = $('<select><optgroup><option /></optgroup></select>').find('option')[0];
+        const el = buildHtml('<select><optgroup><option /></optgroup></select>').querySelector('option');
         expect(aria.allowed(el)).toInclude({
           implicit: ['option'],
           roles: [],
@@ -800,7 +800,7 @@ describe('#aria', () => {
       });
 
       it('option within a datalist', () => {
-        const el = $('<datalist><option /></datalist>').find('option')[0];
+        const el = buildHtml('<datalist><option /></datalist>').querySelector('option');
         expect(aria.allowed(el)).toInclude({
           implicit: ['option'],
           roles: [],
@@ -808,7 +808,7 @@ describe('#aria', () => {
       });
 
       it('option on its own', () => {
-        const el = build('<option />');
+        const el = buildHtml('<option />');
         expect(aria.allowed(el)).toInclude({
           implicit: [],
           roles: [],
@@ -816,7 +816,7 @@ describe('#aria', () => {
       });
 
       it('output', () => {
-        const el = build('<output />');
+        const el = buildHtml('<output />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['status'],
           roles: '*',
@@ -824,7 +824,7 @@ describe('#aria', () => {
       });
 
       it('param', () => {
-        const el = build('<param />');
+        const el = buildHtml('<param />');
         expect(aria.allowed(el)).toInclude({
           implicit: [],
           roles: [],
@@ -832,7 +832,7 @@ describe('#aria', () => {
       });
 
       it('picture', () => {
-        const el = build('<picture />');
+        const el = buildHtml('<picture />');
         expect(aria.allowed(el)).toInclude({
           implicit: [],
           roles: [],
@@ -840,7 +840,7 @@ describe('#aria', () => {
       });
 
       it('progress', () => {
-        const el = build('<progress />');
+        const el = buildHtml('<progress />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['progressbar'],
           roles: [],
@@ -848,7 +848,7 @@ describe('#aria', () => {
       });
 
       it('script', () => {
-        const el = build('<script />');
+        const el = buildHtml('<script />');
         expect(aria.allowed(el)).toInclude({
           implicit: [],
           roles: [],
@@ -856,7 +856,7 @@ describe('#aria', () => {
       });
 
       it('section', () => {
-        const el = build('<section />');
+        const el = buildHtml('<section />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['region'],
           roles: [
@@ -867,7 +867,7 @@ describe('#aria', () => {
       });
 
       it('select', () => {
-        const el = build('<select />');
+        const el = buildHtml('<select />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['listbox'],
           roles: [],
@@ -875,7 +875,7 @@ describe('#aria', () => {
       });
 
       it('source', () => {
-        const el = build('<source />');
+        const el = buildHtml('<source />');
         expect(aria.allowed(el)).toInclude({
           implicit: [],
           roles: [],
@@ -883,7 +883,7 @@ describe('#aria', () => {
       });
 
       it('span', () => {
-        const el = build('<span />');
+        const el = buildHtml('<span />');
         expect(aria.allowed(el)).toInclude({
           implicit: [],
           roles: '*',
@@ -891,7 +891,7 @@ describe('#aria', () => {
       });
 
       it('style', () => {
-        const el = build('<style />');
+        const el = buildHtml('<style />');
         expect(aria.allowed(el)).toInclude({
           implicit: [],
           roles: [],
@@ -899,7 +899,7 @@ describe('#aria', () => {
       });
 
       it('svg', () => {
-        const el = build('<svg />');
+        const el = buildHtml('<svg />');
         expect(aria.allowed(el)).toInclude({
           implicit: [],
           roles: ['application', 'document', 'img'],
@@ -907,7 +907,7 @@ describe('#aria', () => {
       });
 
       it('summary', () => {
-        const el = build('<summary />');
+        const el = buildHtml('<summary />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['button'],
           roles: [],
@@ -915,7 +915,7 @@ describe('#aria', () => {
       });
 
       it('table', () => {
-        const el = build('<table />');
+        const el = buildHtml('<table />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['table'],
           roles: '*',
@@ -923,7 +923,7 @@ describe('#aria', () => {
       });
 
       it('template', () => {
-        const el = build('<template />');
+        const el = buildHtml('<template />');
         expect(aria.allowed(el)).toInclude({
           implicit: [],
           roles: [],
@@ -931,7 +931,7 @@ describe('#aria', () => {
       });
 
       it('textarea', () => {
-        const el = build('<textarea />');
+        const el = buildHtml('<textarea />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['textbox'],
           roles: [],
@@ -939,7 +939,7 @@ describe('#aria', () => {
       });
 
       it('tbody', () => {
-        const el = build('<tbody />');
+        const el = buildHtml('<tbody />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['rowgroup'],
           roles: '*',
@@ -947,7 +947,7 @@ describe('#aria', () => {
       });
 
       it('thead', () => {
-        const el = build('<thead />');
+        const el = buildHtml('<thead />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['rowgroup'],
           roles: '*',
@@ -955,7 +955,7 @@ describe('#aria', () => {
       });
 
       it('tfoot', () => {
-        const el = build('<tfoot />');
+        const el = buildHtml('<tfoot />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['rowgroup'],
           roles: '*',
@@ -963,7 +963,7 @@ describe('#aria', () => {
       });
 
       it('title', () => {
-        const el = build('<title />');
+        const el = buildHtml('<title />');
         expect(aria.allowed(el)).toInclude({
           implicit: [],
           roles: [],
@@ -971,7 +971,7 @@ describe('#aria', () => {
       });
 
       it('td', () => {
-        const el = build('<td />');
+        const el = buildHtml('<td />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['cell'],
           roles: '*',
@@ -984,7 +984,7 @@ describe('#aria', () => {
         'ruby', 'rc', 'rtc', 'rt', 'rp', 'bdi', 'bdo', 'br', 'wbr',
       ].forEach((name) => {
         it(name, () => {
-          const el = build(`<${name} />`);
+          const el = buildHtml(`<${name} />`);
           expect(aria.allowed(el)).toInclude({
             implicit: [],
             roles: '*',
@@ -993,7 +993,7 @@ describe('#aria', () => {
       });
 
       it('th', () => {
-        const el = build('<th />');
+        const el = buildHtml('<th />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['columnheader', 'rowheader'],
           roles: '*',
@@ -1001,7 +1001,7 @@ describe('#aria', () => {
       });
 
       it('tr', () => {
-        const el = build('<tr />');
+        const el = buildHtml('<tr />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['row'],
           roles: '*',
@@ -1009,7 +1009,7 @@ describe('#aria', () => {
       });
 
       it('track', () => {
-        const el = build('<track />');
+        const el = buildHtml('<track />');
         expect(aria.allowed(el)).toInclude({
           implicit: [],
           roles: [],
@@ -1017,7 +1017,7 @@ describe('#aria', () => {
       });
 
       it('ul', () => {
-        const el = build('<ul />');
+        const el = buildHtml('<ul />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['list'],
           roles: [
@@ -1028,7 +1028,7 @@ describe('#aria', () => {
       });
 
       it('video', () => {
-        const el = build('<video />');
+        const el = buildHtml('<video />');
         expect(aria.allowed(el)).toInclude({
           implicit: [],
           roles: ['application'],
@@ -1039,59 +1039,59 @@ describe('#aria', () => {
 
   describe('#getRole', () => {
     it('returns null for no role', () => {
-      const el = build('<div />');
+      const el = buildHtml('<div />');
       expect(aria.getRole(el)).toEqual(null);
     });
 
     it('returns a valid provided role', () => {
-      const el = build('<div role="alert" />');
+      const el = buildHtml('<div role="alert" />');
       expect(aria.getRole(el)).toEqual('alert');
     });
 
     it('returns the first valid provided role', () => {
-      const el = build('<div role="invalid alert" />');
+      const el = buildHtml('<div role="invalid alert" />');
       expect(aria.getRole(el)).toEqual('alert');
     });
 
     it('returns an implicit role', () => {
-      const el = build('<input />');
+      const el = buildHtml('<input />');
       expect(aria.getRole(el)).toEqual('textbox');
     });
 
     it('returns an implicit role if no valid role is provided', () => {
-      const el = build('<input role="invalid" />');
+      const el = buildHtml('<input role="invalid" />');
       expect(aria.getRole(el)).toEqual('textbox');
     });
 
     it('does not return abstract roles', () => {
-      const el = build('<input role="widget alert" />');
+      const el = buildHtml('<input role="widget alert" />');
       expect(aria.getRole(el)).toEqual('alert');
     });
   });
 
   describe('#hasRole', () => {
     it('returns false for an element with no role', () => {
-      const el = build('<div />');
+      const el = buildHtml('<div />');
       expect(aria.hasRole(el, 'none')).toEqual(false);
     });
 
     it('returns true for an element with an explicit role', () => {
-      const el = build('<div role="button" />');
+      const el = buildHtml('<div role="button" />');
       expect(aria.hasRole(el, 'button')).toEqual(true);
     });
 
     it('returns true for an element with an implicit role', () => {
-      const el = build('<button />');
+      const el = buildHtml('<button />');
       expect(aria.hasRole(el, 'button')).toEqual(true);
     });
 
     it('returns true for a parent superclass role', () => {
-      const el = build('<button />');
+      const el = buildHtml('<button />');
       expect(aria.hasRole(el, 'command')).toEqual(true);
     });
 
     it('returns true for a ancestor superclass role', () => {
-      const el = build('<button />');
+      const el = buildHtml('<button />');
       expect(aria.hasRole(el, 'roletype')).toEqual(true);
     });
 

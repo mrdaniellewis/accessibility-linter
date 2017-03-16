@@ -3,12 +3,11 @@
     "mocha": true
   },
   "globals": {
-    "$": false,
     "AccessibilityLinter": false,
     "afterAll": false,
     "appendToBody": false,
     "beforeAll": false,
-    "build": false,
+    "buildHtml": false,
     "clean": false,
     "domCleaner": false,
     "expect": false,

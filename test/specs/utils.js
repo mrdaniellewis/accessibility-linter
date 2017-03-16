@@ -1,4 +1,4 @@
-describe('support', function () {
+describe('Utils', function () {
   it('is a property of AccessibilityLinter', () => {
     expect(AccessibilityLinter.Utils).toExist();
   });
