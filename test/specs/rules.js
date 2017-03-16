@@ -15,7 +15,7 @@ describe('rules', () => {
     frame.remove();
   });
 
-  ruleSpecs.forEach((path) => {
+  AccessibilityLinter[Symbol.for('accessibility-linter.rule-sources')].forEach((path) => {
     let window, linter, Rule, rules, iframeError;
     const name = path.replace(/\//g, '-');
 
