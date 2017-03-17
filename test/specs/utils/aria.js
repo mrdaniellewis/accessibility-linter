@@ -1111,4 +1111,68 @@ describe('#aria', () => {
       expect(aria.hasRole('button', 'roletype')).toEqual(true);
     });
   });
+
+  describe('#hasExplicitRole', () => {
+    it('returns false for an element without a role', () => {
+      const el = buildHtml('<div />');
+      expect(aria.hasExplicitRole(el, 'none')).toEqual(false);
+    });
+
+    it('returns false for an element with a different role', () => {
+      const el = buildHtml('<div role="foo" />');
+      expect(aria.hasExplicitRole(el, 'none')).toEqual(false);
+    });
+
+    it('returns true for an element with a role', () => {
+      const el = buildHtml('<div role="none" />');
+      expect(aria.hasExplicitRole(el, 'none')).toEqual(true);
+    });
+
+    it('returns true for an element with a role when checking several roles', () => {
+      const el = buildHtml('<div role="presentation" />');
+      expect(aria.hasExplicitRole(el, ['none', 'presentation'])).toEqual(true);
+    });
+
+    it('returns true for an element with a role list', () => {
+      const el = buildHtml('<div role="none presentation" />');
+      expect(aria.hasExplicitRole(el, 'none')).toEqual(true);
+    });
+
+    it('returns false for an element with a fallback role', () => {
+      const el = buildHtml('<div role="none presentation" />');
+      expect(aria.hasExplicitRole(el, 'presentation')).toEqual(false);
+    });
+  });
+
+  describe('#hasAncestorWithExplicitRole', () => {
+    it('returns false for an element without a role', () => {
+      const el = buildHtml('<div><div><span /></div></div>');
+      expect(aria.hasAncestorWithExplicitRole(el.querySelector('span'), 'none')).toEqual(false);
+    });
+
+    it('returns false for an element with a different role', () => {
+      const el = buildHtml('<div role="bar"><div role="foo"><span /></div></div>');
+      expect(aria.hasAncestorWithExplicitRole(el.querySelector('span'), 'none')).toEqual(false);
+    });
+
+    it('returns true for an element with a role', () => {
+      const el = buildHtml('<div role="none"><div><span /></div></div>');
+      expect(aria.hasAncestorWithExplicitRole(el.querySelector('span'), 'none')).toEqual(true);
+    });
+
+    it('returns true for an element with a role when checking several roles', () => {
+      const el = buildHtml('<div role="presentation"><div><span /></div></div>');
+      expect(aria.hasAncestorWithExplicitRole(el.querySelector('span'), ['none', 'presentation'])).toEqual(true);
+    });
+
+    it('returns true for an element with a role list', () => {
+      const el = buildHtml('<div role="none presentation"><div><span /></div></div>');
+      expect(aria.hasAncestorWithExplicitRole(el.querySelector('span'), 'none')).toEqual(true);
+    });
+
+    it('returns false for an element with a fallback role', () => {
+      const el = buildHtml('<div role="none presentation"><div><span /></div></div>');
+      expect(aria.hasAncestorWithExplicitRole(el.querySelector('span'), 'presentation')).toEqual(false);
+    });
+  });
 });
