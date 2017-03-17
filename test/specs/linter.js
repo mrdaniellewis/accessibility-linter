@@ -384,6 +384,18 @@ describe('AccessibilityLinter', () => {
       });
     });
 
+    it('does not test disconnected nodes', () => {
+      // As the test act on a parent, we need to disconnect the parent
+      const container = appendToBody('<div />');
+      linter.observe();
+      const el = document.createElement('foo');
+      container.appendChild(el);
+      container.remove();
+      return whenDomUpdates(() => {
+        expect(logger).toNotHaveEntries();
+      });
+    });
+
     describe('#stopObserving', () => {
       it('does nothing if no observing is happening', () => {
         linter.stopObserving();
