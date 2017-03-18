@@ -188,7 +188,8 @@
     const module = { exports: {} };
     return requireScript(url)
       .then((content) => {
-        new Function('module', content)(module); // eslint-disable-line no-new-func
+        // eslint-disable-next-line no-new-func
+        new Function('module', 'exports', content)(module, module.exports);
         return module.exports;
       });
   };
