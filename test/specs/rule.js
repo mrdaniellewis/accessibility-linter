@@ -106,6 +106,15 @@ describe('Rule', () => {
       });
     });
 
+    describe('#selector', () => {
+      it('is passed utils', () => {
+        const test = new Test();
+        const spy = expect.spyOn(test, 'selector');
+        test.run(document, () => true, utils);
+        expect(spy).toHaveHadCalls([utils]);
+      });
+    });
+
     describe('#test', () => {
       it('can return null to produce no error messages', () => {
         appendToBody('<foo />');

@@ -1115,6 +1115,18 @@ describe('#aria', () => {
     it('returns true for an matching ancestor string role', () => {
       expect(aria.hasRole('button', 'roletype')).toEqual(true);
     });
+
+    it('returns true for an matching against an array of roles', () => {
+      expect(aria.hasRole('button', ['link', 'button'])).toEqual(true);
+    });
+
+    it('returns true for an matching superclass against an array of roles', () => {
+      expect(aria.hasRole('button', ['link', 'command'])).toEqual(true);
+    });
+
+    it('returns false for match an array of roles that does not contain the role', () => {
+      expect(aria.hasRole('button', ['link', 'scrollbar'])).toEqual(false);
+    });
   });
 
   describe('#closestRole', () => {
@@ -1151,6 +1163,12 @@ describe('#aria', () => {
     it('returns null if the role is a fallback role', () => {
       const el = appendToBody('<div role="none presentation"><span /></div>');
       expect(aria.closestRole(el.querySelector('span'), 'presentation')).toEqual(null);
+    });
+  });
+
+  describe('#rolesOfType', () => {
+    it('finds all non-abstract roles of a particular type', () => {
+      expect(aria.rolesOfType('command')).toEqual(['button', 'link', 'menuitem', 'menuitemcheckbox', 'menuitemradio']);
     });
   });
 });
