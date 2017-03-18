@@ -1048,6 +1048,11 @@ describe('#aria', () => {
       expect(aria.getRole(el)).toEqual('alert');
     });
 
+    it('returns a valid provided role with bad spacing', () => {
+      const el = buildHtml('<div role=" alert" />');
+      expect(aria.getRole(el)).toEqual('alert');
+    });
+
     it('returns the first valid provided role', () => {
       const el = buildHtml('<div role="invalid alert" />');
       expect(aria.getRole(el)).toEqual('alert');
@@ -1112,67 +1117,40 @@ describe('#aria', () => {
     });
   });
 
-  describe('#hasExplicitRole', () => {
-    it('returns false for an element without a role', () => {
-      const el = buildHtml('<div />');
-      expect(aria.hasExplicitRole(el, 'none')).toEqual(false);
+  describe('#closestRole', () => {
+    it('returns null if role is not found', () => {
+      const el = appendToBody('<span />');
+      expect(aria.closestRole(el, 'none')).toEqual(null);
     });
 
-    it('returns false for an element with a different role', () => {
-      const el = buildHtml('<div role="foo" />');
-      expect(aria.hasExplicitRole(el, 'none')).toEqual(false);
+    it('returns null if a different role is found', () => {
+      const el = appendToBody('<div role="button"><span /></div>');
+      expect(aria.closestRole(el.querySelector('span'), 'none')).toEqual(null);
     });
 
-    it('returns true for an element with a role', () => {
-      const el = buildHtml('<div role="none" />');
-      expect(aria.hasExplicitRole(el, 'none')).toEqual(true);
+    it('returns the closest element with the role', () => {
+      const el = appendToBody('<div role="none"><span /></div>');
+      expect(aria.closestRole(el.querySelector('span'), 'none')).toEqual(el);
     });
 
-    it('returns true for an element with a role when checking several roles', () => {
-      const el = buildHtml('<div role="presentation" />');
-      expect(aria.hasExplicitRole(el, ['none', 'presentation'])).toEqual(true);
+    it('returns the body for document', () => {
+      const el = appendToBody('<div><span /></div>');
+      expect(aria.closestRole(el.querySelector('span'), 'document')).toEqual(document.body);
     });
 
-    it('returns true for an element with a role list', () => {
-      const el = buildHtml('<div role="none presentation" />');
-      expect(aria.hasExplicitRole(el, 'none')).toEqual(true);
+    it('returns an element when checking several roles', () => {
+      const el = appendToBody('<div role="none"><span /></div>');
+      expect(aria.closestRole(el.querySelector('span'), ['presentation', 'none'])).toEqual(el);
     });
 
-    it('returns false for an element with a fallback role', () => {
-      const el = buildHtml('<div role="none presentation" />');
-      expect(aria.hasExplicitRole(el, 'presentation')).toEqual(false);
-    });
-  });
-
-  describe('#hasAncestorWithExplicitRole', () => {
-    it('returns false for an element without a role', () => {
-      const el = buildHtml('<div><div><span /></div></div>');
-      expect(aria.hasAncestorWithExplicitRole(el.querySelector('span'), 'none')).toEqual(false);
+    it('returns an element if fallback roles are present', () => {
+      const el = appendToBody('<div role="none presentation"><span /></div>');
+      expect(aria.closestRole(el.querySelector('span'), 'none')).toEqual(el);
     });
 
-    it('returns false for an element with a different role', () => {
-      const el = buildHtml('<div role="bar"><div role="foo"><span /></div></div>');
-      expect(aria.hasAncestorWithExplicitRole(el.querySelector('span'), 'none')).toEqual(false);
-    });
-
-    it('returns true for an element with a role', () => {
-      const el = buildHtml('<div role="none"><div><span /></div></div>');
-      expect(aria.hasAncestorWithExplicitRole(el.querySelector('span'), 'none')).toEqual(true);
-    });
-
-    it('returns true for an element with a role when checking several roles', () => {
-      const el = buildHtml('<div role="presentation"><div><span /></div></div>');
-      expect(aria.hasAncestorWithExplicitRole(el.querySelector('span'), ['none', 'presentation'])).toEqual(true);
-    });
-
-    it('returns true for an element with a role list', () => {
-      const el = buildHtml('<div role="none presentation"><div><span /></div></div>');
-      expect(aria.hasAncestorWithExplicitRole(el.querySelector('span'), 'none')).toEqual(true);
-    });
-
-    it('returns false for an element with a fallback role', () => {
-      const el = buildHtml('<div role="none presentation"><div><span /></div></div>');
-      expect(aria.hasAncestorWithExplicitRole(el.querySelector('span'), 'presentation')).toEqual(false);
+    it('returns null if the role is a fallback role', () => {
+      const el = appendToBody('<div role="none presentation"><span /></div>');
+      expect(aria.closestRole(el.querySelector('span'), 'presentation')).toEqual(null);
     });
   });
 });
