@@ -368,7 +368,7 @@ describe('config', () => {
     });
 
     describe('native text alternatives', () => {
-      const hasNativeLabel = ['area', 'button', 'img', 'input', 'meter', 'output', 'progress', 'select', 'textarea'];
+      const hasNativeLabel = ['area', 'button', 'fieldset', 'img', 'input', 'meter', 'output', 'progress', 'select', 'textarea'];
       const hasNativeDescription = [];
 
       describe('elements have no native label', () => {
@@ -495,6 +495,26 @@ describe('config', () => {
         describe('<input> with a type', () => {
           // No need to test every type
           testLabels('input', 'type="email" alt="xxx"');
+        });
+
+        describe('<fieldset>', () => {
+          it('uses the first legend as the native text alternative', () => {
+            const el = appendToBody(`<fieldset>
+              <legend>foo</legend>
+              <legend>bar</legend>
+              <p>foe thumb</p>
+            </fieldset>`);
+            expect(elements.fieldset.nativeLabel(el, utils)).toEqual(el.querySelector('legend'));
+          });
+
+          it('returns null if the legend is hidden', () => {
+            const el = appendToBody(`<fieldset>
+              <legend aria-hidden="true">foo</legend>
+              <legend>bar</legend>
+              <p>foe thumb</p>
+            </fieldset>`);
+            expect(elements.fieldset.nativeLabel(el, utils)).toEqual(null);
+          });
         });
       });
     });
