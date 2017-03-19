@@ -46,7 +46,7 @@ main > code {
 
 section {
   border: 1px solid #eee;
-  margin: 0 -1em;
+  margin: 0 -1em 1em;
 }
 
 section > * {
@@ -58,6 +58,10 @@ section > header,
 section > footer {
   background-color: #eee;
   padding: .5em 1em;
+}
+
+section > header + * {
+  margin-top: 1em;
 }
 
 section > header > h2 {
