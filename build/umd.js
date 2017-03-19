@@ -1,48 +1,1201 @@
-(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.AccessibilityLinter = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"./rules":[function(require,module,exports){
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.AccessibilityLinter = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"./rules/aria/attribute-values/rule.js":[function(require,module,exports){
 "use strict";
-module.exports = new Map([
-  ["aria-attribute-values", require("./rules/aria/attribute-values/rule.js")],
-  ["aria-deprecated-attributes", require("./rules/aria/deprecated-attributes/rule.js")],
-  ["aria-immutable-role", require("./rules/aria/immutable-role/rule.js")],
-  ["aria-invalid-attributes", require("./rules/aria/invalid-attributes/rule.js")],
-  ["aria-no-focusable-hidden", require("./rules/aria/no-focusable-hidden/rule.js")],
-  ["aria-no-none-without-presentation", require("./rules/aria/no-none-without-presentation/rule.js")],
-  ["aria-roles", require("./rules/aria/roles/rule.js")],
-  ["colour-contrast-aa", require("./rules/colour-contrast/aa/rule.js")],
-  ["colour-contrast-aaa", require("./rules/colour-contrast/aaa/rule.js")],
-  ["data-attributes", require("./rules/data-attributes/rule.js")],
-  ["elements-obsolete", require("./rules/elements/obsolete/rule.js")],
-  ["elements-unknown", require("./rules/elements/unknown/rule.js")],
-  ["fieldset-fieldset-has-legend", require("./rules/fieldset/fieldset-has-legend/rule.js")],
-  ["fieldset-legend-has-fieldset", require("./rules/fieldset/legend-has-fieldset/rule.js")],
-  ["fieldset-multiple-in-fieldset", require("./rules/fieldset/multiple-in-fieldset/rule.js")],
-  ["headings", require("./rules/headings/rule.js")],
-  ["ids-form-attribute", require("./rules/ids/form-attribute/rule.js")],
-  ["ids-imagemap-ids", require("./rules/ids/imagemap-ids/rule.js")],
-  ["ids-labels-have-inputs", require("./rules/ids/labels-have-inputs/rule.js")],
-  ["ids-list-id", require("./rules/ids/list-id/rule.js")],
-  ["ids-no-duplicate-anchor-names", require("./rules/ids/no-duplicate-anchor-names/rule.js")],
-  ["ids-unique-id", require("./rules/ids/unique-id/rule.js")],
-  ["labels-area", require("./rules/labels/area/rule.js")],
-  ["labels-aria-command", require("./rules/labels/aria-command/rule.js")],
-  ["labels-controls", require("./rules/labels/controls/rule.js")],
-  ["labels-headings", require("./rules/labels/headings/rule.js")],
-  ["labels-img", require("./rules/labels/img/rule.js")],
-  ["labels-links", require("./rules/labels/links/rule.js")],
-  ["labels-tabindex", require("./rules/labels/tabindex/rule.js")],
-  ["lang", require("./rules/lang/rule.js")],
-  ["no-button-without-type", require("./rules/no-button-without-type/rule.js")],
-  ["no-empty-select", require("./rules/no-empty-select/rule.js")],
-  ["no-links-as-buttons", require("./rules/no-links-as-buttons/rule.js")],
-  ["no-links-to-missing-fragments", require("./rules/no-links-to-missing-fragments/rule.js")],
-  ["no-multiple-select", require("./rules/no-multiple-select/rule.js")],
-  ["no-outside-controls", require("./rules/no-outside-controls/rule.js")],
-  ["no-reset", require("./rules/no-reset/rule.js")],
-  ["title", require("./rules/title/rule.js")],
-]);
-},{"./rules/aria/attribute-values/rule.js":8,"./rules/aria/deprecated-attributes/rule.js":9,"./rules/aria/immutable-role/rule.js":10,"./rules/aria/invalid-attributes/rule.js":11,"./rules/aria/no-focusable-hidden/rule.js":12,"./rules/aria/no-none-without-presentation/rule.js":13,"./rules/aria/roles/rule.js":14,"./rules/colour-contrast/aa/rule.js":15,"./rules/colour-contrast/aaa/rule.js":16,"./rules/data-attributes/rule.js":17,"./rules/elements/obsolete/rule.js":18,"./rules/elements/unknown/rule.js":19,"./rules/fieldset/fieldset-has-legend/rule.js":20,"./rules/fieldset/legend-has-fieldset/rule.js":21,"./rules/fieldset/multiple-in-fieldset/rule.js":22,"./rules/headings/rule.js":23,"./rules/ids/form-attribute/rule.js":24,"./rules/ids/imagemap-ids/rule.js":25,"./rules/ids/labels-have-inputs/rule.js":26,"./rules/ids/list-id/rule.js":27,"./rules/ids/no-duplicate-anchor-names/rule.js":28,"./rules/ids/unique-id/rule.js":29,"./rules/labels/area/rule.js":30,"./rules/labels/aria-command/rule.js":31,"./rules/labels/controls/rule.js":32,"./rules/labels/headings/rule.js":33,"./rules/labels/img/rule.js":34,"./rules/labels/links/rule.js":35,"./rules/labels/tabindex/rule.js":36,"./rules/lang/rule.js":37,"./rules/no-button-without-type/rule.js":38,"./rules/no-empty-select/rule.js":39,"./rules/no-links-as-buttons/rule.js":40,"./rules/no-links-to-missing-fragments/rule.js":41,"./rules/no-multiple-select/rule.js":42,"./rules/no-outside-controls/rule.js":43,"./rules/no-reset/rule.js":44,"./rules/title/rule.js":46}],"./version":[function(require,module,exports){
+const Rule = require('../../rule');
+const config = require('../../../config');
+const ExtendedArray = require('../../../support/extended-array');
+const { rSpace } = require('../../../support/constants');
+
+const checkers = {
+  string(value) {
+    return !value.trim() ? 'must be a non-empty string' : null;
+  },
+
+  integer(value) {
+    return /^-?\d+$/.test(value) ? null : 'must be an integer';
+  },
+
+  number(value) {
+    // Although not entirely clear, let us assume the number follows the html5 specification
+    return /^-?(?:\d+\.\d+|\d+|\.\d+)(?:[eE][+-]?\d+)?$/.test(value) ? null : 'must be a floating point number';
+  },
+
+  token(value, { tokens }) {
+    return tokens.includes(value) ? null : `must be one of: ${tokens.join(', ')}`;
+  },
+
+  tokenlist(value, { tokens, alone }) {
+    const values = value.split(/\s+/).filter(Boolean);
+    const unknown = values.filter(token => !tokens.includes(token));
+    if (values.length === 0) {
+      return `must be one or more of: ${tokens.join(', ')}`;
+    }
+    if (unknown.length) {
+      return `contains unknown values: ${unknown.join(', ')}`;
+    }
+    if (alone && values.length > 1) {
+      const alones = values.filter(token => alone.includes(token));
+      if (alones.length) {
+        return `should only contain the following values on their own: ${alones.join(', ')}`;
+      }
+    }
+    return null;
+  },
+
+  id(value) {
+    if (!value.trim()) {
+      return 'must be an element id';
+    }
+
+    if (rSpace.test(value)) {
+      return 'must not contain spaces';
+    }
+
+    return document.getElementById(value) ? null : `no element can be found with an id of ${value}`;
+  },
+
+  idlist(value) {
+    if (!value.trim()) {
+      return 'must be a list of one of more ids';
+    }
+    const missing = value.split(rSpace).filter(id => !document.getElementById(id));
+    if (!missing.length) {
+      return null;
+    }
+    return missing.map(id => `no element can be found with an id of ${id}`);
+  },
+};
+
+module.exports = class extends Rule {
+  selector() {
+    return this._selector || (this._selector = Object.keys(config.ariaAttributes).map(name => `[aria-${name}]`).join(','));
+  }
+
+  test(el) {
+    return ExtendedArray.from(el.attributes)
+      .map(({ name, value }) => {
+        if (!name.startsWith('aria-')) {
+          return null;
+        }
+        name = name.slice(5);
+        const description = config.ariaAttributes[name];
+        if (!description) {
+          return null;
+        }
+        return new ExtendedArray()
+          .concat(checkers[description.values.type](value, description.values))
+          .compact()
+          .map(message => `aria-${name} ${message}`);
+      })
+      .compact()
+      .flatten();
+  }
+};
+
+},{"../../../config":4,"../../../support/constants":10,"../../../support/extended-array":12,"../../rule":8}],"./rules/aria/deprecated-attributes/rule.js":[function(require,module,exports){
 "use strict";
-module.exports = "1.6.0"
+const Rule = require('../../rule');
+const config = require('../../../config');
+
+module.exports = class extends Rule {
+  deprecated() {
+    return this._deprecated || (this._deprecated = Object.entries(config.ariaAttributes)
+      .filter(([, value]) => value.deprecated)
+      .map(([name]) => `aria-${name}`));
+  }
+
+  selector() {
+    return this.deprecated().map(name => `[${name}]`).join(',');
+  }
+
+  test(el) {
+    return Array.from(el.attributes)
+      .filter(({ name }) => this.deprecated().includes(name))
+      .map(({ name }) => `${name} is deprecated`);
+  }
+};
+
+},{"../../../config":4,"../../rule":8}],"./rules/aria/immutable-role/rule.js":[function(require,module,exports){
+"use strict";
+const Rule = require('../../rule');
+
+module.exports = class extends Rule {
+  constructor(settings) {
+    super(settings);
+    this.history = new WeakMap();
+  }
+
+  selector() {
+    return '[role]';
+  }
+
+  test(el) {
+    const role = el.getAttribute('role');
+    if (this.history.has(el)) {
+      if (this.history.get(el) !== role) {
+        return 'an elements role must not be modified';
+      }
+    } else {
+      this.history.set(el, role);
+    }
+    return null;
+  }
+};
+
+},{"../../rule":8}],"./rules/aria/invalid-attributes/rule.js":[function(require,module,exports){
+"use strict";
+const Rule = require('../../rule');
+const config = require('../../../config');
+
+module.exports = class extends Rule {
+  setDefaults() {
+    this.includeHidden = true;
+  }
+
+  selector() {
+    return '*';
+  }
+
+  test(el) {
+    const invalid = Array.from(el.attributes)
+      .map(attr => attr.name)
+      .filter(name => name.indexOf('aria-') === 0)
+      .map(name => name.slice(5))
+      .filter(name => !Object.keys(config.ariaAttributes).includes(name));
+
+    if (invalid.length) {
+      return `element has unknown aria attribute${invalid.length > 1 ? 's' : ''}: ${invalid.map(name => `aria-${name}`).join(', ')}`;
+    }
+
+    return null;
+  }
+};
+
+},{"../../../config":4,"../../rule":8}],"./rules/aria/landmark/one-banner/rule.js":[function(require,module,exports){
+"use strict";
+const Rule = require('../../../rule');
+
+module.exports = class extends Rule {
+  selector() {
+    return 'header,[role~=banner]';
+  }
+
+  get role() {
+    return 'banner';
+  }
+
+  get message() {
+    return `there should only be one element with a role of ${this.role} in each document or application`;
+  }
+
+  test(el, utils) {
+    if (!utils.aria.hasRole(el, this.role)) {
+      return null;
+    }
+
+    const found = utils.$$(this.selector())
+      .filter(elm => utils.aria.hasRole(elm, this.role))
+      .groupBy(elm => utils.aria.closestRole(elm, ['application', 'document']))
+      .filter(group => group.includes(el))
+      .flatten();
+
+    if (found.length > 1) {
+      return this.message;
+    }
+
+    return null;
+  }
+};
+
+},{"../../../rule":8}],"./rules/aria/landmark/one-contentinfo/rule.js":[function(require,module,exports){
+"use strict";
+const BannerRule = require('../one-banner/rule');
+
+module.exports = class extends BannerRule {
+  selector() {
+    return 'footer,[role~=contentinfo]';
+  }
+
+  get role() {
+    return 'contentinfo';
+  }
+};
+
+},{"../one-banner/rule":"./rules/aria/landmark/one-banner/rule.js"}],"./rules/aria/landmark/one-main/rule.js":[function(require,module,exports){
+"use strict";
+const BannerRule = require('../one-banner/rule');
+
+module.exports = class extends BannerRule {
+  selector() {
+    return 'main,[role~=main]';
+  }
+
+  get role() {
+    return 'main';
+  }
+};
+
+},{"../one-banner/rule":"./rules/aria/landmark/one-banner/rule.js"}],"./rules/aria/landmark/prefer-main/rule.js":[function(require,module,exports){
+"use strict";
+const Rule = require('../../../rule');
+
+module.exports = class extends Rule {
+  selector() {
+    return ':not(main)[role~=main]';
+  }
+
+  test(el, utils) {
+    if (!utils.aria.hasRole(el, 'main')) {
+      return null;
+    }
+
+    return 'use a main element for role=main';
+  }
+};
+
+},{"../../../rule":8}],"./rules/aria/no-focusable-hidden/rule.js":[function(require,module,exports){
+"use strict";
+const Rule = require('../../rule');
+
+const focusable = ['button', 'input:not([type="hidden"])', 'meter', 'output', 'progress', 'select', 'textarea', 'a[href]', 'area[href]', '[tabindex]'];
+
+module.exports = class extends Rule {
+  selector() {
+    return this._selector || (this._selector = focusable.map(selector => `${selector}[aria-hidden="true"]`).join(','));
+  }
+
+  test(el, utils) {
+    if (el.nodeName.toLowerCase() === 'area' || !utils.hidden(el)) {
+      return 'do not mark focusable elements with `aria-hidden="true"`';
+    }
+    return null;
+  }
+};
+
+},{"../../rule":8}],"./rules/aria/no-focusable-role-none/rule.js":[function(require,module,exports){
+"use strict";
+const Rule = require('../../rule');
+
+const focusable = 'button,input:not([type="hidden"]),meter,output,progress,select,textarea,a[href],area[href],[tabindex]';
+
+module.exports = class extends Rule {
+  selector() {
+    return '[role~=none],[role~=presentation]';
+  }
+
+  test(el, utils) {
+    if (el.matches(focusable) && utils.aria.hasRole(el, ['none', 'presentation'])) {
+      return 'do not mark focusable elements with a role of presentation or none';
+    }
+    return null;
+  }
+};
+
+},{"../../rule":8}],"./rules/aria/no-none-without-presentation/rule.js":[function(require,module,exports){
+"use strict";
+const Rule = require('../../rule');
+
+module.exports = class extends Rule {
+  selector() {
+    return '[role="none"]';
+  }
+
+  test() {
+    return 'use a role of "none presentation" to support older user-agents';
+  }
+};
+
+},{"../../rule":8}],"./rules/aria/one-role/rule.js":[function(require,module,exports){
+"use strict";
+const Rule = require('../../rule');
+const { rSpace } = require('../../../support/constants');
+
+module.exports = class extends Rule {
+  selector() {
+    return '[role]';
+  }
+
+  test(el) {
+    const roles = el.getAttribute('role').split(rSpace).filter(Boolean);
+    if (roles.join(' ') === 'none presentation') {
+      return null;
+    }
+
+    if (roles.length > 1) {
+      return 'do not add multiple roles';
+    }
+
+    return null;
+  }
+};
+
+},{"../../../support/constants":10,"../../rule":8}],"./rules/aria/roles/rule.js":[function(require,module,exports){
+"use strict";
+const Rule = require('../../rule');
+const config = require('../../../config');
+const { rSpace } = require('../../../support/constants');
+
+module.exports = class extends Rule {
+  selector() {
+    return '[role]';
+  }
+
+  test(el, utils) {
+    const role = el.getAttribute('role').trim();
+    if (!role) {
+      return 'role attribute should not be empty';
+    }
+
+    let error;
+    const allowed = utils.aria.allowed(el);
+    role.split(rSpace).some((name) => {
+      if (!config.roles[name]) {
+        error = `role "${name}" is not a known role`;
+        return true;
+      }
+
+      if (config.roles[name].abstract) {
+        error = `role "${name}" is an abstract role and should not be used`;
+        return true;
+      }
+
+      if (allowed.implicit.includes(name)) {
+        error = `role "${name}" is implicit for this element and should not be specified`;
+        return true;
+      }
+
+      if (allowed.roles === '*') {
+        return null;
+      }
+
+      if (!allowed.roles.includes(name)) {
+        error = `role "${name}" is not allowed for this element`;
+      }
+
+      return null;
+    });
+
+    return error;
+  }
+};
+
+},{"../../../config":4,"../../../support/constants":10,"../../rule":8}],"./rules/colour-contrast/aa/rule.js":[function(require,module,exports){
+"use strict";
+const Rule = require('../../rule');
+const ExtendedArray = require('../../../support/extended-array');
+
+/**
+ *  Check the colour contrast for all visible nodes with child text nodes
+ */
+module.exports = class extends Rule {
+  setDefaults() {
+    this.enabled = false;
+    this.min = 4.5;
+    this.minLarge = 3;
+  }
+
+  run(context, filter = () => true, utils) {
+    context = context || document;
+    return this.iterate(context, utils, false)
+      .filter(filter)
+      .map(el => this.findAncestor(el, utils))
+      .unique()
+      .filter(filter)
+      .map(el => [el, this.test(el, utils)])
+      .filter(([, ratio]) => ratio)
+      .map(([el, ratio]) => this.message(el, ratio));
+  }
+
+  iterate(node, utils, iterateSiblings) {
+    let found = new ExtendedArray();
+    let cursor = node;
+    while (cursor) {
+      if (!utils.hidden(cursor, { noAria: true })) {
+        if (this.hasTextNode(cursor)) {
+          found.push(cursor);
+        }
+
+        if (cursor.firstElementChild) {
+          found = found.concat(this.iterate(cursor.firstElementChild, utils, true));
+        }
+      }
+
+      if (iterateSiblings) {
+        cursor = cursor.nextElementSibling;
+      } else {
+        cursor = null;
+      }
+    }
+
+    return found;
+  }
+
+  // Does the element have a text node with content
+  hasTextNode(el) {
+    return Array.from(el.childNodes)
+      .filter(node => node.nodeType === Node.TEXT_NODE)
+      .some(node => node.data.trim());
+  }
+
+  // Find the last ancestor or self with the same colours
+  findAncestor(el, utils) {
+    const colour = utils.contrast.textColour(el);
+    const backgroundColour = utils.contrast.backgroundColour(el);
+
+    let cursor = el;
+    while (cursor.parentNode !== document) {
+      const parent = cursor.parentNode;
+      if (utils.contrast.textColour(parent) !== colour
+        && utils.contrast.backgroundColour(parent) !== backgroundColour) {
+        break;
+      }
+      cursor = parent;
+    }
+
+    return cursor;
+  }
+
+  // Does the element meet AAA or AA standards
+  test(el, utils) {
+    const ratio = parseFloat(utils.contrast.textContrast(el).toFixed(2));
+
+    if (ratio >= this.min) {
+      return null;
+    }
+
+    const fontSize = parseFloat(utils.style(el, 'fontSize'));
+    const large = fontSize >= 24 /* 18pt */ || (fontSize >= 18.66 /* 14pt */ && utils.style(el, 'fontWeight') >= 700);
+
+    if (large && ratio >= this.minLarge) {
+      return null;
+    }
+
+    return ratio;
+  }
+
+  message(el, ratio) {
+    return { el, message: `contrast is too low ${parseFloat(ratio.toFixed(2))}:1`, type: this.type };
+  }
+};
+
+},{"../../../support/extended-array":12,"../../rule":8}],"./rules/colour-contrast/aaa/rule.js":[function(require,module,exports){
+"use strict";
+const ColourContrastAARule = require('../aa/rule.js');
+
+module.exports = class extends ColourContrastAARule {
+  setDefaults() {
+    this.min = 7;
+    this.minLarge = 4.5;
+    this.enabled = false;
+  }
+};
+
+},{"../aa/rule.js":"./rules/colour-contrast/aa/rule.js"}],"./rules/data-attributes/rule.js":[function(require,module,exports){
+"use strict";
+const Rule = require('../rule');
+
+module.exports = class extends Rule {
+  selector() {
+    return '[data],[data-]';
+  }
+
+  test() {
+    return 'data is an attribute prefix';
+  }
+};
+
+},{"../rule":8}],"./rules/elements/obsolete/rule.js":[function(require,module,exports){
+"use strict";
+const Rule = require('../../rule');
+const config = require('../../../config');
+
+module.exports = class extends Rule {
+  selector() {
+    return this._selector || (this._selector = Object.keys(config.elements).filter(el => config.elements[el].obsolete).join(','));
+  }
+
+  test() {
+    return 'do not use obsolete elements';
+  }
+};
+
+},{"../../../config":4,"../../rule":8}],"./rules/elements/unknown/rule.js":[function(require,module,exports){
+"use strict";
+const Rule = require('../../rule');
+const config = require('../../../config');
+
+module.exports = class extends Rule {
+  selector() {
+    return this._selector || (this._selector = Object.keys(config.elements).map(name => `:not(${name})`).join(''));
+  }
+
+  test(el) {
+    if (el.closest('svg,math')) {
+      return null;
+    }
+    return 'unknown element';
+  }
+};
+
+},{"../../../config":4,"../../rule":8}],"./rules/fieldset-has-legend/rule.js":[function(require,module,exports){
+"use strict";
+const Rule = require('../rule');
+
+module.exports = class extends Rule {
+  selector() {
+    return 'fieldset';
+  }
+
+  test(el) {
+    const first = el.firstElementChild;
+    if (first && first.matches('legend')) {
+      return null;
+    }
+    return 'fieldsets must have a legend';
+  }
+};
+
+},{"../rule":8}],"./rules/headings/rule.js":[function(require,module,exports){
+"use strict";
+const Rule = require('../rule');
+
+const selector = 'h2,h3,h4,h5,h6,[role~=heading]';
+
+function previous(el) {
+  let cursor = el.previousElementSibling;
+  while (cursor && cursor.lastElementChild) {
+    cursor = cursor.lastElementChild;
+  }
+  return cursor;
+}
+
+function getLevel(el) {
+  return /h[1-6]/i.test(el.nodeName) ? +el.nodeName[1] : (+el.getAttribute('aria-level') || 2);
+}
+
+module.exports = class extends Rule {
+  selector() {
+    return `${selector}:not([aria-level="1"])`;
+  }
+
+  test(el, utils) {
+    if (!utils.aria.hasRole(el, 'heading') || utils.hidden(el)) {
+      return null;
+    }
+    let cursor = el;
+    const level = getLevel(el);
+    do {
+      cursor = previous(cursor) || cursor.parentElement;
+      if (cursor && cursor.matches(`h1,${selector}`) && !utils.hidden(cursor) && utils.aria.hasRole(cursor, 'heading')) {
+        const previousLevel = getLevel(cursor);
+        if (level <= previousLevel + 1) {
+          return null;
+        }
+        break;
+      }
+    } while (cursor);
+    return 'headings must be nested correctly';
+  }
+};
+
+},{"../rule":8}],"./rules/ids/form-attribute/rule.js":[function(require,module,exports){
+"use strict";
+const Rule = require('../../rule');
+const { rSpace } = require('../../../support/constants');
+
+const selector = ['button', 'fieldset', 'input', 'object', 'output', 'select', 'textarea'].map(name => `${name}[form]`).join(',');
+
+module.exports = class extends Rule {
+  selector() {
+    return selector;
+  }
+
+  test(el) {
+    const formId = el.getAttribute('form');
+    if (!formId) {
+      return 'form attribute should be an id';
+    }
+
+    if (rSpace.test(formId)) {
+      return 'form attribute should not contain spaces';
+    }
+
+    const form = document.getElementById(formId);
+    if (!form) {
+      return `cannot find element for form attribute with id "${formId}"`;
+    }
+
+    if (form.nodeName.toLowerCase() !== 'form') {
+      return 'form attribute does not point to a form';
+    }
+
+    return null;
+  }
+};
+
+},{"../../../support/constants":10,"../../rule":8}],"./rules/ids/imagemap-ids/rule.js":[function(require,module,exports){
+"use strict";
+const Rule = require('../../rule');
+const { rSpace } = require('../../../support/constants');
+
+module.exports = class extends Rule {
+  selector() {
+    return 'map';
+  }
+
+  test(el, utils) {
+    if (!el.name) {
+      return 'name attribute is required';
+    }
+
+    if (rSpace.test(el.name)) {
+      return 'name attribute must not contain spaces';
+    }
+
+    const name = el.name.toLowerCase();
+    const mapNames = utils.$$('map[name]').map(map => map.name.toLowerCase());
+    if (mapNames.filter(item => item === name).length > 1) {
+      return 'name attribute must be case-insensitively unique';
+    }
+
+    const imgUseMaps = utils.$$('img[usemap]').map(img => img.useMap.toLowerCase());
+    if (!imgUseMaps.includes(`#${name}`)) {
+      return 'name attribute should be referenced by an img usemap attribute';
+    }
+
+    if (el.id && el.id !== el.name) {
+      return 'if the id attribute is present it must equal the name attribute';
+    }
+
+    return null;
+  }
+};
+
+},{"../../../support/constants":10,"../../rule":8}],"./rules/ids/labels-have-inputs/rule.js":[function(require,module,exports){
+"use strict";
+const Rule = require('../../rule');
+const { rSpace } = require('../../../support/constants');
+
+module.exports = class extends Rule {
+  selector() {
+    return 'label[for]';
+  }
+
+  test(el) {
+    if (!el.htmlFor) {
+      return 'for attribute should not be empty';
+    }
+
+    if (rSpace.test(el.htmlFor)) {
+      return 'for attribute should not contain spaces';
+    }
+
+    if (document.getElementById(el.htmlFor)) {
+      return null;
+    }
+
+    return 'no element can be found with id of id attribute';
+  }
+};
+
+},{"../../../support/constants":10,"../../rule":8}],"./rules/ids/list-id/rule.js":[function(require,module,exports){
+"use strict";
+const Rule = require('../../rule');
+const { rSpace } = require('../../../support/constants');
+
+module.exports = class extends Rule {
+  selector() {
+    return 'input[list]';
+  }
+
+  test(el, utils) {
+    const listId = el.getAttribute('list');
+
+    if (!listId) {
+      return 'list attribute should not be empty';
+    }
+
+    if (rSpace.test(listId)) {
+      return 'list attribute should not contain spaces';
+    }
+
+    if (listId && utils.$(`datalist[id="${utils.cssEscape(listId)}"]`)) {
+      return null;
+    }
+    return 'no datalist found';
+  }
+};
+
+},{"../../../support/constants":10,"../../rule":8}],"./rules/ids/no-duplicate-anchor-names/rule.js":[function(require,module,exports){
+"use strict";
+const Rule = require('../../rule');
+
+module.exports = class extends Rule {
+  selector() {
+    return 'a[name]';
+  }
+
+  test(el, utils) {
+    if (!el.name) {
+      return 'name should not be empty';
+    }
+    if (el.id && el.id !== el.name) {
+      return 'if the id attribute is present it must equal the name attribute';
+    }
+    const id = utils.cssEscape(el.name);
+    if (id && utils.$$(`a[name="${id}"],[id="${id}"]`).length > 1) {
+      return 'name is not unique';
+    }
+    return null;
+  }
+};
+
+},{"../../rule":8}],"./rules/ids/unique-id/rule.js":[function(require,module,exports){
+"use strict";
+const Rule = require('../../rule');
+const { rSpace } = require('../../../support/constants');
+
+module.exports = class extends Rule {
+  selector() {
+    return '[id]';
+  }
+
+  test(el, utils) {
+    if (!el.id) {
+      return 'id should not be empty';
+    }
+    if (rSpace.test(el.id)) {
+      return 'id should not contain space characters';
+    }
+    if (!el.id || utils.$$(`[id="${utils.cssEscape(el.id)}"]`).length > 1) {
+      return 'id is not unique';
+    }
+    return null;
+  }
+};
+
+},{"../../../support/constants":10,"../../rule":8}],"./rules/labels/area/rule.js":[function(require,module,exports){
+"use strict";
+const Rule = require('../../rule');
+
+module.exports = class extends Rule {
+  selector() {
+    return 'area[href]';
+  }
+
+  test(el, utils) {
+    const map = el.closest('map');
+    if (!map || !map.name) {
+      return null;
+    }
+    const img = utils.$(`img[usemap="#${utils.cssEscape(map.name)}"]`);
+    if (!img || utils.hidden(img)) {
+      return null;
+    }
+    if (el.alt) {
+      return null;
+    }
+    return 'area with a href must have a label';
+  }
+};
+
+},{"../../rule":8}],"./rules/labels/aria-command/rule.js":[function(require,module,exports){
+"use strict";
+const Rule = require('../../rule');
+
+module.exports = class extends Rule {
+  selector(utils) {
+    return this._selector || (this._selector = utils.aria.rolesOfType('command').map(role => `[role~="${role}"]`).join(','));
+  }
+
+  test(el, utils) {
+    if (!utils.aria.hasRole(el, utils.aria.rolesOfType('command'))) {
+      return null;
+    }
+    if (utils.hidden(el, { ariaHidden: true }) || utils.accessibleName(el)) {
+      return null;
+    }
+    return 'elements with a role with a superclass of command must have a label';
+  }
+};
+
+},{"../../rule":8}],"./rules/labels/controls/rule.js":[function(require,module,exports){
+"use strict";
+const Rule = require('../../rule');
+
+module.exports = class extends Rule {
+  selector() {
+    return 'button,input:not([type="hidden"]),meter,output,progress,select,textarea';
+  }
+
+  test(el, utils) {
+    if (utils.hidden(el, { ariaHidden: true }) || utils.accessibleName(el)) {
+      return null;
+    }
+    return 'form controls must have a label';
+  }
+};
+
+},{"../../rule":8}],"./rules/labels/group/rule.js":[function(require,module,exports){
+"use strict";
+const Rule = require('../../rule');
+
+module.exports = class extends Rule {
+  selector() {
+    return 'fieldset,[role~=group],[role~=radiogroup]';
+  }
+
+  test(el, utils) {
+    if (utils.hidden(el)
+      || (el.nodeName.toLowerCase() !== 'fieldset' && !utils.aria.hasRole(el, ['group', 'radiogroup']))
+      || utils.accessibleName(el)) {
+      return null;
+    }
+    return 'fieldsets, groups and radiogroups must have a label';
+  }
+};
+
+},{"../../rule":8}],"./rules/labels/headings/rule.js":[function(require,module,exports){
+"use strict";
+const Rule = require('../../rule');
+
+module.exports = class extends Rule {
+  selector() {
+    return 'h1,h2,h3,h4,h5,h6,[role~="heading"]';
+  }
+
+  test(el, utils) {
+    if (!utils.aria.hasRole(el, 'heading')) {
+      return null;
+    }
+    if (utils.hidden(el, { ariaHidden: true }) || utils.accessibleName(el)) {
+      return null;
+    }
+    return 'headings must have a label';
+  }
+};
+
+},{"../../rule":8}],"./rules/labels/img/rule.js":[function(require,module,exports){
+"use strict";
+const Rule = require('../../rule');
+
+module.exports = class extends Rule {
+  setDefaults() {
+    this.includeHidden = true;
+  }
+
+  selector() {
+    return 'img:not([alt])';
+  }
+
+  test() {
+    return 'missing alt attribute';
+  }
+};
+
+},{"../../rule":8}],"./rules/labels/links/rule.js":[function(require,module,exports){
+"use strict";
+const Rule = require('../../rule');
+
+module.exports = class extends Rule {
+  selector() {
+    return 'a[href]';
+  }
+
+  test(el, utils) {
+    if (utils.hidden(el, { ariaHidden: true }) || utils.accessibleName(el)) {
+      return null;
+    }
+    return 'links with a href must have a label';
+  }
+};
+
+},{"../../rule":8}],"./rules/labels/tabindex/rule.js":[function(require,module,exports){
+"use strict";
+const Rule = require('../../rule');
+
+module.exports = class extends Rule {
+  selector() {
+    return '[tabindex]';
+  }
+
+  test(el, utils) {
+    if (utils.hidden(el, { ariaHidden: true }) || utils.accessibleName(el)) {
+      return null;
+    }
+    return 'focusable elements must have a label';
+  }
+};
+
+},{"../../rule":8}],"./rules/lang/rule.js":[function(require,module,exports){
+"use strict";
+const Rule = require('../rule');
+
+// Language tags are defined in http://www.ietf.org/rfc/bcp/bcp47.txt
+const match = /^((en-gb-oed)|([a-z]{2,3}(-[a-z]{3})?(-[a-z]{4})?(-[a-z]{2}|-\d{3})?(-[a-z0-9]{5,8}|-(\d[a-z0-9]{3}))*))$/i;
+
+module.exports = class extends Rule {
+  selector() {
+    return 'html';
+  }
+
+  test(el) {
+    if (!el.lang) {
+      return 'missing lang attribute';
+    }
+    if (!match.test(el.lang)) {
+      return 'language code is invalid';
+    }
+    return null;
+  }
+};
+
+},{"../rule":8}],"./rules/legend-has-fieldset/rule.js":[function(require,module,exports){
+"use strict";
+const Rule = require('../rule');
+
+module.exports = class extends Rule {
+  selector() {
+    return ':not(fieldset)>legend,fieldset>legend:not(:first-child)';
+  }
+
+  test() {
+    return 'legends must be the first child of a fieldset';
+  }
+};
+
+},{"../rule":8}],"./rules/multiple-in-group/rule.js":[function(require,module,exports){
+"use strict";
+const Rule = require('../rule');
+
+const excludeTypes = ['hidden', 'image', 'submit', 'reset', 'button'];
+const excludeSelector = excludeTypes.map(type => `:not([type=${type}])`).join('');
+
+module.exports = class extends Rule {
+  selector() {
+    return this._selector || (this._selector = `input[name]${excludeSelector},textarea[name],select[name],object[name]`);
+  }
+
+  test(el, utils) {
+    if (utils.hidden(el)) {
+      return null;
+    }
+    let group;
+
+    if (el.form) {
+      const elements = el.form.elements[el.name];
+      if (elements instanceof Node) {
+        return null;
+      }
+      group = Array.from(elements)
+        .filter(elm => !excludeTypes.includes(elm.type))
+        .filter(elm => !utils.hidden(elm));
+    } else {
+      const namePart = `[name="${utils.cssEscape(el.name)}"]`;
+      group = utils.$$(`input${namePart}${excludeSelector},textarea${namePart},select${namePart},object${namePart}`)
+        .filter(elm => !elm.form)
+        .filter(elm => !utils.hidden(elm));
+    }
+
+    if (group.length === 1 || el.closest('fieldset') || utils.aria.closestRole(el, ['group', 'radiogroup'])) {
+      return null;
+    }
+
+    return 'multiple inputs with the same name should be in a fieldset, group or radiogroup';
+  }
+};
+
+},{"../rule":8}],"./rules/no-button-without-type/rule.js":[function(require,module,exports){
+"use strict";
+const Rule = require('../rule');
+
+module.exports = class extends Rule {
+  selector() {
+    return 'button:not([type])';
+  }
+
+  test() {
+    return 'all buttons should have a type attribute';
+  }
+};
+
+},{"../rule":8}],"./rules/no-empty-select/rule.js":[function(require,module,exports){
+"use strict";
+const Rule = require('../rule');
+
+module.exports = class extends Rule {
+  selector() {
+    return 'select';
+  }
+
+  test(el, utils) {
+    if (utils.hidden(el) || utils.$$('option', el).length) {
+      return null;
+    }
+    return 'selects should have options';
+  }
+};
+
+},{"../rule":8}],"./rules/no-links-as-buttons/rule.js":[function(require,module,exports){
+"use strict";
+const Rule = require('../rule');
+
+module.exports = class extends Rule {
+  selector() {
+    return 'a[role=button],a[href="#"],a[href="#!"],a[href^="javascript:"]';
+  }
+
+  test(el, utils) {
+    if (utils.hidden(el)) {
+      return null;
+    }
+    return 'use a button instead of a link';
+  }
+};
+
+},{"../rule":8}],"./rules/no-links-to-missing-fragments/rule.js":[function(require,module,exports){
+"use strict";
+const Rule = require('../rule');
+
+function removeHash(ob) {
+  return ob.href.replace(/#.*$/, '');
+}
+
+module.exports = class extends Rule {
+  selector() {
+    return 'a[href*="#"]';
+  }
+
+  test(el, utils) {
+    if (utils.hidden(el)) {
+      return null;
+    }
+    if (removeHash(window.location) !== removeHash(el)) {
+      return null;
+    }
+    const id = utils.cssEscape(decodeURI(el.hash.slice(1)));
+    const found = utils.$(`[id="${id}"],a[name="${id}"]`);
+
+    if (!found) {
+      return 'fragment not found in document';
+    }
+
+    if (utils.hidden(found)) {
+      return 'link target is hidden';
+    }
+
+    return null;
+  }
+};
+
+},{"../rule":8}],"./rules/no-multiple-select/rule.js":[function(require,module,exports){
+"use strict";
+const Rule = require('../rule');
+
+module.exports = class extends Rule {
+  selector() {
+    return 'select[multiple]';
+  }
+
+  test() {
+    return 'do not use multiple selects';
+  }
+};
+
+},{"../rule":8}],"./rules/no-outside-controls/rule.js":[function(require,module,exports){
+"use strict";
+const Rule = require('../rule');
+
+module.exports = class extends Rule {
+  selector() {
+    return 'input,textarea,select,button:not([type]),button[type="submit"],button[type="reset"]';
+  }
+
+  test(el) {
+    if (el.form) {
+      return null;
+    }
+    return 'all controls should be associated with a form';
+  }
+};
+
+},{"../rule":8}],"./rules/no-reset/rule.js":[function(require,module,exports){
+"use strict";
+const Rule = require('../rule');
+
+module.exports = class extends Rule {
+  selector() {
+    return 'input[type=reset],button[type=reset]';
+  }
+
+  test() {
+    return 'do not use reset buttons';
+  }
+};
+
+},{"../rule":8}],"./rules/no-unassociated-labels/rule.js":[function(require,module,exports){
+"use strict";
+const Rule = require('../rule');
+
+const labelable = 'input:not([type=hidden]),select,textarea,button,meter,output,progress';
+
+module.exports = class extends Rule {
+  selector() {
+    return 'label';
+  }
+
+  test(el, utils) {
+    if (utils.hidden(el)) {
+      return null;
+    }
+
+    if (el.htmlFor) {
+      const forEl = document.getElementById(el.htmlFor);
+      if (!forEl) {
+        return 'label is not labelling an element';
+      }
+      if (utils.hidden(forEl)) {
+        return 'label is labelling a hidden element';
+      }
+      return null;
+    }
+
+    const targets = utils.$$(labelable, el);
+
+    if (targets.length && !targets.filter(elm => !utils.hidden(elm)).length) {
+      return 'label is labelling a hidden element';
+    }
+
+    if (!targets.length) {
+      return 'label is not labelling an element';
+    }
+
+    return null;
+  }
+};
+
+},{"../rule":8}],"./rules/title/rule.js":[function(require,module,exports){
+"use strict";
+const Rule = require('../rule');
+
+module.exports = class extends Rule {
+  selector() {
+    return 'html';
+  }
+
+  test() {
+    if (document.title.trim()) {
+      return null;
+    }
+    return 'document must have a title';
+  }
+};
+
+},{"../rule":8}],"./rules":[function(require,module,exports){
+"use strict";
+module.exports = ["aria/attribute-values","aria/deprecated-attributes","aria/immutable-role","aria/invalid-attributes","aria/landmark/one-banner","aria/landmark/one-contentinfo","aria/landmark/one-main","aria/landmark/prefer-main","aria/no-focusable-hidden","aria/no-focusable-role-none","aria/no-none-without-presentation","aria/one-role","aria/roles","colour-contrast/aa","colour-contrast/aaa","data-attributes","elements/obsolete","elements/unknown","fieldset-has-legend","headings","ids/form-attribute","ids/imagemap-ids","ids/labels-have-inputs","ids/list-id","ids/no-duplicate-anchor-names","ids/unique-id","labels/area","labels/aria-command","labels/controls","labels/group","labels/headings","labels/img","labels/links","labels/tabindex","lang","legend-has-fieldset","multiple-in-group","no-button-without-type","no-empty-select","no-links-as-buttons","no-links-to-missing-fragments","no-multiple-select","no-outside-controls","no-reset","no-unassociated-labels","title"];
+},{}],"./version":[function(require,module,exports){
+"use strict";
+module.exports = "1.7.0"
 },{}],1:[function(require,module,exports){
 "use strict";
 /**
@@ -742,7 +1895,7 @@ const labels = (el, utils) => {
     found = utils.$$(`label[for="${utils.cssEscape(el.id)}"]`);
   }
   found.push(el.closest('label:not([for])'));
-  return found.filter(Boolean).filter(elm => !utils.hidden(elm));
+  return found.filter(Boolean).filter(elm => !utils.hidden(elm, { ariaHidden: true }));
 };
 
 const obsolete = { obsolete: true };
@@ -797,7 +1950,15 @@ module.exports = {
   dt: {},
   em: {},
   embed: {},
-  fieldset: {},
+  fieldset: {
+    nativeLabel(el, utils) {
+      const found = el.querySelector('legend');
+      if (found && utils.hidden(found, { ariaHidden: true })) {
+        return null;
+      }
+      return found;
+    },
+  },
   figcaption: {},
   figure: {},
   font: obsolete,
@@ -1267,11 +2428,14 @@ const version = require('./version');
 const config = require('./config');
 const Contrast = require('./utils/contrast');
 
+// eslint-disable-next-line global-require, import/no-dynamic-require
+const ruleList = new Map(rules.map(path => [path.replace(/\//g, '-'), require(`./rules/${path}/rule.js`)]));
+
 const Linter = module.exports = class AccessibilityLinter extends Runner {
   constructor(options) {
     options = options || {};
     options.logger = options.logger || new Logger();
-    options.rules = options.rules || rules;
+    options.rules = options.rules || ruleList;
     super(options);
 
     this.root = options.root || document;
@@ -1300,6 +2464,12 @@ const Linter = module.exports = class AccessibilityLinter extends Runner {
           }
         });
       });
+      // Remove nodes that are disconnected
+      nodes.forEach((node) => {
+        if (!document.contains(node)) {
+          nodes.delete(node);
+        }
+      });
       // Run test against each node
       nodes.forEach(node => this.run(node));
     });
@@ -1323,12 +2493,13 @@ const Linter = module.exports = class AccessibilityLinter extends Runner {
 Linter.config = config;
 Linter.Logger = Logger;
 Linter.Rule = Rule;
-Linter.rules = rules;
+Linter.rules = ruleList;
+Linter[Symbol.for('accessibility-linter.rule-sources')] = rules;
 Linter.Utils = Utils;
 Linter.version = version;
 Linter.colourContrast = Contrast.colourContrast;
 
-},{"./config":4,"./logger":7,"./rules":"./rules","./rules/rule":45,"./runner":47,"./utils":53,"./utils/contrast":50,"./version":"./version"}],7:[function(require,module,exports){
+},{"./config":4,"./logger":7,"./rules":"./rules","./rules/rule":8,"./runner":9,"./utils":18,"./utils/contrast":15,"./version":"./version"}],7:[function(require,module,exports){
 "use strict";
 /* eslint-disable no-console, class-methods-use-this */
 module.exports = class Logger {
@@ -1339,968 +2510,10 @@ module.exports = class Logger {
 
 },{}],8:[function(require,module,exports){
 "use strict";
-const Rule = require('../../rule');
-const config = require('../../../config');
+const ExtendedArray = require('../support/extended-array');
 
-const checkers = {
-  string(value) {
-    return !value.trim() ? 'must be a non-empty string' : null;
-  },
-
-  integer(value) {
-    return /^-?\d+$/.test(value) ? null : 'must be an integer';
-  },
-
-  number(value) {
-    // Although not entirely clear, let us assume the number follows the html5 specification
-    return /^-?(?:\d+\.\d+|\d+|\.\d+)(?:[eE][+-]?\d+)?$/.test(value) ? null : 'must be a floating point number';
-  },
-
-  token(value, { tokens }) {
-    return tokens.includes(value) ? null : `must be one of: ${tokens.join(', ')}`;
-  },
-
-  tokenlist(value, { tokens, alone }) {
-    const values = value.split(/\s+/).filter(Boolean);
-    const unknown = values.filter(token => !tokens.includes(token));
-    if (values.length === 0) {
-      return `must be one or more of: ${tokens.join(', ')}`;
-    }
-    if (unknown.length) {
-      return `contains unknown values: ${unknown.join(', ')}`;
-    }
-    if (alone && values.length > 1) {
-      const alones = values.filter(token => alone.includes(token));
-      if (alones.length) {
-        return `should only contain the following values on their own: ${alones.join(', ')}`;
-      }
-    }
-    return null;
-  },
-
-  id(value) {
-    if (!value.trim()) {
-      return 'must be an element id';
-    }
-
-    if (/[ \t\n\f\r]/.test(value)) {
-      return 'must not contain spaces';
-    }
-
-    return document.getElementById(value) ? null : `no element can be found with an id of ${value}`;
-  },
-
-  idlist(value) {
-    if (!value.trim()) {
-      return 'must be a list of one of more ids';
-    }
-    const missing = value.split(/\s+/).filter(id => !document.getElementById(id));
-    if (!missing.length) {
-      return null;
-    }
-    return missing.map(id => `no element can be found with an id of ${id}`);
-  },
-};
-
-module.exports = class extends Rule {
-  setDefaults() {
-    this.includeHidden = true;
-  }
-
-  selector() {
-    return this._selector || (this._selector = Object.keys(config.ariaAttributes).map(name => `[aria-${name}]`).join(','));
-  }
-
-  test(el) {
-    return Array.from(el.attributes)
-      .map(attr => [attr.name, attr.value])
-      .filter(([name]) => name.indexOf('aria-') === 0)
-      .map(([name, value]) => [name.slice(5), value])
-      .map(([name, value]) => [name, value, config.ariaAttributes[name]])
-      .filter(([,, desc]) => desc)
-      .map(([name, value, desc]) => [name, checkers[desc.values.type](value, desc.values)])
-      .filter(([, errors]) => errors && errors.length)
-      .reduce((ret, [name, errors]) => ret.concat([].concat(errors).map(message => `aria-${name} ${message}`)), []);
-  }
-};
-
-},{"../../../config":4,"../../rule":45}],9:[function(require,module,exports){
-"use strict";
-const Rule = require('../../rule');
-const config = require('../../../config');
-
-module.exports = class extends Rule {
-  setDefaults() {
-    this.includeHidden = true;
-  }
-
-  deprecated() {
-    return this._deprecated || (this._deprecated = Object.entries(config.ariaAttributes)
-      .filter(([, value]) => value.deprecated)
-      .map(([name]) => `aria-${name}`));
-  }
-
-  selector() {
-    return this.deprecated().map(name => `[${name}]`).join(',');
-  }
-
-  test(el) {
-    return Array.from(el.attributes)
-      .filter(({ name }) => this.deprecated().includes(name))
-      .map(({ name }) => `${name} is deprecated`);
-  }
-};
-
-},{"../../../config":4,"../../rule":45}],10:[function(require,module,exports){
-"use strict";
-const Rule = require('../../rule');
-
-module.exports = class extends Rule {
-  setDefaults() {
-    this.includeHidden = true;
-    this.history = new WeakMap();
-  }
-
-  selector() {
-    return '[role]';
-  }
-
-  test(el) {
-    const role = el.getAttribute('role');
-    if (this.history.has(el)) {
-      if (this.history.get(el) !== role) {
-        return 'an elements role must not be modified';
-      }
-    } else {
-      this.history.set(el, role);
-    }
-    return null;
-  }
-};
-
-},{"../../rule":45}],11:[function(require,module,exports){
-"use strict";
-const Rule = require('../../rule');
-const config = require('../../../config');
-
-module.exports = class extends Rule {
-  setDefaults() {
-    this.includeHidden = true;
-  }
-
-  selector() {
-    return '*';
-  }
-
-  test(el) {
-    const invalid = Array.from(el.attributes)
-      .map(attr => attr.name)
-      .filter(name => name.indexOf('aria-') === 0)
-      .map(name => name.slice(5))
-      .filter(name => !Object.keys(config.ariaAttributes).includes(name));
-
-    if (invalid.length) {
-      return `element has unknown aria attribute${invalid.length > 1 ? 's' : ''}: ${invalid.map(name => `aria-${name}`).join(', ')}`;
-    }
-
-    return null;
-  }
-};
-
-},{"../../../config":4,"../../rule":45}],12:[function(require,module,exports){
-"use strict";
-const Rule = require('../../rule');
-
-const focusable = ['button', 'input:not([type="hidden"])', 'meter', 'output', 'progress', 'select', 'textarea', 'a[href]', 'area[href]', '[tabindex]'];
-
-module.exports = class extends Rule {
-  setDefaults() {
-    this.includeHidden = true;
-  }
-
-  selector() {
-    return this._selector || (this._selector = focusable.map(selector => `${selector}[aria-hidden="true"]`).join(','));
-  }
-
-  test(el, utils) {
-    if (el.nodeName.toLowerCase() === 'area' || !utils.hidden(el, { noAria: true })) {
-      return 'do not mark focusable elements with `aria-hidden="true"`';
-    }
-    return null;
-  }
-};
-
-},{"../../rule":45}],13:[function(require,module,exports){
-"use strict";
-const Rule = require('../../rule');
-
-module.exports = class extends Rule {
-  setDefaults() {
-    this.includeHidden = true;
-  }
-
-  selector() {
-    return '[role="none"]';
-  }
-
-  test() {
-    return 'use a role of "none presentation" to support older user-agents';
-  }
-};
-
-},{"../../rule":45}],14:[function(require,module,exports){
-"use strict";
-const Rule = require('../../rule');
-const config = require('../../../config');
-
-module.exports = class extends Rule {
-  setDefaults() {
-    this.includeHidden = true;
-  }
-
-  selector() {
-    return '[role]';
-  }
-
-  test(el, utils) {
-    const role = el.getAttribute('role').trim();
-    if (!role) {
-      return 'role attribute should not be empty';
-    }
-    let error;
-    const allowed = utils.aria.allowed(el);
-    role.split(/\s+/).some((name) => {
-      if (!config.roles[name]) {
-        error = `role "${name}" is not a known role`;
-        return true;
-      }
-
-      if (config.roles[name].abstract) {
-        error = `role "${name}" is an abstract role and should not be used`;
-        return true;
-      }
-
-      if (allowed.implicit.includes(name)) {
-        error = `role "${name}" is implicit for this element and should not be specified`;
-        return true;
-      }
-
-      if (allowed.roles === '*') {
-        return null;
-      }
-
-      if (!allowed.roles.includes(name)) {
-        error = `role "${name}" is not allowed for this element`;
-      }
-
-      return null;
-    });
-
-    return error;
-  }
-};
-
-},{"../../../config":4,"../../rule":45}],15:[function(require,module,exports){
-"use strict";
-const Rule = require('../../rule');
-
-/**
- *  Check the colour contrast for all visible nodes with child text nodes
- */
-module.exports = class extends Rule {
-  setDefaults() {
-    this.enabled = false;
-    this.min = 4.5;
-    this.minLarge = 3;
-  }
-
-  run(context, filter = () => true, utils) {
-    context = context || document;
-    return this.iterate(context, utils, false)
-      .filter(filter)
-      .map(el => this.findAncestor(el, utils))
-      .reduce((ar, el) => (ar.includes(el) ? ar : (ar.push(el), ar)), []) // Unique
-      .filter(filter)
-      .map(el => [el, this.test(el, utils)])
-      .filter(([, ratio]) => ratio)
-      .map(([el, ratio]) => this.message(el, ratio));
-  }
-
-  iterate(node, utils, iterateSiblings) {
-    const found = [];
-    let cursor = node;
-    while (cursor) {
-      if (!utils.hidden(cursor, { noAria: true })) {
-        if (this.hasTextNode(cursor)) {
-          found.push(cursor);
-        }
-
-        if (cursor.firstElementChild) {
-          found.push.apply(found, this.iterate(cursor.firstElementChild, utils, true));
-        }
-      }
-
-      if (iterateSiblings) {
-        cursor = cursor.nextElementSibling;
-      } else {
-        cursor = null;
-      }
-    }
-
-    return found;
-  }
-
-  // Does the element have a text node with content
-  hasTextNode(el) {
-    return Array.from(el.childNodes)
-      .filter(node => node.nodeType === Node.TEXT_NODE)
-      .some(node => node.data.trim());
-  }
-
-  // Find the last ancestor or self with the same colours
-  findAncestor(el, utils) {
-    const colour = utils.contrast.textColour(el);
-    const backgroundColour = utils.contrast.backgroundColour(el);
-
-    let cursor = el;
-    while (cursor.parentNode !== document) {
-      const parent = cursor.parentNode;
-      if (utils.contrast.textColour(parent) !== colour
-        && utils.contrast.backgroundColour(parent) !== backgroundColour) {
-        break;
-      }
-      cursor = parent;
-    }
-
-    return cursor;
-  }
-
-  // Does the element meet AAA or AA standards
-  test(el, utils) {
-    const ratio = parseFloat(utils.contrast.textContrast(el).toFixed(2));
-
-    if (ratio >= this.min) {
-      return null;
-    }
-
-    const fontSize = parseFloat(utils.style(el, 'fontSize'));
-    const large = fontSize >= 24 /* 18pt */ || (fontSize >= 18.66 /* 14pt */ && utils.style(el, 'fontWeight') >= 700);
-
-    if (large && ratio >= this.minLarge) {
-      return null;
-    }
-
-    return ratio;
-  }
-
-  message(el, ratio) {
-    return { el, message: `contrast is too low ${parseFloat(ratio.toFixed(2))}:1`, type: this.type };
-  }
-};
-
-},{"../../rule":45}],16:[function(require,module,exports){
-"use strict";
-const ColourContrastAARule = require('../aa/rule.js');
-
-module.exports = class extends ColourContrastAARule {
-  setDefaults() {
-    this.min = 7;
-    this.minLarge = 4.5;
-    this.enabled = false;
-  }
-};
-
-},{"../aa/rule.js":15}],17:[function(require,module,exports){
-"use strict";
-const Rule = require('../rule');
-
-module.exports = class extends Rule {
-  selector() {
-    return '[data],[data-]';
-  }
-
-  test() {
-    return 'data is an attribute prefix';
-  }
-};
-
-},{"../rule":45}],18:[function(require,module,exports){
-"use strict";
-const Rule = require('../../rule');
-const config = require('../../../config');
-
-module.exports = class extends Rule {
-  selector() {
-    return this._selector || (this._selector = Object.keys(config.elements).filter(el => config.elements[el].obsolete).join(','));
-  }
-
-  test() {
-    return 'do not use obsolete elements';
-  }
-};
-
-},{"../../../config":4,"../../rule":45}],19:[function(require,module,exports){
-"use strict";
-const Rule = require('../../rule');
-const config = require('../../../config');
-
-module.exports = class extends Rule {
-  selector() {
-    return this._selector || (this._selector = Object.keys(config.elements).map(name => `:not(${name})`).join(''));
-  }
-
-  test(el) {
-    if (el.closest('svg,math')) {
-      return null;
-    }
-    return 'unknown element';
-  }
-};
-
-},{"../../../config":4,"../../rule":45}],20:[function(require,module,exports){
-"use strict";
-const Rule = require('../../rule');
-
-module.exports = class extends Rule {
-  selector() {
-    return 'fieldset';
-  }
-
-  test(el) {
-    const first = el.firstElementChild;
-    if (first && first.matches('legend')) {
-      return null;
-    }
-    return 'All fieldsets must have a legend';
-  }
-};
-
-},{"../../rule":45}],21:[function(require,module,exports){
-"use strict";
-const Rule = require('../../rule');
-
-module.exports = class extends Rule {
-  selector() {
-    return ':not(fieldset)>legend,fieldset>legend:not(:first-child)';
-  }
-
-  test() {
-    return 'All legends must be the first child of a fieldset';
-  }
-};
-
-},{"../../rule":45}],22:[function(require,module,exports){
-"use strict";
-const Rule = require('../../rule');
-
-const excludeTypes = ['hidden', 'image', 'submit', 'reset', 'button'];
-const excludeSelector = excludeTypes.map(type => `:not([type=${type}])`).join('');
-
-module.exports = class extends Rule {
-  selector() {
-    return `input[name]${excludeSelector},textarea[name],select[name]`;
-  }
-
-  test(el, utils) {
-    let group;
-
-    if (el.form) {
-      const elements = el.form.elements[el.name];
-      if (elements instanceof Node) {
-        return null;
-      }
-      group = Array.from(elements).filter(elm => excludeTypes.includes(elm.type));
-    } else {
-      const namePart = `[name="${utils.cssEscape(el.name)}"]`;
-      group = utils.$$(`input${namePart}${excludeSelector},textarea${namePart},select${namePart}`).filter(elm => !elm.form);
-    }
-
-    if (group.length === 1 || el.closest('fieldset')) {
-      return null;
-    }
-
-    return 'Multiple inputs with the same name should be in a fieldset';
-  }
-};
-
-},{"../../rule":45}],23:[function(require,module,exports){
-"use strict";
-const Rule = require('../rule');
-
-const allowed = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
-
-function previous(el) {
-  let cursor = el.previousElementSibling;
-  while (cursor && cursor.lastElementChild) {
-    cursor = cursor.lastElementChild;
-  }
-  return cursor;
-}
-
-module.exports = class extends Rule {
-  selector() {
-    return 'h2,h3,h4,h5,h6';
-  }
-
-  test(el) {
-    let cursor = el;
-    const level = +el.nodeName[1];
-    do {
-      cursor = previous(cursor) || cursor.parentElement;
-      if (cursor && cursor.matches(allowed.join())) {
-        if (cursor.matches(allowed.slice(level - 2).join(','))) {
-          return null;
-        }
-        break;
-      }
-    } while (cursor);
-    return 'Headings must be nested correctly';
-  }
-};
-
-},{"../rule":45}],24:[function(require,module,exports){
-"use strict";
-const Rule = require('../../rule');
-
-const selector = ['button', 'fieldset', 'input', 'object', 'output', 'select', 'textarea'].map(name => `${name}[form]`).join(',');
-
-module.exports = class extends Rule {
-  setDefaults() {
-    this.includeHidden = true;
-  }
-
-  selector() {
-    return selector;
-  }
-
-  test(el) {
-    const formId = el.getAttribute('form');
-    if (!formId) {
-      return 'form attribute should be an id';
-    }
-
-    if (/\s/.test(formId)) {
-      return 'form attribute should not contain spaces';
-    }
-
-    const form = document.getElementById(formId);
-    if (!form) {
-      return `cannot find element for form attribute with id "${formId}"`;
-    }
-
-    if (form.nodeName.toLowerCase() !== 'form') {
-      return 'form attribute does not point to a form';
-    }
-
-    return null;
-  }
-};
-
-},{"../../rule":45}],25:[function(require,module,exports){
-"use strict";
-const Rule = require('../../rule');
-
-module.exports = class extends Rule {
-  setDefaults() {
-    this.includeHidden = true;
-  }
-
-  selector() {
-    return 'map';
-  }
-
-  test(el, utils) {
-    if (!el.name) {
-      return 'map elements should have a name';
-    }
-
-    const name = el.name.toLowerCase();
-    const mapNames = utils.$$('map[name]').map(map => map.name.toLowerCase());
-    if (mapNames.filter(item => item === name).length > 1) {
-      return 'map element names must be case-insensitively unique';
-    }
-
-    const imgUseMaps = utils.$$('img[usemap]').map(img => img.useMap.toLowerCase());
-    if (!imgUseMaps.includes(`#${name}`)) {
-      return 'map elements should be referenced by an img usemap attribute';
-    }
-
-    return null;
-  }
-};
-
-},{"../../rule":45}],26:[function(require,module,exports){
-"use strict";
-const Rule = require('../../rule');
-
-module.exports = class extends Rule {
-  selector() {
-    return 'label';
-  }
-
-  test(el) {
-    if (el.htmlFor && document.getElementById(el.htmlFor)) {
-      return null;
-    }
-    return 'all labels must be linked to a control';
-  }
-};
-
-},{"../../rule":45}],27:[function(require,module,exports){
-"use strict";
-const Rule = require('../../rule');
-
-module.exports = class extends Rule {
-  selector() {
-    return 'input[list]';
-  }
-
-  test(el, utils) {
-    const listId = el.getAttribute('list');
-    if (listId && utils.$(`datalist[id="${utils.cssEscape(listId)}"]`)) {
-      return null;
-    }
-    return 'no datalist found';
-  }
-};
-
-},{"../../rule":45}],28:[function(require,module,exports){
-"use strict";
-const Rule = require('../../rule');
-
-module.exports = class extends Rule {
-  setDefaults() {
-    this.includeHidden = true;
-  }
-
-  selector() {
-    return 'a[name]';
-  }
-
-  test(el, utils) {
-    if (!el.name) {
-      return 'name should not be empty';
-    }
-    if (el.id && el.id !== el.name) {
-      return 'if the id attribute is present it must equal the name attribute';
-    }
-    const id = utils.cssEscape(el.name);
-    if (id && utils.$$(`a[name="${id}"],[id="${id}"]`).length > 1) {
-      return 'name is not unique';
-    }
-    return null;
-  }
-};
-
-},{"../../rule":45}],29:[function(require,module,exports){
-"use strict";
-const Rule = require('../../rule');
-
-const rSpace = /[ \t\n\f\r]/;
-
-module.exports = class extends Rule {
-  setDefaults() {
-    this.includeHidden = true;
-  }
-
-  selector() {
-    return '[id]';
-  }
-
-  test(el, utils) {
-    if (!el.id) {
-      return 'id should not be empty';
-    }
-    if (rSpace.test(el.id)) {
-      return 'id should not contain space characters';
-    }
-    if (!el.id || utils.$$(`[id="${utils.cssEscape(el.id)}"]`).length > 1) {
-      return 'id is not unique';
-    }
-    return null;
-  }
-};
-
-},{"../../rule":45}],30:[function(require,module,exports){
-"use strict";
-const Rule = require('../../rule');
-
-module.exports = class extends Rule {
-  setDefaults() {
-    this.includeHidden = true;
-  }
-
-  selector() {
-    return 'area[href]';
-  }
-
-  test(el, utils) {
-    const map = el.closest('map');
-    if (!map || !map.name) {
-      return null;
-    }
-    const img = utils.$(`img[usemap="#${utils.cssEscape(map.name)}"]`);
-    if (!img || utils.hidden(img)) {
-      return null;
-    }
-    if (el.alt) {
-      return null;
-    }
-    return 'area with a href must have a label';
-  }
-};
-
-},{"../../rule":45}],31:[function(require,module,exports){
-"use strict";
-const Rule = require('../../rule');
-
-module.exports = class extends Rule {
-  selector() {
-    return '[role="button"],[role="link"],[role="menuitem"],[role="menuitemcheckbox"],[role="menuitemradio"]';
-  }
-
-  test(el, utils) {
-    if (utils.accessibleName(el)) {
-      return null;
-    }
-    return 'elements with a role with a superclass of command must have a label';
-  }
-};
-
-},{"../../rule":45}],32:[function(require,module,exports){
-"use strict";
-const Rule = require('../../rule');
-
-module.exports = class extends Rule {
-  selector() {
-    return 'button,input:not([type="hidden"]),meter,output,progress,select,textarea';
-  }
-
-  test(el, utils) {
-    if (utils.accessibleName(el)) {
-      return null;
-    }
-    return 'form controls must have a label';
-  }
-};
-
-},{"../../rule":45}],33:[function(require,module,exports){
-"use strict";
-const Rule = require('../../rule');
-
-module.exports = class extends Rule {
-  selector() {
-    return 'h1,h2,h3,h4,h5,h6,[role="heading"]';
-  }
-
-  test(el, utils) {
-    if (utils.accessibleName(el)) {
-      return null;
-    }
-    return 'headings must have a label';
-  }
-};
-
-},{"../../rule":45}],34:[function(require,module,exports){
-"use strict";
-const Rule = require('../../rule');
-
-module.exports = class extends Rule {
-  setDefaults() {
-    this.includeHidden = true;
-  }
-
-  selector() {
-    return 'img:not([alt])';
-  }
-
-  test() {
-    return 'missing alt attribute';
-  }
-};
-
-},{"../../rule":45}],35:[function(require,module,exports){
-"use strict";
-const Rule = require('../../rule');
-
-module.exports = class extends Rule {
-  selector() {
-    return 'a[href]';
-  }
-
-  test(el, utils) {
-    if (utils.accessibleName(el)) {
-      return null;
-    }
-    return 'links with a href must have a label';
-  }
-};
-
-},{"../../rule":45}],36:[function(require,module,exports){
-"use strict";
-const Rule = require('../../rule');
-
-module.exports = class extends Rule {
-  selector() {
-    return '[tabindex]';
-  }
-
-  test(el, utils) {
-    if (utils.accessibleName(el)) {
-      return null;
-    }
-    return 'focusable elements must have a label';
-  }
-};
-
-},{"../../rule":45}],37:[function(require,module,exports){
-"use strict";
-const Rule = require('../rule');
-
-// Language tags are defined in http://www.ietf.org/rfc/bcp/bcp47.txt
-const match = /^((en-gb-oed)|([a-z]{2,3}(-[a-z]{3})?(-[a-z]{4})?(-[a-z]{2}|-\d{3})?(-[a-z0-9]{5,8}|-(\d[a-z0-9]{3}))*))$/i;
-
-module.exports = class extends Rule {
-  defaultSettings() {
-    this.includeHidden = true;
-  }
-
-  selector() {
-    return 'html';
-  }
-
-  test(el) {
-    if (!el.lang) {
-      return 'missing lang attribute';
-    }
-    if (!match.test(el.lang)) {
-      return 'language code is invalid';
-    }
-    return null;
-  }
-};
-
-},{"../rule":45}],38:[function(require,module,exports){
-"use strict";
-const Rule = require('../rule');
-
-module.exports = class extends Rule {
-  selector() {
-    return 'button:not([type])';
-  }
-
-  test() {
-    return 'all buttons should have a type attribute';
-  }
-};
-
-},{"../rule":45}],39:[function(require,module,exports){
-"use strict";
-const Rule = require('../rule');
-
-module.exports = class extends Rule {
-  selector() {
-    return 'select';
-  }
-
-  test(el, utils) {
-    if (utils.$$('option', el).length) {
-      return null;
-    }
-    return 'selects should have options';
-  }
-};
-
-},{"../rule":45}],40:[function(require,module,exports){
-"use strict";
-const Rule = require('../rule');
-
-module.exports = class extends Rule {
-  selector() {
-    return 'a[role=button],a[href="#"],a[href="#!"],a[href^="javascript:"]';
-  }
-
-  test() {
-    return 'use a button instead of a link';
-  }
-};
-
-},{"../rule":45}],41:[function(require,module,exports){
-"use strict";
-const Rule = require('../rule');
-
-function removeHash(ob) {
-  return ob.href.replace(/#.*$/, '');
-}
-
-module.exports = class extends Rule {
-  selector() {
-    return 'a[href*="#"]';
-  }
-
-  test(el, utils) {
-    if (removeHash(window.location) !== removeHash(el)) {
-      return null;
-    }
-    const id = utils.cssEscape(decodeURI(el.hash.slice(1)));
-    if (utils.$(`[id="${id}"],a[name="${id}"]`)) {
-      return null;
-    }
-
-    return 'fragment not found in document';
-  }
-};
-
-},{"../rule":45}],42:[function(require,module,exports){
-"use strict";
-const Rule = require('../rule');
-
-module.exports = class extends Rule {
-  selector() {
-    return 'select[multiple]';
-  }
-
-  test() {
-    return 'do not use multiple selects';
-  }
-};
-
-},{"../rule":45}],43:[function(require,module,exports){
-"use strict";
-const Rule = require('../rule');
-
-module.exports = class extends Rule {
-  selector() {
-    return 'input,textarea,select,button:not([type]),button[type="submit"],button[type="reset"]';
-  }
-
-  test(el) {
-    if (el.form) {
-      return null;
-    }
-    return 'all controls should be associated with a form';
-  }
-};
-
-},{"../rule":45}],44:[function(require,module,exports){
-"use strict";
-const Rule = require('../rule');
-
-module.exports = class extends Rule {
-  selector() {
-    return 'input[type=reset],button[type=reset]';
-  }
-
-  test() {
-    return 'do not use reset buttons';
-  }
-};
-
-},{"../rule":45}],45:[function(require,module,exports){
-"use strict";
 module.exports = class Rule {
   constructor(settings) {
-    this.includeHidden = false;
     this.type = 'error';
     this.enabled = true;
     this.setDefaults();
@@ -2322,23 +2535,15 @@ module.exports = class Rule {
    * @returns {String|String[]|null} Zero or more error messages
    */
   run(context, filter = () => true, utils) {
-    return this.select(context, utils)
+    return utils.$$(this.selector(utils), context)
       .filter(filter)
-      .filter(el => (this.includeHidden ? true : !utils.hidden(el)))
-      .map(el => [el, this.test(el, utils)])
-      .reduce((errors, [el, messages]) => (
-        errors.concat([].concat(messages)
-          .filter(Boolean)
+      .map(el => (
+        ExtendedArray.of(this.test(el, utils))
+          .flatten()
+          .compact()
           .map(message => ({ el, message, type: this.type }))
-        )
-      ), []);
-  }
-
-  /**
-   * Select elements potentially breaking the rule
-   */
-  select(context, utils) {
-    return utils.$$(this.selector(), context);
+      ))
+      .flatten();
   }
 
   /**
@@ -2359,29 +2564,16 @@ module.exports = class Rule {
   }
 };
 
-},{}],46:[function(require,module,exports){
-"use strict";
-const Rule = require('../rule');
-
-module.exports = class extends Rule {
-  selector() {
-    return 'html';
-  }
-
-  test() {
-    if (document.title.trim()) {
-      return null;
-    }
-    return 'document must have a title';
-  }
-};
-
-},{"../rule":45}],47:[function(require,module,exports){
+},{"../support/extended-array":12}],9:[function(require,module,exports){
 "use strict";
 const Utils = require('./utils');
+const SetCache = require('./support/set-cache');
 
-const addToSetArray = (set, key, value) => set.set(key, (set.get(key) || []).concat(value));
-const isInSetArray = (set, key, value) => (set.get(key) || []).includes(value);
+const dummyCache = {
+  add() {},
+  set() {},
+  has() { return false; },
+};
 
 module.exports = class Runner {
   constructor(config) {
@@ -2405,9 +2597,14 @@ module.exports = class Runner {
     this.whitelist = config.whitelist;
     this.logger = config.logger;
 
-    this.reported = new WeakMap();
-    this.whitelisted = new WeakMap();
-    this.ignored = new WeakMap();
+    if (this.cacheReported) {
+      this.reported = new SetCache();
+      this.whitelisted = new SetCache();
+      this.globalWhitelisted = new WeakSet();
+      this.ignored = new SetCache();
+    } else {
+      this.reported = this.whitelisted = this.globalWhitelisted = this.ignored = dummyCache;
+    }
 
     this.utils = null;
   }
@@ -2418,11 +2615,9 @@ module.exports = class Runner {
    */
   run(context) {
     this.utils = new Utils();
-    this.rules.forEach((rule) => {
-      if (rule.enabled) {
-        this.runInternal(rule, context, (el, name) => this.filter(el, name, false));
-      }
-    });
+    Array.from(this.rules.values())
+      .filter(rule => rule.enabled)
+      .forEach(rule => this.runInternal(rule, context, (el, name) => this.filter(el, name)));
     this.utils = null;
   }
 
@@ -2432,28 +2627,35 @@ module.exports = class Runner {
    * @param {HTMLElement} [context] A context
    * @param {String} [whitelist] Optionally a whitelist
    */
-  runRule(rule, context, whitelist) {
+  runRule(rule, { context, whitelist, ruleSettings } = {}) {
     if (typeof rule === 'string') {
       rule = this.rules.get(rule);
     }
-    this.utils = new Utils();
-    const oldWhitelist = this.whitelist;
-    if (typeof whitelist === 'string') {
-      this.whitelist = whitelist;
-    }
-    this.runInternal(rule, context, (el, name) => this.filter(el, name, true));
-    this.utils = null;
-    this.whitelist = oldWhitelist;
+
+    const runner = new Runner({
+      rules: new Map([[rule.name, rule.constructor]]),
+      whitelist: whitelist || this.whitelist,
+      logger: this.logger,
+      ruleSettings: {
+        [rule.name]: Object.assign(
+          {},
+          ruleSettings || this.ruleSettings[rule.name] || {},
+          { enabled: true }
+        ),
+      },
+    });
+
+    runner.run(context);
   }
 
   /**
    * Filter if the element has already reported on this rule or is excluded from this rule
    * @private
    */
-  filter(el, name, includeReported) {
+  filter(el, name) {
     return this.notWhitelisted(el, name)
       && this.notIgnored(el, name)
-      && (includeReported || this.notReported(el, name));
+      && this.notReported(el, name);
   }
 
   /**
@@ -2463,9 +2665,7 @@ module.exports = class Runner {
   runInternal(rule, context, filter) {
     rule.run(context, el => filter(el, rule.name), this.utils)
       .forEach((issue) => {
-        if (this.cacheReported) {
-          addToSetArray(this.reported, issue.el, rule.name);
-        }
+        this.reported.set(issue.el, rule.name);
         this.logger.log(Object.assign({ name: rule.name }, issue));
       });
   }
@@ -2475,7 +2675,7 @@ module.exports = class Runner {
    * @private
    */
   notReported(el, name) {
-    return !isInSetArray(this.reported, el, name);
+    return !this.reported.has(el, name);
   }
 
   /**
@@ -2483,20 +2683,21 @@ module.exports = class Runner {
    * @private
    */
   notWhitelisted(el, name) {
-    if (isInSetArray(this.whitelisted, el, name)) {
+    if (this.globalWhitelisted.has(el) || this.whitelisted.has(el, name)) {
       return false;
     }
-    const globalWhitelist = this.whitelist;
-    const whitelist = this.ruleSettings[name] && this.ruleSettings[name].whitelist;
-    const isWhitelisted = (globalWhitelist && el.matches(globalWhitelist)) ||
-      (whitelist && el.matches(whitelist));
 
-    if (isWhitelisted) {
-      if (this.cacheReported) {
-        addToSetArray(this.whitelisted, el, name);
-      }
+    if (this.whitelist && el.matches(this.whitelist)) {
+      this.globalWhitelisted.add(el);
       return false;
     }
+
+    const whitelist = this.ruleSettings[name] && this.ruleSettings[name].whitelist;
+    if (whitelist && el.matches(whitelist)) {
+      this.whitelisted.set(el, name);
+      return false;
+    }
+
     return true;
   }
 
@@ -2505,7 +2706,7 @@ module.exports = class Runner {
    * @private
    */
   notIgnored(el, ruleName) {
-    if (isInSetArray(this.ignored, el, ruleName)) {
+    if (this.ignored.has(el, ruleName)) {
       return false;
     }
 
@@ -2514,9 +2715,7 @@ module.exports = class Runner {
     );
 
     if (ignore) {
-      if (this.cacheReported) {
-        addToSetArray(this.ignored, el, ruleName);
-      }
+      this.ignored.set(el, ruleName);
       return false;
     }
 
@@ -2524,7 +2723,126 @@ module.exports = class Runner {
   }
 };
 
-},{"./utils":53}],48:[function(require,module,exports){
+},{"./support/set-cache":13,"./utils":18}],10:[function(require,module,exports){
+"use strict";
+// https://www.w3.org/TR/html52/infrastructure.html#common-parser-idioms
+exports.rSpace = /[ \t\n\f\r]+/;
+
+},{}],11:[function(require,module,exports){
+"use strict";
+/**
+ * Caching for element values
+ */
+/* eslint-disable class-methods-use-this */
+
+function getOrSet(cache, key, setter) {
+  if (cache.has(key)) {
+    return cache.get(key);
+  }
+  const value = setter();
+  cache.set(key, value);
+  return value;
+}
+
+module.exports = class ElementCache {
+  constructor() {
+    this._cache = new WeakMap();
+  }
+
+  /**
+   * Generate a key from the options supplied to key
+   */
+  key(el, key) {
+    return key;
+  }
+
+  /**
+   * Sets stored value
+   */
+  setter() {
+    throw new Error('not implemented');
+  }
+
+  /**
+   *  Get a value
+   *  @param {Object} el A key to cache against
+   */
+  get(el) {
+    const map = getOrSet(this._cache, el, () => new Map());
+    const optionsKey = this.key.apply(this, arguments);
+    return getOrSet(map, optionsKey, () => this.setter.apply(this, arguments));
+  }
+};
+
+},{}],12:[function(require,module,exports){
+"use strict";
+module.exports = class ExtendedArray extends Array {
+  tap(fn) {
+    fn(this);
+    return this;
+  }
+
+  unique() {
+    const set = new Set();
+    return this.filter(item => (set.has(item) ? false : set.add(item)));
+  }
+
+  groupBy(fn) {
+    const map = new Map();
+    this.forEach((item, i, ar) => {
+      const key = fn(item, i, ar);
+      if (map.has(key)) {
+        map.get(key).push(item);
+      } else {
+        map.set(key, ExtendedArray.of(item));
+      }
+    });
+    return ExtendedArray.from(map.values());
+  }
+
+  compact() {
+    return this.filter(Boolean);
+  }
+
+  flatten() {
+    let result = new ExtendedArray();
+    this.forEach((item) => {
+      if (Array.isArray(item)) {
+        result = result.concat(ExtendedArray.from(item).flatten());
+      } else {
+        result.push(item);
+      }
+    });
+    return result;
+  }
+};
+
+},{}],13:[function(require,module,exports){
+"use strict";
+module.exports = class ElementCache {
+  constructor() {
+    this._cache = new WeakMap();
+  }
+
+  has(el, value) {
+    const set = this._cache.get(el);
+    if (!set) {
+      return false;
+    }
+    return set.has(value);
+  }
+
+  set(el, value) {
+    let set = this._cache.get(el);
+    if (!set) {
+      set = new Set();
+      this._cache.set(el, set);
+    }
+    set.add(value);
+  }
+};
+
+},{}],14:[function(require,module,exports){
 "use strict";
 /**
  *  Data and functions for aria validation.  Based on
@@ -2532,12 +2850,13 @@ module.exports = class Runner {
  *  - https://www.w3.org/TR/html52/
  */
 const config = require('../config');
+const ExtendedArray = require('../support/extended-array');
 
 /**
  * All roles
  * @type {Object[]}
  */
-const allowed = exports.allowed = (el) => {
+exports.allowed = (el) => {
   const name = el.nodeName.toLowerCase();
   let found = config.allowedAria[name];
   if (Array.isArray(found)) {
@@ -2554,7 +2873,7 @@ const allowed = exports.allowed = (el) => {
 exports.getRole = (el) => {
   let role = null;
   // Should be the first non-abstract role in the list
-  if ((el.getAttribute('role') || '').split(/\s+/).some((name) => {
+  if ((el.getAttribute('role') || '').split(/\s+/).filter(Boolean).some((name) => {
     if (config.roles[name] && !config.roles[name].abstract) {
       role = name;
       return true;
@@ -2563,21 +2882,21 @@ exports.getRole = (el) => {
   })) {
     return role;
   }
-  return allowed(el).implicit[0] || null;
+  return exports.allowed(el).implicit[0] || null;
 };
 
 /**
  * Does an element have a role. This will test against abstract roles
  * @param {Element|String} target
- * @param {String} name
+ * @param {String|String[]} name
  * @returns {Boolean}
  */
 exports.hasRole = (target, name) => {
-  const actualRole = target instanceof Element ? exports.getRole(target) : target;
+  const actualRole = target instanceof HTMLElement ? exports.getRole(target) : target;
   if (!actualRole) {
     return false;
   }
-  return [name].some(function hasRole(checkRole) {
+  return [].concat(name).some(function hasRole(checkRole) {
     if (checkRole === actualRole) {
       return true;
     }
@@ -2585,50 +2904,37 @@ exports.hasRole = (target, name) => {
   });
 };
 
-},{"../config":4}],49:[function(require,module,exports){
-"use strict";
 /**
- * Caching for element values
+ * Find the closest element with the specified role(s)
+ * @param {Element} el
+ * @param {String|String[]} role
+ * @returns {Boolean}
  */
-/* eslint-disable class-methods-use-this */
-
-function getOrSet(cache, key, setter) {
-  if (cache.has(key)) {
-    return cache.get(key);
+exports.closestRole = (el, role) => {
+  const roles = [].concat(role);
+  let cursor = el;
+  while ((cursor = cursor.parentNode) && cursor instanceof HTMLElement) {
+    // eslint-disable-next-line no-loop-func
+    if (roles.some(name => exports.hasRole(cursor, name))) {
+      return cursor;
+    }
   }
-  const value = setter();
-  cache.set(key, value);
-  return value;
-}
-
-module.exports = class Cache {
-  constructor() {
-    this.cache = new Map();
-  }
-
-  /**
-   * Generate a key from the options supplied to key
-   */
-  key(el, key) {
-    return key;
-  }
-
-  setter() {
-    throw new Error('unimplemented');
-  }
-
-  /**
-   *  Get a value
-   *  @param {Object} el A key to cache against
-   */
-  get(el) {
-    const optionsKey = this.key.apply(this, arguments);
-    const cache = getOrSet(this.cache, optionsKey, () => new WeakMap());
-    return getOrSet(cache, el, () => this.setter.apply(this, arguments));
-  }
+  return null;
 };
 
-},{}],50:[function(require,module,exports){
+exports.rolesOfType = (name) => {
+  const roles = new ExtendedArray();
+  const role = config.roles[name];
+  if (!role.abstract) {
+    roles.push(name);
+  }
+  if (role.subclass) {
+    roles.push(role.subclass.map(exports.rolesOfType));
+  }
+  return roles.flatten();
+};
+
+},{"../config":4,"../support/extended-array":12}],15:[function(require,module,exports){
 "use strict";
 // Luminosity calculation
 /* eslint-disable class-methods-use-this */
@@ -2774,20 +3080,20 @@ module.exports.prototype._luminosity = luminosity;
 module.exports.prototype._colourParts = colourParts;
 module.exports.prototype._contrastRatio = contrastRatio;
 
-},{}],51:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 "use strict";
 module.exports = function cssEscape(name) {
   return name.replace(/["\\]/g, '\\$&');
 };
 
-},{}],52:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 "use strict";
 /**
  *  Determine if an element is hidden or not
  */
 /* eslint-disable class-methods-use-this */
 
-const Cache = require('./cache');
+const ElementCache = require('../support/element-cache');
 
 // Is the element hidden using CSS
 function cssHidden(el, style) {
@@ -2795,43 +3101,43 @@ function cssHidden(el, style) {
 }
 
 // Is the element hidden from accessibility software
-function hidden(el, style, noAria = false) {
+function hidden(el, style, ariaHidden = false) {
   if (el === document) {
     return false;
   }
-  return (!noAria && el.getAttribute('aria-hidden') === 'true')
+  return (ariaHidden && el.getAttribute('aria-hidden') === 'true')
     || el.getClientRects().length === 0
-    || (!noAria && !!el.closest('[aria-hidden=true]'))
+    || (ariaHidden && !!el.closest('[aria-hidden=true]'))
     || cssHidden(el, style);
 }
 
 /**
  *  Cache of hidden element
  */
-module.exports = class HiddenCache extends Cache {
+module.exports = class Hidden extends ElementCache {
   constructor(style) {
     super();
     this.style = style;
   }
 
-  key(el, { noAria = false } = {}) {
-    return noAria;
+  key(el, { ariaHidden = false } = {}) {
+    return ariaHidden;
   }
 
-  setter(el, { noAria = false } = {}) {
-    return hidden(el, this.style, noAria);
+  setter(el, { ariaHidden = false } = {}) {
+    return hidden(el, this.style, ariaHidden);
   }
 };
 
-},{"./cache":49}],53:[function(require,module,exports){
+},{"../support/element-cache":11}],18:[function(require,module,exports){
 "use strict";
 const { $, $$ } = require('./selectors');
 const { accessibleName, accessibleDescription } = require('./name');
 const aria = require('./aria');
 const Contrast = require('./contrast');
 const cssEscape = require('./cssEscape');
-const HiddenCache = require('./hidden-cache');
-const StyleCache = require('./style-cache');
+const Hidden = require('./hidden');
+const Style = require('./style');
 
 const getOrSet = (cache, el, setter) => {
   if (cache.has(el)) {
@@ -2848,24 +3154,24 @@ const getOrSet = (cache, el, setter) => {
  */
 const Utils = class Utils {
   constructor() {
-    this.styleCache = new StyleCache();
-    this.hiddenCache = new HiddenCache(this.styleCache);
-    this.nameCache = new WeakMap();
-    this.descriptionCache = new WeakMap();
-    this.contrast = new Contrast(this.styleCache);
+    this._style = new Style();
+    this._hidden = new Hidden(this._style);
+    this._nameCache = new WeakMap();
+    this._descriptionCache = new WeakMap();
+    this.contrast = new Contrast(this._style);
   }
 
   hidden(el, options) {
-    return this.hiddenCache.get(el, options);
+    return this._hidden.get(el, options);
   }
 
   style(el, name, pseudo) {
-    return this.styleCache.get(el, name, pseudo);
+    return this._style.get(el, name, pseudo);
   }
 
   accessibleName(el) {
     return getOrSet(
-      this.nameCache,
+      this._nameCache,
       el,
       () => accessibleName(el, Object.assign({ utils: this }))
     );
@@ -2873,7 +3179,7 @@ const Utils = class Utils {
 
   accessibleDescription(el) {
     return getOrSet(
-      this.nameCache,
+      this._descriptionCache,
       el,
       () => accessibleDescription(el, Object.assign({ utils: this }))
     );
@@ -2887,7 +3193,7 @@ Utils.prototype.cssEscape = cssEscape;
 
 module.exports = Utils;
 
-},{"./aria":48,"./contrast":50,"./cssEscape":51,"./hidden-cache":52,"./name":54,"./selectors":55,"./style-cache":56}],54:[function(require,module,exports){
+},{"./aria":14,"./contrast":15,"./cssEscape":16,"./hidden":17,"./name":19,"./selectors":20,"./style":21}],19:[function(require,module,exports){
 "use strict";
 // An implementation of the text alternative computation
 // https://www.w3.org/TR/accname-aam-1.1/#mapping_additional_nd_te
@@ -2952,7 +3258,7 @@ class AccessibleName {
     if (this.includeHidden) {
       return null;
     }
-    const isHidden = this.utils.hidden(this.el);
+    const isHidden = this.utils.hidden(this.el, { ariaHidden: true });
     if (this.allowHidden && isHidden) {
       this.includeHidden = true;
       return null;
@@ -2989,9 +3295,12 @@ class AccessibleName {
 
     const element = config.elements[this.nodeName];
     if (element && element[prop]) {
-      const value = element[prop](this.el, this.utils);
+      let value = element[prop](this.el, this.utils);
       if (typeof value === 'string') {
         return value;
+      }
+      if (value instanceof HTMLElement) {
+        value = [value];
       }
       if (Array.isArray(value)) {
         return value
@@ -3098,7 +3407,7 @@ class AccessibleDescription extends AccessibleName {
       return null;
     }
 
-    if (this.utils.hidden(this.el)) {
+    if (this.utils.hidden(this.el, { ariaHidden: true })) {
       return '';
     }
 
@@ -3114,11 +3423,13 @@ class AccessibleDescription extends AccessibleName {
 exports.accessibleName = (el, options) => new AccessibleName(el, options).build();
 exports.accessibleDescription = (el, options) => new AccessibleDescription(el, options).build();
 
-},{"../config":4,"./aria":48,"./selectors":55}],55:[function(require,module,exports){
+},{"../config":4,"./aria":14,"./selectors":20}],20:[function(require,module,exports){
 "use strict";
+const ExtendedArray = require('../support/extended-array');
+
 exports.$$ = function $$(selector, context) {
   const root = context || document;
-  const els = Array.from(root.querySelectorAll(selector));
+  const els = ExtendedArray.from(root.querySelectorAll(selector));
   if (context && context instanceof Element && context.matches(selector)) {
     els.push(context);
   }
@@ -3129,19 +3440,19 @@ exports.$ = function $(selector, context) {
   return exports.$$(selector, context)[0];
 };
 
-},{}],56:[function(require,module,exports){
+},{"../support/extended-array":12}],21:[function(require,module,exports){
 "use strict";
 /**
  * A cache of computed style properties
  */
 /* eslint-disable class-methods-use-this */
-const Cache = require('./cache');
+const ElementCache = require('../support/element-cache');
 
 function getStyle(el, name, pseudo) {
   return window.getComputedStyle(el, pseudo ? `::${pseudo}` : null)[name];
 }
 
-module.exports = class StyleCache extends Cache {
+module.exports = class Style extends ElementCache {
   key(el, name, pseudo) {
     return `${name}~${pseudo}`;
   }
@@ -3151,6 +3462,6 @@ module.exports = class StyleCache extends Cache {
   }
 };
 
-},{"./cache":49}]},{},["./rules","./version",6])(6)
+},{"../support/element-cache":11}]},{},["./rules/aria/attribute-values/rule.js","./rules/aria/deprecated-attributes/rule.js","./rules/aria/immutable-role/rule.js","./rules/aria/invalid-attributes/rule.js","./rules/aria/landmark/one-banner/rule.js","./rules/aria/landmark/one-contentinfo/rule.js","./rules/aria/landmark/one-main/rule.js","./rules/aria/landmark/prefer-main/rule.js","./rules/aria/no-focusable-hidden/rule.js","./rules/aria/no-focusable-role-none/rule.js","./rules/aria/no-none-without-presentation/rule.js","./rules/aria/one-role/rule.js","./rules/aria/roles/rule.js","./rules/colour-contrast/aa/rule.js","./rules/colour-contrast/aaa/rule.js","./rules/data-attributes/rule.js","./rules/elements/obsolete/rule.js","./rules/elements/unknown/rule.js","./rules/fieldset-has-legend/rule.js","./rules/headings/rule.js","./rules/ids/form-attribute/rule.js","./rules/ids/imagemap-ids/rule.js","./rules/ids/labels-have-inputs/rule.js","./rules/ids/list-id/rule.js","./rules/ids/no-duplicate-anchor-names/rule.js","./rules/ids/unique-id/rule.js","./rules/labels/area/rule.js","./rules/labels/aria-command/rule.js","./rules/labels/controls/rule.js","./rules/labels/group/rule.js","./rules/labels/headings/rule.js","./rules/labels/img/rule.js","./rules/labels/links/rule.js","./rules/labels/tabindex/rule.js","./rules/lang/rule.js","./rules/legend-has-fieldset/rule.js","./rules/multiple-in-group/rule.js","./rules/no-button-without-type/rule.js","./rules/no-empty-select/rule.js","./rules/no-links-as-buttons/rule.js","./rules/no-links-to-missing-fragments/rule.js","./rules/no-multiple-select/rule.js","./rules/no-outside-controls/rule.js","./rules/no-reset/rule.js","./rules/no-unassociated-labels/rule.js","./rules/title/rule.js","./rules","./version",6])(6)
 });
 //# sourceMappingURL=umd.js.map
