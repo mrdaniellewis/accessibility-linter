@@ -1,37 +1,15 @@
 (function () {
-  // Run an assertion after a DOM modification has completed
-  // Remove any DOM modifications once completed
-  // Usage
-  // it('does stuff', when(() => change DOM...).then(() => run tests...))
-  window.when = function when(setup, global = window) {
-    return {
-      setup,
+  // -------------------------------------
+  // Make before/after names more explicit
+  // -------------------------------------
+  window.beforeAll = before;
+  window.afterAll = after;
+  window.before = () => { throw new Error('use `beforeAll`'); };
+  window.after = () => { throw new Error('use `afterAll`'); };
 
-      global,
-
-      then(test) {
-        this.test = test;
-        return this.run.bind(this);
-      },
-
-      run() {
-        return new Promise((resolve) => {
-          const observer = new MutationObserver((mutations) => {
-            observer.disconnect();
-            resolve(mutations);
-          });
-          observer.observe(
-            global.document,
-            { subtree: true, childList: true, attributes: true, characterData: true }
-          );
-          this.setup();
-        })
-        .then(this.test);
-      },
-    };
-  };
-
+  // -------------------------------------
   // A test logger that just saves the log messages
+  // -------------------------------------
   window.TestLogger = class {
     constructor() {
       this.clear();
@@ -47,8 +25,11 @@
     }
   };
 
-  // Assertions for the logger
+  // -------------------------------------
+  // Custom assertions
+  // -------------------------------------
   expect.extend({
+    // Test logger to have no entries
     toNotHaveEntries() {
       expect.assert(
         this.actual.errors.length === 0 && this.actual.warnings.length === 0,
@@ -58,7 +39,8 @@
       return this;
     },
 
-    toHaveEntries() {
+    // Test logger to have errors
+    toHaveErrors() {
       if (arguments.length === 0) {
         expect.assert(
           this.actual.errors.length > 0,
@@ -71,6 +53,7 @@
       return this;
     },
 
+    // Test logger to have warnings
     toHaveWarnings() {
       if (arguments.length === 0) {
         expect.assert(
@@ -84,6 +67,7 @@
       return this;
     },
 
+    // Like toEqual, but tells you what is wrong
     toMatchArray(array) {
       try {
         expect(this.actual.sort()).toEqual(array.sort());
@@ -99,27 +83,77 @@
       return this;
     },
 
+    // Matches the arguments in each call made to a spy
     toHaveHadCalls() {
       expect(this.actual.calls.map(call => call.arguments)).toEqual(Array.from(arguments));
       return this;
     },
   });
 
+  // -------------------------------------
+  // Ensure each test has assertions
+  // -------------------------------------
+  let hasAssertions = false;
+  const originalExpect = expect;
+  Object.defineProperty(window, 'expect', {
+    get() {
+      hasAssertions = true;
+      return originalExpect;
+    },
+    enumerable: true,
+  });
+
+  beforeEach(() => {
+    hasAssertions = false;
+  });
+
+  afterEach(function () {
+    if (!hasAssertions) {
+      this.test.error(new Error('test has no assertions'));
+    }
+  });
+
+  // -------------------------------------
+  // Clean up spies
+  // -------------------------------------
+  afterEach(() => {
+    expect.restoreSpies();
+  });
+
+  // -------------------------------------
   // Clean up created elements between tests
-  window.clean = () => {
+  // -------------------------------------
+  window.whenDomUpdates = null;
+  window.clean = (context = () => window) => {
     let cleaner;
 
-    before(() => {
-      cleaner = domCleaner({ exclude: '#mocha *' });
+    beforeAll(() => {
+      cleaner = context().domCleaner({ exclude: '#mocha *' });
     });
 
-    afterEach(() => Promise.resolve().then(() => cleaner.clean()));
+    beforeEach(() => {
+      window.whenDomUpdates = function (fn) {
+        return new Promise(resolve => cleaner.onUpdate(resolve))
+          .then(fn);
+      };
+    });
 
-    after(() => {
+    afterEach(() => {
+      window.whenDomUpdates = null;
+      return Promise.resolve().then(() => cleaner.clean());
+    });
+
+    afterAll(() => {
       cleaner.stop();
     });
   };
 
+  // -------------------------------------
+  // Swap an object property for the duration of a test
+  //
+  // proxy(fn => fn(object, propertyName, newValue));
+  //
+  // -------------------------------------
   window.proxy = function (fn) {
     let ob, prop, originalValue;
 
@@ -137,7 +171,66 @@
     });
   };
 
-  afterEach(() => {
-    expect.restoreSpies();
-  });
+  // -------------------------------------
+  // Asynchronously load scripts and tests
+  // -------------------------------------
+  window.requireScript = function (url) {
+    return fetch(url)
+      .then((response) => {
+        if (response.ok) {
+          return response.text();
+        }
+        throw new Error(`${url} returned ${response.status}`);
+      });
+  };
+
+  window.requireModule = function (url) {
+    const module = { exports: {} };
+    return requireScript(url)
+      .then((content) => {
+        // eslint-disable-next-line no-new-func
+        new Function('module', 'exports', content)(module, module.exports);
+        return module.exports;
+      });
+  };
+
+  window.loadingTests = [];
+  Mocha.Suite.prototype.requireTests = function requireTests(url, run) {
+    run = run || (content => new Function(content)()); // eslint-disable-line no-new-func
+
+    const loading = requireScript(url)
+      .then((content) => {
+        const stack = [this];
+        const hooks = ['beforeAll', 'beforeEach', 'afterAll', 'afterEach', 'describe', 'context', 'it'];
+        const oldHooks = {};
+        hooks.forEach(name => (oldHooks[name] = window[name]));
+
+        window.describe = window.context = (title, fn) => {
+          const block = new Mocha.Suite(title);
+          stack[0].addSuite(block);
+          stack.unshift(block);
+          fn();
+          stack.shift();
+        };
+
+        window.it = (title, fn) => {
+          stack[0].addTest(new Mocha.Test(title, fn));
+        };
+
+        ['beforeAll', 'beforeEach', 'afterAll', 'afterEach'].forEach((name) => {
+          window[name] = fn => stack[0][name](fn);
+        });
+
+        run(content);
+
+        hooks.forEach(name => (oldHooks[name] = oldHooks[name]));
+      })
+      .catch((e) => {
+        this.beforeAll(() => {
+          throw new Error(`cannot load ${url}: ${e}`);
+        });
+      });
+
+    window.loadingTests.push(loading);
+  };
 }());

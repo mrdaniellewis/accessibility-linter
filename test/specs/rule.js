@@ -13,12 +13,6 @@ describe('Rule', () => {
     });
   });
 
-  describe('#includeHidden', () => {
-    it('defaults to false', () => {
-      expect(new Rule().includeHidden).toEqual(false);
-    });
-  });
-
   describe('#enabled', () => {
     it('defaults to true', () => {
       expect(new Rule().enabled).toEqual(true);
@@ -26,12 +20,11 @@ describe('Rule', () => {
   });
 
   describe('custom settings', () => {
-    before(() => {
+    beforeAll(() => {
       Test = class extends Rule {
         setDefaults() {
           this.enabled = false;
           this.type = 'warn';
-          this.includeHidden = true;
           this.foo = 'bar';
         }
       };
@@ -42,7 +35,6 @@ describe('Rule', () => {
         const test = new Test();
         expect(test.enabled).toEqual(false);
         expect(test.type).toEqual('warn');
-        expect(test.includeHidden).toEqual(true);
         expect(test.foo).toEqual('bar');
       });
     });
@@ -52,12 +44,10 @@ describe('Rule', () => {
         const test = new Test({
           enabled: true,
           type: 'error',
-          includeHidden: false,
           foo: 'thumb',
         });
         expect(test.enabled).toEqual(true);
         expect(test.type).toEqual('error');
-        expect(test.includeHidden).toEqual(false);
         expect(test.foo).toEqual('thumb');
       });
     });
@@ -72,7 +62,7 @@ describe('Rule', () => {
       utils = new AccessibilityLinter.Utils();
     });
 
-    before(() => {
+    beforeAll(() => {
       Test = class extends Rule {
         selector() {
           return 'foo,bar';
@@ -116,38 +106,12 @@ describe('Rule', () => {
       });
     });
 
-    describe('#select', () => {
-      it('can be overridden to return arbitrary elements', () => {
-        appendToBody('<foo />');
-        const thumb = appendToBody('<thumb />');
+    describe('#selector', () => {
+      it('is passed utils', () => {
         const test = new Test();
-        test.select = function () {
-          return [thumb];
-        };
-        const spy = expect.spyOn(test, 'test');
-        test.run(null, () => true, utils);
-
-        expect(spy).toHaveHadCalls([thumb, utils]);
-      });
-    });
-
-    describe('#includeHidden', () => {
-      it('filters hidden elements when false', () => {
-        appendToBody('<foo aria-hidden="true" />');
-        const test = new Test({ includeHidden: false });
-        const spy = expect.spyOn(test, 'test');
-        test.run(null, () => true, utils);
-
-        expect(spy).toNotHaveBeenCalled();
-      });
-
-      it('does not filter hidden elements when true', () => {
-        const foo = appendToBody('<foo aria-hidden="true" />');
-        const test = new Test({ includeHidden: true });
-        const spy = expect.spyOn(test, 'test');
-        test.run(null, () => true, utils);
-
-        expect(spy).toHaveHadCalls([foo, utils]);
+        const spy = expect.spyOn(test, 'selector');
+        test.run(document, () => true, utils);
+        expect(spy).toHaveHadCalls([utils]);
       });
     });
 

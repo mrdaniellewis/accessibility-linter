@@ -3,18 +3,23 @@
     "mocha": true
   },
   "globals": {
-    "expect": false,
-    "$": false,
-    "when": false,
     "AccessibilityLinter": false,
-    "TestLogger": false,
-    "ruleSpecs": false,
+    "afterAll": false,
     "appendToBody": false,
-    "domCleaner": false,
-    "build": false,
+    "beforeAll": false,
+    "buildHtml": false,
     "clean": false,
+    "domCleaner": false,
+    "expect": false,
+    "Mocha": false,
+    "proxy": false,
+    "requireModule": false,
+    "requireScript": false,
+    "requireTests": false,
+    "ruleSpecs": false,
+    "TestLogger": false,
     "uniqueId": false,
-    "proxy": false
+    "whenDomUpdates": false
   },
   "rules": {
     "prefer-arrow-callback": 0,

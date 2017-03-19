@@ -1,9 +1,9 @@
 // Rules are run in an iframe so mocha display does not interfere
 describe('rules', () => {
-  const context = { when };
+  const context = {};
   let frame;
 
-  before((done) => {
+  beforeAll((done) => {
     frame = document.createElement('iframe');
     frame.src = 'frame.htm';
     frame.style = 'border: 0; height: 0; width: 0;';
@@ -11,16 +11,17 @@ describe('rules', () => {
     frame.contentWindow.addEventListener('load', () => done());
   });
 
-  after(() => {
+  afterAll(() => {
     frame.remove();
   });
 
-  ruleSpecs.forEach((spec, name) => {
-    let window, linter, Rule, rules, cleaner, iframeError;
+  AccessibilityLinter[Symbol.for('accessibility-linter.rule-sources')].forEach((path) => {
+    let window, linter, Rule, rules, iframeError;
+    const name = path.replace(/\//g, '-');
 
     // Make sure everything is setup using the iFrame versions
-    describe(name, () => {
-      before(() => {
+    describe(name, function () {
+      beforeAll(() => {
         window = context.window = frame.contentWindow;
         context.document = window.document;
         Rule = context.Rule = window.AccessibilityLinter.rules.get(name);
@@ -33,6 +34,8 @@ describe('rules', () => {
         };
       });
 
+      clean(() => window);
+
       beforeEach(() => {
         iframeError = false;
         const logger = context.logger = new TestLogger();
@@ -42,40 +45,37 @@ describe('rules', () => {
           ruleSettings: { [name]: { enabled: true, type: 'error' } },
         });
         linter.observe();
-        cleaner = window.domCleaner();
       });
 
       // Execute in a promise so it runs next tick after any dom mutations
       afterEach(() => Promise.resolve().then(() => {
         linter.stopObserving();
         linter = null;
-        cleaner.stop();
-        cleaner.clean();
-        cleaner = null;
         if (iframeError) {
           throw new Error('script error in iframe - see browser log');
         }
       }));
 
-      // eslint-disable-next-line no-new-func
-      new Function(`
-        let el, el2, Rule, logger, linter, window, document, $, appendToBody, location;
-        const when = fn => this.when(fn, this);
+      this.requireTests(`../lib/rules/${path}/spec.js`, (content) => {
+        // eslint-disable-next-line no-new-func
+        new Function(`
+          let Rule, logger, linter, window, document, $, appendToBody, location;
 
-        before(() => {
-          ({ window, document, window: { $, appendToBody, location } } = this);
-        });
+          beforeAll(() => {
+            ({ window, document, window: { $, appendToBody, location } } = this);
+          });
 
-        beforeEach(() => {
-          ({Rule, logger, linter} = this);
-        });
+          beforeEach(() => {
+            ({Rule, logger, linter} = this);
+          });
 
-        afterEach(() => {
-          el = el2 = Rule = logger = linter = null;
-        });
+          afterEach(() => {
+            Rule = logger = linter = null;
+          });
 
-        ${spec.toString().replace(/^function\s*\(\)\s*{/, '').replace(/}$/, '')}
-      `).call(context);
+          ${content}
+        `).call(context);
+      });
     });
   });
 });
