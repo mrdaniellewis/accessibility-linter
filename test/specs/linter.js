@@ -342,57 +342,91 @@ describe('AccessibilityLinter', () => {
       linter.stopObserving();
     });
 
-    it('finds errors when nodes are added to the DOM', () => {
-      linter.observe();
-      appendToBody('<foo />');
-      return whenDomUpdates(() => {
-        expect(spy).toHaveBeenCalledWith(document.body);
-        expect(logger).toHaveErrors();
+    context('DOM changes', () => {
+      it('finds errors when nodes are added to the DOM', () => {
+        linter.observe();
+        appendToBody('<foo />');
+        return whenDomUpdates(() => {
+          expect(spy).toHaveBeenCalledWith(document.body);
+          expect(logger).toHaveErrors();
+        });
+      });
+
+      it('finds errors when DOM attributes are changed', () => {
+        const el = appendToBody('<foo />');
+        linter.observe();
+        el.title = 'foo';
+        return whenDomUpdates(() => {
+          expect(spy).toHaveBeenCalledWith(document.body);
+          expect(logger).toHaveErrors();
+        });
+      });
+
+      it('finds errors when text nodes are changed', () => {
+        const el = appendToBody('<foo />');
+        linter.observe();
+        el.textContent = 'foo';
+        return whenDomUpdates(() => {
+          expect(spy).toHaveBeenCalledWith(el);
+          expect(logger).toHaveErrors();
+        });
+      });
+
+      it('only tests against each DOM element once', () => {
+        linter.observe();
+        const el = appendToBody('<foo />');
+        appendToBody('<foo />');
+        el2 = document.createElement('foo');
+        el.appendChild(el2);
+        el.textContent = 'foo';
+        return whenDomUpdates(() => {
+          expect(spy).toHaveBeenCalledWith(document.body);
+          expect(logger).toHaveErrors();
+        });
+      });
+
+      it('does not test disconnected nodes', () => {
+        const el = appendToBody('<foo />');
+        linter.observe();
+        el.classList.add('foo');
+        el.remove();
+        return whenDomUpdates(() => {
+          expect(logger).toNotHaveEntries();
+        });
+      });
+
+      it('does not test disconnected node parents', () => {
+        // As the test act on a parent, we need to disconnect the parent
+        const container = appendToBody('<div />');
+        linter.observe();
+        const el = document.createElement('foo');
+        container.appendChild(el);
+        container.remove();
+        return whenDomUpdates(() => {
+          expect(logger).toNotHaveEntries();
+        });
       });
     });
 
-    it('finds errors when DOM attributes are changed', () => {
-      const el = appendToBody('<foo />');
-      linter.observe();
-      el.title = 'foo';
-      return whenDomUpdates(() => {
-        expect(spy).toHaveBeenCalledWith(document.body);
-        expect(logger).toHaveErrors();
-      });
-    });
+    context('focus', () => {
+      it('finds errors on focused elements', () => {
+        const el = appendToBody('<foo />');
+        linter.observe();
+        el.dispatchEvent(new Event('focus'));
 
-    it('finds errors when text nodes are changed', () => {
-      const el = appendToBody('<foo />');
-      linter.observe();
-      el.textContent = 'foo';
-      return whenDomUpdates(() => {
-        expect(spy).toHaveBeenCalledWith(el);
-        expect(logger).toHaveErrors();
+        return afterTimeout(() => {
+          expect(logger).toHaveErrors();
+        }, 0);
       });
-    });
 
-    it('only tests against each DOM element once', () => {
-      linter.observe();
-      const el = appendToBody('<foo />');
-      appendToBody('<foo />');
-      el2 = document.createElement('foo');
-      el.appendChild(el2);
-      el.textContent = 'foo';
-      return whenDomUpdates(() => {
-        expect(spy).toHaveBeenCalledWith(document.body);
-        expect(logger).toHaveErrors();
-      });
-    });
+      it('finds errors on blurred elements', () => {
+        const el = appendToBody('<foo />');
+        linter.observe();
+        el.dispatchEvent(new Event('blur'));
 
-    it('does not test disconnected nodes', () => {
-      // As the test act on a parent, we need to disconnect the parent
-      const container = appendToBody('<div />');
-      linter.observe();
-      const el = document.createElement('foo');
-      container.appendChild(el);
-      container.remove();
-      return whenDomUpdates(() => {
-        expect(logger).toNotHaveEntries();
+        return afterTimeout(() => {
+          expect(logger).toHaveErrors();
+        }, 0);
       });
     });
 
@@ -406,6 +440,28 @@ describe('AccessibilityLinter', () => {
         linter.stopObserving();
         appendToBody('<foo />');
         return whenDomUpdates(() => {
+          expect(logger).toNotHaveEntries();
+        });
+      });
+
+      it('stops finding errors on focus', () => {
+        const el = appendToBody('<foo />');
+        linter.observe();
+        linter.stopObserving();
+        el.dispatchEvent(new Event('focus'));
+
+        return afterTimeout(() => {
+          expect(logger).toNotHaveEntries();
+        });
+      });
+
+      it('stops finding errors on blur', () => {
+        const el = appendToBody('<foo />');
+        linter.observe();
+        linter.stopObserving();
+        el.dispatchEvent(new Event('blur'));
+
+        return afterTimeout(() => {
           expect(logger).toNotHaveEntries();
         });
       });

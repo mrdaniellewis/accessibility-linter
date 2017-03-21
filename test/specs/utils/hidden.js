@@ -19,7 +19,7 @@ describe('#hidden', () => {
 
   it('is true for elements that have a parent set to display: none', () => {
     const el = appendToBody('<div style="display: none"><p>foo</p></div>');
-    expect(utils.hidden(utils.$('p', el))).toEqual(true);
+    expect(utils.hidden(el.querySelector('p'))).toEqual(true);
   });
 
   it('is true for elements that are visibility: hidden', () => {
@@ -29,7 +29,7 @@ describe('#hidden', () => {
 
   it('is true for elements that have a parent set to visibility: hidden', () => {
     const el = appendToBody('<div style="visibility: hidden"><p>foo</p></div>');
-    expect(utils.hidden(utils.$('p', el))).toEqual(true);
+    expect(utils.hidden(el.querySelector('p'))).toEqual(true);
   });
 
   it('is true for elements that are visibility: collapse', () => {
@@ -39,7 +39,19 @@ describe('#hidden', () => {
 
   it('is true for elements that have a parent set to visibility: collapse', () => {
     const el = appendToBody('<div style="visibility: collapse"><p>foo</p></div>');
-    expect(utils.hidden(utils.$('p', el))).toEqual(true);
+    expect(utils.hidden(el.querySelector('p'))).toEqual(true);
+  });
+
+  ['br', 'wbr'].forEach((name) => {
+    it(`is false for a visible ${name}`, () => {
+      const el = appendToBody(`<${name} />`);
+      expect(utils.hidden(el)).toEqual(false);
+    });
+
+    it(`is true for a hidden ${name}`, () => {
+      const el = appendToBody(`<div style="display: none"><${name} /></div>`);
+      expect(utils.hidden(el.querySelector(name))).toEqual(false);
+    });
   });
 
   it('is false for document', () => {

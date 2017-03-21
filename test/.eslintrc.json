@@ -5,6 +5,7 @@
   "globals": {
     "AccessibilityLinter": false,
     "afterAll": false,
+    "afterTimeout": false,
     "appendToBody": false,
     "beforeAll": false,
     "buildHtml": false,
