@@ -91,6 +91,11 @@
   });
 
   // -------------------------------------
+  // Turn a timeout into a promise
+  // -------------------------------------
+  window.afterTimeout = fn => new Promise(resolve => resolve(fn()));
+
+  // -------------------------------------
   // Ensure each test has assertions
   // -------------------------------------
   let hasAssertions = false;
