@@ -165,7 +165,7 @@
             const state = e.target.querySelectorAll('[name="rule-state"]')[i].value;
             settings.ruleSettings[item.value] = {
               whitelist: e.target.querySelectorAll('[name="rule-whitelist"]')[i].value.trim() || undefined,
-              enable: state !== 'off',
+              enabled: state !== 'off',
               type: state !== 'off' && state || undefined,
             };
           });

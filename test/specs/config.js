@@ -368,7 +368,7 @@ describe('config', () => {
     });
 
     describe('native text alternatives', () => {
-      const hasNativeLabel = ['area', 'button', 'fieldset', 'img', 'input', 'meter', 'output', 'progress', 'select', 'textarea'];
+      const hasNativeLabel = ['area', 'button', 'details', 'fieldset', 'img', 'input', 'meter', 'output', 'progress', 'select', 'textarea'];
       const hasNativeDescription = [];
 
       describe('elements have no native label', () => {
@@ -514,6 +514,26 @@ describe('config', () => {
               <p>foe thumb</p>
             </fieldset>`);
             expect(elements.fieldset.nativeLabel(el, utils)).toEqual(null);
+          });
+        });
+
+        describe('<details>', () => {
+          it('uses the first summary as the native text alternative', () => {
+            const el = appendToBody(`<details>
+              <summary>foo</summary>
+              <summary>bar</summary>
+              <p>foe thumb</p>
+            </details>`);
+            expect(elements.details.nativeLabel(el, utils)).toEqual(el.querySelector('summary'));
+          });
+
+          it('returns null if the legend is hidden', () => {
+            const el = appendToBody(`<details>
+              <summary aria-hidden="true">foo</summary>
+              <summary>bar</summary>
+              <p>foe thumb</p>
+            </details>`);
+            expect(elements.details.nativeLabel(el, utils)).toEqual(null);
           });
         });
       });

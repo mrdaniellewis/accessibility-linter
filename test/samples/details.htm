@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en-gb">
+<head>
+  <meta charset="utf-8" />
+  <title>Details test</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    details:not([open]) > *:not(summary) {
+      display: none;
+    }
+
+    .details:not([open]) > *:not(.summary) {
+      display: none;
+    }
+  </style>
+
+  <script>
+    function toggleDetails(el) {
+      const details = el.closest('details, .details');
+      const open = el.getAttribute('aria-expanded') === 'true';
+
+      if (!(details instanceof HTMLDetailsElement)) {
+        if (open) {
+          details.removeAttribute('open');
+        } else {
+          details.setAttribute('open', '');
+        }
+      }
+      el.setAttribute('aria-expanded', open ? 'false' : 'true');
+    }
+  </script>
+<body>
+  <header>
+    <h1>Details test</h1>
+    <p>Testing using &lt;details> and &lt;summary> elements to reveal content<p>
+  </header>
+  <main>
+    <section>
+      <header><h2>Details and summary</h2></header>
+      <details>
+        <summary>Legend</summary>
+        <p>Contents</p>
+      </details>
+    </section>
+
+    <section>
+      <header><h2>Details and summary with backup aria</h2></header>
+      <details role="group" id="details-1" aria-labelledby="summary-1">
+        <summary class="summary" id="summary-1" role="button" aria-expanded="false" aria-controls="details-1" tabindex="0" onClick="toggleDetails(this)" onKeyDown="if (event.keyCode === 32) toggleDetails(this)">Legend</summary>
+        <p>Contents</p>
+      </details>
+    </section>
+
+    <section>
+      <header><h2>Using divs and aria</h2></header>
+      <div class="details" role="group" id="details-2" aria-labelledby="summary-2">
+        <div class="summary" id="summary-2" role="button" aria-expanded="false" aria-controls="details-2" tabindex="0" onClick="toggleDetails(this)" onKeyDown="if (event.keyCode === 32) toggleDetails(this)">Legend</div>
+        <p>Contents</p>
+      </div>
+    </section>
+  </main>
+</body>
