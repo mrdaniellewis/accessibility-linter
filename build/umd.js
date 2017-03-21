@@ -256,7 +256,7 @@ module.exports = class extends Rule {
 "use strict";
 const Rule = require('../../rule');
 
-const focusable = ['button', 'input:not([type="hidden"])', 'meter', 'output', 'progress', 'select', 'textarea', 'a[href]', 'area[href]', '[tabindex]'];
+const focusable = ['button:not(:disabled)', 'input:not([type="hidden"]):not(:disabled)', 'select:not(:disabled)', 'textarea:not(:disabled)', 'a[href]', 'area[href]', '[tabindex]'];
 
 module.exports = class extends Rule {
   selector() {
@@ -1018,13 +1018,53 @@ module.exports = class extends Rule {
   }
 };
 
+},{"../rule":8}],"./rules/no-consecutive-brs/rule.js":[function(require,module,exports){
+"use strict";
+const Rule = require('../rule');
+
+function isBr(el) {
+  return el instanceof Element && el.nodeName.toLowerCase() === 'br';
+}
+
+function previousElementIsBr(el, utils) {
+  while ((el = el.previousSibling)) {
+    if ((el instanceof Element && !utils.hidden(el)) || (el instanceof Text && el.data.trim())) {
+      break;
+    }
+  }
+  return isBr(el);
+}
+
+function nextElementIsBr(el, utils) {
+  while ((el = el.nextSibling)) {
+    if ((el instanceof Element && !utils.hidden(el)) || (el instanceof Text && el.data.trim())) {
+      break;
+    }
+  }
+  return isBr(el);
+}
+
+module.exports = class extends Rule {
+  selector() {
+    return 'br + br';
+  }
+
+  test(el, utils) {
+    if (utils.hidden(el) || !previousElementIsBr(el, utils) || nextElementIsBr(el, utils)) {
+      return null;
+    }
+
+    return 'do not use <br>s for spacing';
+  }
+};
+
 },{"../rule":8}],"./rules/no-empty-select/rule.js":[function(require,module,exports){
 "use strict";
 const Rule = require('../rule');
 
 module.exports = class extends Rule {
   selector() {
-    return 'select';
+    return 'select:not(:disabled)';
   }
 
   test(el, utils) {
@@ -1093,10 +1133,13 @@ const Rule = require('../rule');
 
 module.exports = class extends Rule {
   selector() {
-    return 'select[multiple]';
+    return 'select[multiple]:not(:disabled)';
   }
 
-  test() {
+  test(el, utils) {
+    if (utils.hidden(el)) {
+      return null;
+    }
     return 'do not use multiple selects';
   }
 };
@@ -1110,8 +1153,8 @@ module.exports = class extends Rule {
     return 'input,textarea,select,button:not([type]),button[type="submit"],button[type="reset"]';
   }
 
-  test(el) {
-    if (el.form) {
+  test(el, utils) {
+    if (el.form || utils.hidden(el) || el.disabled) {
       return null;
     }
     return 'all controls should be associated with a form';
@@ -1192,10 +1235,10 @@ module.exports = class extends Rule {
 
 },{"../rule":8}],"./rules":[function(require,module,exports){
 "use strict";
-module.exports = ["aria/attribute-values","aria/deprecated-attributes","aria/immutable-role","aria/invalid-attributes","aria/landmark/one-banner","aria/landmark/one-contentinfo","aria/landmark/one-main","aria/landmark/prefer-main","aria/no-focusable-hidden","aria/no-focusable-role-none","aria/no-none-without-presentation","aria/one-role","aria/roles","colour-contrast/aa","colour-contrast/aaa","data-attributes","elements/obsolete","elements/unknown","fieldset-has-legend","headings","ids/form-attribute","ids/imagemap-ids","ids/labels-have-inputs","ids/list-id","ids/no-duplicate-anchor-names","ids/unique-id","labels/area","labels/aria-command","labels/controls","labels/group","labels/headings","labels/img","labels/links","labels/tabindex","lang","legend-has-fieldset","multiple-in-group","no-button-without-type","no-empty-select","no-links-as-buttons","no-links-to-missing-fragments","no-multiple-select","no-outside-controls","no-reset","no-unassociated-labels","title"];
+module.exports = ["aria/attribute-values","aria/deprecated-attributes","aria/immutable-role","aria/invalid-attributes","aria/landmark/one-banner","aria/landmark/one-contentinfo","aria/landmark/one-main","aria/landmark/prefer-main","aria/no-focusable-hidden","aria/no-focusable-role-none","aria/no-none-without-presentation","aria/one-role","aria/roles","colour-contrast/aa","colour-contrast/aaa","data-attributes","elements/obsolete","elements/unknown","fieldset-has-legend","headings","ids/form-attribute","ids/imagemap-ids","ids/labels-have-inputs","ids/list-id","ids/no-duplicate-anchor-names","ids/unique-id","labels/area","labels/aria-command","labels/controls","labels/group","labels/headings","labels/img","labels/links","labels/tabindex","lang","legend-has-fieldset","multiple-in-group","no-button-without-type","no-consecutive-brs","no-empty-select","no-links-as-buttons","no-links-to-missing-fragments","no-multiple-select","no-outside-controls","no-reset","no-unassociated-labels","title"];
 },{}],"./version":[function(require,module,exports){
 "use strict";
-module.exports = "1.7.0"
+module.exports = "1.8.0"
 },{}],1:[function(require,module,exports){
 "use strict";
 /**
@@ -2445,6 +2488,19 @@ const Linter = module.exports = class AccessibilityLinter extends Runner {
    * Start looking for issues
    */
   observe() {
+    this.observeDomChanges();
+    this.observeFocus();
+  }
+
+  /**
+   * Stop looking for issues
+   */
+  stopObserving() {
+    this.stopObservingDomChanges();
+    this.stopObservingFocus();
+  }
+
+  observeDomChanges() {
     this.observer = new MutationObserver((mutations) => {
       // De-duplicate
       const nodes = new Set(mutations.map((record) => {
@@ -2452,7 +2508,8 @@ const Linter = module.exports = class AccessibilityLinter extends Runner {
           return record.target;
         }
         return record.target.parentNode;
-      }));
+      }).filter(Boolean));
+
       // Remove nodes that are children of other nodes
       nodes.forEach((node1) => {
         nodes.forEach((node2) => {
@@ -2479,14 +2536,25 @@ const Linter = module.exports = class AccessibilityLinter extends Runner {
     );
   }
 
-  /**
-   * Stop looking for issues
-   */
-  stopObserving() {
+  stopObservingDomChanges() {
     if (this.observer) {
       this.observer.disconnect();
       this.observer = null;
     }
+  }
+
+  handleEvent(e) {
+    new Promise(resolve => resolve(this.run(e.target))); // eslint-disable-line no-new
+  }
+
+  observeFocus() {
+    document.addEventListener('focus', this, { capture: true, passive: true });
+    document.addEventListener('blur', this, { capture: true, passive: true });
+  }
+
+  stopObservingFocus() {
+    document.removeEventListener('focus', this, { capture: true, passive: true });
+    document.removeEventListener('blur', this, { capture: true, passive: true });
   }
 };
 
@@ -3095,6 +3163,9 @@ module.exports = function cssEscape(name) {
 
 const ElementCache = require('../support/element-cache');
 
+// Elements that don't have client rectangles
+const noRects = ['br', 'wbr'];
+
 // Is the element hidden using CSS
 function cssHidden(el, style) {
   return style.get(el, 'visibility') !== 'visible' || style.get(el, 'display') === 'none';
@@ -3106,7 +3177,7 @@ function hidden(el, style, ariaHidden = false) {
     return false;
   }
   return (ariaHidden && el.getAttribute('aria-hidden') === 'true')
-    || el.getClientRects().length === 0
+    || (!noRects.includes(el.nodeName.toLowerCase()) && el.getClientRects().length === 0)
     || (ariaHidden && !!el.closest('[aria-hidden=true]'))
     || cssHidden(el, style);
 }
@@ -3462,6 +3533,6 @@ module.exports = class Style extends ElementCache {
   }
 };
 
-},{"../support/element-cache":11}]},{},["./rules/aria/attribute-values/rule.js","./rules/aria/deprecated-attributes/rule.js","./rules/aria/immutable-role/rule.js","./rules/aria/invalid-attributes/rule.js","./rules/aria/landmark/one-banner/rule.js","./rules/aria/landmark/one-contentinfo/rule.js","./rules/aria/landmark/one-main/rule.js","./rules/aria/landmark/prefer-main/rule.js","./rules/aria/no-focusable-hidden/rule.js","./rules/aria/no-focusable-role-none/rule.js","./rules/aria/no-none-without-presentation/rule.js","./rules/aria/one-role/rule.js","./rules/aria/roles/rule.js","./rules/colour-contrast/aa/rule.js","./rules/colour-contrast/aaa/rule.js","./rules/data-attributes/rule.js","./rules/elements/obsolete/rule.js","./rules/elements/unknown/rule.js","./rules/fieldset-has-legend/rule.js","./rules/headings/rule.js","./rules/ids/form-attribute/rule.js","./rules/ids/imagemap-ids/rule.js","./rules/ids/labels-have-inputs/rule.js","./rules/ids/list-id/rule.js","./rules/ids/no-duplicate-anchor-names/rule.js","./rules/ids/unique-id/rule.js","./rules/labels/area/rule.js","./rules/labels/aria-command/rule.js","./rules/labels/controls/rule.js","./rules/labels/group/rule.js","./rules/labels/headings/rule.js","./rules/labels/img/rule.js","./rules/labels/links/rule.js","./rules/labels/tabindex/rule.js","./rules/lang/rule.js","./rules/legend-has-fieldset/rule.js","./rules/multiple-in-group/rule.js","./rules/no-button-without-type/rule.js","./rules/no-empty-select/rule.js","./rules/no-links-as-buttons/rule.js","./rules/no-links-to-missing-fragments/rule.js","./rules/no-multiple-select/rule.js","./rules/no-outside-controls/rule.js","./rules/no-reset/rule.js","./rules/no-unassociated-labels/rule.js","./rules/title/rule.js","./rules","./version",6])(6)
+},{"../support/element-cache":11}]},{},["./rules/aria/attribute-values/rule.js","./rules/aria/deprecated-attributes/rule.js","./rules/aria/immutable-role/rule.js","./rules/aria/invalid-attributes/rule.js","./rules/aria/landmark/one-banner/rule.js","./rules/aria/landmark/one-contentinfo/rule.js","./rules/aria/landmark/one-main/rule.js","./rules/aria/landmark/prefer-main/rule.js","./rules/aria/no-focusable-hidden/rule.js","./rules/aria/no-focusable-role-none/rule.js","./rules/aria/no-none-without-presentation/rule.js","./rules/aria/one-role/rule.js","./rules/aria/roles/rule.js","./rules/colour-contrast/aa/rule.js","./rules/colour-contrast/aaa/rule.js","./rules/data-attributes/rule.js","./rules/elements/obsolete/rule.js","./rules/elements/unknown/rule.js","./rules/fieldset-has-legend/rule.js","./rules/headings/rule.js","./rules/ids/form-attribute/rule.js","./rules/ids/imagemap-ids/rule.js","./rules/ids/labels-have-inputs/rule.js","./rules/ids/list-id/rule.js","./rules/ids/no-duplicate-anchor-names/rule.js","./rules/ids/unique-id/rule.js","./rules/labels/area/rule.js","./rules/labels/aria-command/rule.js","./rules/labels/controls/rule.js","./rules/labels/group/rule.js","./rules/labels/headings/rule.js","./rules/labels/img/rule.js","./rules/labels/links/rule.js","./rules/labels/tabindex/rule.js","./rules/lang/rule.js","./rules/legend-has-fieldset/rule.js","./rules/multiple-in-group/rule.js","./rules/no-button-without-type/rule.js","./rules/no-consecutive-brs/rule.js","./rules/no-empty-select/rule.js","./rules/no-links-as-buttons/rule.js","./rules/no-links-to-missing-fragments/rule.js","./rules/no-multiple-select/rule.js","./rules/no-outside-controls/rule.js","./rules/no-reset/rule.js","./rules/no-unassociated-labels/rule.js","./rules/title/rule.js","./rules","./version",6])(6)
 });
 //# sourceMappingURL=umd.js.map
