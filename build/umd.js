@@ -503,7 +503,26 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../rule":8}],"./rules/elements/obsolete/rule.js":[function(require,module,exports){
+},{"../rule":8}],"./rules/details-and-summary/rule.js":[function(require,module,exports){
+"use strict";
+const FieldsetRule = require('../fieldset-and-legend/rule');
+
+module.exports = class extends FieldsetRule {
+  get parent() {
+    return 'details';
+  }
+
+  get child() {
+    return 'summary';
+  }
+
+  isHidden(el, utils) {
+    // summary will be hidden if details is not open
+    return el.nodeName.toLowerCase() !== 'summary' && utils.hidden(el);
+  }
+};
+
+},{"../fieldset-and-legend/rule":"./rules/fieldset-and-legend/rule.js"}],"./rules/elements/obsolete/rule.js":[function(require,module,exports){
 "use strict";
 const Rule = require('../../rule');
 const config = require('../../../config');
@@ -536,21 +555,59 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../../../config":4,"../../rule":8}],"./rules/fieldset-has-legend/rule.js":[function(require,module,exports){
+},{"../../../config":4,"../../rule":8}],"./rules/fieldset-and-legend/rule.js":[function(require,module,exports){
 "use strict";
 const Rule = require('../rule');
 
+function getFirstChild(el) {
+  let cursor = el.firstChild;
+  while (cursor instanceof Text && !cursor.data.trim()) {
+    cursor = cursor.nextSibling;
+  }
+  return cursor;
+}
+
 module.exports = class extends Rule {
-  selector() {
+  get parent() {
     return 'fieldset';
   }
 
-  test(el) {
-    const first = el.firstElementChild;
-    if (first && first.matches('legend')) {
+  get child() {
+    return 'legend';
+  }
+
+  isHidden(el, utils) {
+    return utils.hidden(el);
+  }
+
+  selector() {
+    return `${this.parent},${this.child}`;
+  }
+
+  test(el, utils) {
+    if (this.isHidden(el, utils)) {
       return null;
     }
-    return 'fieldsets must have a legend';
+
+    if (el.nodeName.toLowerCase() === this.parent) {
+      const firstChild = getFirstChild(el);
+      if (firstChild
+        && firstChild instanceof HTMLElement
+        && firstChild.nodeName.toLowerCase() === this.child
+        && !utils.hidden(firstChild)) {
+        return null;
+      }
+      return `a <${this.parent}> must have a visible <${this.child}> as their first child`;
+    }
+
+    // Legend
+    if (el.parentNode.nodeName.toLowerCase() === this.parent) {
+      const firstChild = getFirstChild(el.parentNode);
+      if (firstChild === el) {
+        return null;
+      }
+    }
+    return `a <${this.child}> must be the first child of a <${this.parent}>`;
   }
 };
 
@@ -841,7 +898,7 @@ const Rule = require('../../rule');
 
 module.exports = class extends Rule {
   selector() {
-    return 'fieldset,[role~=group],[role~=radiogroup]';
+    return 'fieldset,details,[role~=group],[role~=radiogroup]';
   }
 
   test(el, utils) {
@@ -850,7 +907,8 @@ module.exports = class extends Rule {
       || utils.accessibleName(el)) {
       return null;
     }
-    return 'fieldsets, groups and radiogroups must have a label';
+    const name = el.matches('fieldset,details') ? el.nodeName.toLowerCase() : utils.aria.getRole(el);
+    return `${name} must have a label`;
   }
 };
 
@@ -946,20 +1004,6 @@ module.exports = class extends Rule {
       return 'language code is invalid';
     }
     return null;
-  }
-};
-
-},{"../rule":8}],"./rules/legend-has-fieldset/rule.js":[function(require,module,exports){
-"use strict";
-const Rule = require('../rule');
-
-module.exports = class extends Rule {
-  selector() {
-    return ':not(fieldset)>legend,fieldset>legend:not(:first-child)';
-  }
-
-  test() {
-    return 'legends must be the first child of a fieldset';
   }
 };
 
@@ -1235,10 +1279,10 @@ module.exports = class extends Rule {
 
 },{"../rule":8}],"./rules":[function(require,module,exports){
 "use strict";
-module.exports = ["aria/attribute-values","aria/deprecated-attributes","aria/immutable-role","aria/invalid-attributes","aria/landmark/one-banner","aria/landmark/one-contentinfo","aria/landmark/one-main","aria/landmark/prefer-main","aria/no-focusable-hidden","aria/no-focusable-role-none","aria/no-none-without-presentation","aria/one-role","aria/roles","colour-contrast/aa","colour-contrast/aaa","data-attributes","elements/obsolete","elements/unknown","fieldset-has-legend","headings","ids/form-attribute","ids/imagemap-ids","ids/labels-have-inputs","ids/list-id","ids/no-duplicate-anchor-names","ids/unique-id","labels/area","labels/aria-command","labels/controls","labels/group","labels/headings","labels/img","labels/links","labels/tabindex","lang","legend-has-fieldset","multiple-in-group","no-button-without-type","no-consecutive-brs","no-empty-select","no-links-as-buttons","no-links-to-missing-fragments","no-multiple-select","no-outside-controls","no-reset","no-unassociated-labels","title"];
+module.exports = ["aria/attribute-values","aria/deprecated-attributes","aria/immutable-role","aria/invalid-attributes","aria/landmark/one-banner","aria/landmark/one-contentinfo","aria/landmark/one-main","aria/landmark/prefer-main","aria/no-focusable-hidden","aria/no-focusable-role-none","aria/no-none-without-presentation","aria/one-role","aria/roles","colour-contrast/aa","colour-contrast/aaa","data-attributes","details-and-summary","elements/obsolete","elements/unknown","fieldset-and-legend","headings","ids/form-attribute","ids/imagemap-ids","ids/labels-have-inputs","ids/list-id","ids/no-duplicate-anchor-names","ids/unique-id","labels/area","labels/aria-command","labels/controls","labels/group","labels/headings","labels/img","labels/links","labels/tabindex","lang","multiple-in-group","no-button-without-type","no-consecutive-brs","no-empty-select","no-links-as-buttons","no-links-to-missing-fragments","no-multiple-select","no-outside-controls","no-reset","no-unassociated-labels","title"];
 },{}],"./version":[function(require,module,exports){
 "use strict";
-module.exports = "1.8.0"
+module.exports = "1.9.0"
 },{}],1:[function(require,module,exports){
 "use strict";
 /**
@@ -1984,7 +2028,15 @@ module.exports = {
   datalist: {},
   dd: {},
   del: {},
-  details: {},
+  details: {
+    nativeLabel(el, utils) {
+      const found = el.querySelector('summary');
+      if (found && utils.hidden(found, { ariaHidden: true })) {
+        return null;
+      }
+      return found;
+    },
+  },
   dfn: {},
   dialog: {},
   dir: obsolete,
@@ -3533,6 +3585,6 @@ module.exports = class Style extends ElementCache {
   }
 };
 
-},{"../support/element-cache":11}]},{},["./rules/aria/attribute-values/rule.js","./rules/aria/deprecated-attributes/rule.js","./rules/aria/immutable-role/rule.js","./rules/aria/invalid-attributes/rule.js","./rules/aria/landmark/one-banner/rule.js","./rules/aria/landmark/one-contentinfo/rule.js","./rules/aria/landmark/one-main/rule.js","./rules/aria/landmark/prefer-main/rule.js","./rules/aria/no-focusable-hidden/rule.js","./rules/aria/no-focusable-role-none/rule.js","./rules/aria/no-none-without-presentation/rule.js","./rules/aria/one-role/rule.js","./rules/aria/roles/rule.js","./rules/colour-contrast/aa/rule.js","./rules/colour-contrast/aaa/rule.js","./rules/data-attributes/rule.js","./rules/elements/obsolete/rule.js","./rules/elements/unknown/rule.js","./rules/fieldset-has-legend/rule.js","./rules/headings/rule.js","./rules/ids/form-attribute/rule.js","./rules/ids/imagemap-ids/rule.js","./rules/ids/labels-have-inputs/rule.js","./rules/ids/list-id/rule.js","./rules/ids/no-duplicate-anchor-names/rule.js","./rules/ids/unique-id/rule.js","./rules/labels/area/rule.js","./rules/labels/aria-command/rule.js","./rules/labels/controls/rule.js","./rules/labels/group/rule.js","./rules/labels/headings/rule.js","./rules/labels/img/rule.js","./rules/labels/links/rule.js","./rules/labels/tabindex/rule.js","./rules/lang/rule.js","./rules/legend-has-fieldset/rule.js","./rules/multiple-in-group/rule.js","./rules/no-button-without-type/rule.js","./rules/no-consecutive-brs/rule.js","./rules/no-empty-select/rule.js","./rules/no-links-as-buttons/rule.js","./rules/no-links-to-missing-fragments/rule.js","./rules/no-multiple-select/rule.js","./rules/no-outside-controls/rule.js","./rules/no-reset/rule.js","./rules/no-unassociated-labels/rule.js","./rules/title/rule.js","./rules","./version",6])(6)
+},{"../support/element-cache":11}]},{},["./rules/aria/attribute-values/rule.js","./rules/aria/deprecated-attributes/rule.js","./rules/aria/immutable-role/rule.js","./rules/aria/invalid-attributes/rule.js","./rules/aria/landmark/one-banner/rule.js","./rules/aria/landmark/one-contentinfo/rule.js","./rules/aria/landmark/one-main/rule.js","./rules/aria/landmark/prefer-main/rule.js","./rules/aria/no-focusable-hidden/rule.js","./rules/aria/no-focusable-role-none/rule.js","./rules/aria/no-none-without-presentation/rule.js","./rules/aria/one-role/rule.js","./rules/aria/roles/rule.js","./rules/colour-contrast/aa/rule.js","./rules/colour-contrast/aaa/rule.js","./rules/data-attributes/rule.js","./rules/details-and-summary/rule.js","./rules/elements/obsolete/rule.js","./rules/elements/unknown/rule.js","./rules/fieldset-and-legend/rule.js","./rules/headings/rule.js","./rules/ids/form-attribute/rule.js","./rules/ids/imagemap-ids/rule.js","./rules/ids/labels-have-inputs/rule.js","./rules/ids/list-id/rule.js","./rules/ids/no-duplicate-anchor-names/rule.js","./rules/ids/unique-id/rule.js","./rules/labels/area/rule.js","./rules/labels/aria-command/rule.js","./rules/labels/controls/rule.js","./rules/labels/group/rule.js","./rules/labels/headings/rule.js","./rules/labels/img/rule.js","./rules/labels/links/rule.js","./rules/labels/tabindex/rule.js","./rules/lang/rule.js","./rules/multiple-in-group/rule.js","./rules/no-button-without-type/rule.js","./rules/no-consecutive-brs/rule.js","./rules/no-empty-select/rule.js","./rules/no-links-as-buttons/rule.js","./rules/no-links-to-missing-fragments/rule.js","./rules/no-multiple-select/rule.js","./rules/no-outside-controls/rule.js","./rules/no-reset/rule.js","./rules/no-unassociated-labels/rule.js","./rules/title/rule.js","./rules","./version",6])(6)
 });
 //# sourceMappingURL=umd.js.map
