@@ -463,7 +463,13 @@ module.exports = class extends Rule {
     }
 
     const fontSize = parseFloat(utils.style(el, 'fontSize'));
-    const large = fontSize >= 24 /* 18pt */ || (fontSize >= 18.66 /* 14pt */ && utils.style(el, 'fontWeight') >= 700);
+    let fontWeight = utils.style(el, 'fontWeight');
+    if (fontWeight === 'bold') {
+      fontWeight = 700;
+    } else if (fontWeight === 'normal') {
+      fontWeight = 400;
+    }
+    const large = fontSize >= 24 /* 18pt */ || (fontSize >= 18.66 /* 14pt */ && fontWeight >= 700);
 
     if (large && ratio >= this.minLarge) {
       return null;
@@ -649,7 +655,7 @@ module.exports = class extends Rule {
         }
         break;
       }
-    } while (cursor);
+    } while (cursor && cursor !== document.body);
     return 'headings must be nested correctly';
   }
 };
@@ -1282,7 +1288,7 @@ module.exports = class extends Rule {
 module.exports = ["aria/attribute-values","aria/deprecated-attributes","aria/immutable-role","aria/invalid-attributes","aria/landmark/one-banner","aria/landmark/one-contentinfo","aria/landmark/one-main","aria/landmark/prefer-main","aria/no-focusable-hidden","aria/no-focusable-role-none","aria/no-none-without-presentation","aria/one-role","aria/roles","colour-contrast/aa","colour-contrast/aaa","data-attributes","details-and-summary","elements/obsolete","elements/unknown","fieldset-and-legend","headings","ids/form-attribute","ids/imagemap-ids","ids/labels-have-inputs","ids/list-id","ids/no-duplicate-anchor-names","ids/unique-id","labels/area","labels/aria-command","labels/controls","labels/group","labels/headings","labels/img","labels/links","labels/tabindex","lang","multiple-in-group","no-button-without-type","no-consecutive-brs","no-empty-select","no-links-as-buttons","no-links-to-missing-fragments","no-multiple-select","no-outside-controls","no-reset","no-unassociated-labels","title"];
 },{}],"./version":[function(require,module,exports){
 "use strict";
-module.exports = "1.9.0"
+module.exports = "1.10.0"
 },{}],1:[function(require,module,exports){
 "use strict";
 /**
@@ -3007,12 +3013,15 @@ exports.getRole = (el) => {
 
 /**
  * Does an element have a role. This will test against abstract roles
- * @param {Element|String} target
+ * @param {Element|String|null} target
  * @param {String|String[]} name
  * @returns {Boolean}
  */
 exports.hasRole = (target, name) => {
-  const actualRole = target instanceof HTMLElement ? exports.getRole(target) : target;
+  if (target === null) {
+    return false;
+  }
+  const actualRole = typeof target === 'string' ? target : exports.getRole(target);
   if (!actualRole) {
     return false;
   }
@@ -3033,7 +3042,7 @@ exports.hasRole = (target, name) => {
 exports.closestRole = (el, role) => {
   const roles = [].concat(role);
   let cursor = el;
-  while ((cursor = cursor.parentNode) && cursor instanceof HTMLElement) {
+  while ((cursor = cursor.parentNode) && cursor.nodeType === Node.ELEMENT_NODE) {
     // eslint-disable-next-line no-loop-func
     if (roles.some(name => exports.hasRole(cursor, name))) {
       return cursor;
@@ -3065,29 +3074,24 @@ function gamma(value) {
   return n <= 0.03928 ? n / 12.92 : Math.pow(((n + 0.055) / 1.055), 2.4);
 }
 
-// Create a canvas for blending colours
-let _context;
-function getCanvasContext() {
-  if (_context) {
-    return _context;
-  }
-  const canvas = document.createElement('canvas');
-  canvas.width = 1;
-  canvas.height = 1;
-  _context = canvas.getContext('2d');
-  return _context;
+function blendAlpha(s, d) {
+  return s + (d * (1 - s));
+}
+
+function blendChannel(sc, dc, sa, da, ba) {
+  return ((sc * sa) + (dc * da * (1 - sa))) / ba;
 }
 
 function blend(colours) {
-  const context = getCanvasContext();
-  context.clearRect(0, 0, 1, 1);
-  colours.reverse().forEach((colour) => {
-    context.fillStyle = `rgba(${colour.join(',')})`;
-    context.fillRect(0, 0, 1, 1);
+  let [r, g, b, a] = [0, 0, 0, 0];
+  colours.reverse().forEach(([_r, _g, _b, _a]) => {
+    const aNew = blendAlpha(_a, a);
+    r = blendChannel(_r, r, _a, a, aNew);
+    g = blendChannel(_g, g, _a, a, aNew);
+    b = blendChannel(_b, b, _a, a, aNew);
+    a = aNew;
   });
-  const colour = Array.from(context.getImageData(0, 0, 1, 1).data);
-  colour[3] /= 255;
-  return colour;
+  return [Math.round(r), Math.round(g), Math.round(b), a];
 }
 
 function luminosity(r, g, b) {
@@ -3107,7 +3111,11 @@ function contrastRatio(l1, l2) {
 function toRgbaArray(style) {
   const el = document.createElement('div');
   el.style.color = style;
+  document.body.appendChild(el);
   const value = window.getComputedStyle(el).color;
+  if (!value) {
+    throw new Error('unable to parse colour');
+  }
   return colourParts(value); // eslint-disable-line no-use-before-define
 }
 
@@ -3121,7 +3129,7 @@ function colourParts(colour) {
   }
   const match = colour.match(/^rgba?\((\d+), *(\d+), *(\d+)(?:, *(\d+(?:\.\d+)?))?\)$/);
   if (match) {
-    return [+match[1], +match[2], +match[3], parseFloat(match[4]) || 1];
+    return [+match[1], +match[2], +match[3], match[4] ? parseFloat(match[4]) : 1];
   }
   return toRgbaArray(colour);
 }
