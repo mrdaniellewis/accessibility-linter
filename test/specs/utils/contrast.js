@@ -79,7 +79,7 @@ describe('#contrast', () => {
 
     it('it blends alpha with an alpha', () => {
       expect(contrast._blend([[20, 40, 60, 0.5], [80, 90, 100, 0.2]]))
-        .toEqual([30, 48, 66, 0.6]);
+        .toEqual([30, 48, 67, 0.6]);
     });
 
     it('it blends multiple colours', () => {
@@ -91,6 +91,10 @@ describe('#contrast', () => {
   describe('#_colourParts', () => {
     it('parses "transparent"', () => {
       expect(contrast._colourParts('transparent')).toEqual([0, 0, 0, 0]);
+    });
+
+    it('parses transparent rgba', () => {
+      expect(contrast._colourParts('rgba(0, 0, 0, 0)')).toEqual([0, 0, 0, 0]);
     });
 
     it('parses rgb', () => {
@@ -115,10 +119,6 @@ describe('#contrast', () => {
 
     it('parses shorthand hex', () => {
       expect(contrast._colourParts('#123')).toEqual([17, 34, 51, 1]);
-    });
-
-    it('parses hex with alpha', () => {
-      expect(contrast._colourParts('#1a2b3c33')).toEqual([26, 43, 60, 0.2]);
     });
 
     it('parses named colours', () => {
@@ -146,7 +146,7 @@ describe('#contrast', () => {
     });
 
     it('it blends rgba', () => {
-      expect(colourContrast('#1155aa99', '#00000033').toFixed(2)).toEqual('2.38');
+      expect(colourContrast('rgba(17, 85, 170, .6)', 'rgba(0, 0, 0, .2)').toFixed(2)).toEqual('2.38');
     });
   });
 
@@ -159,17 +159,17 @@ describe('#contrast', () => {
     });
 
     it('blends alpha with the background', () => {
-      const el = appendToBody('<div style="color: #3366997f; background-color: #123" />');
-      expect(contrast.textColour(el)).toEqual([33, 68, 101, 1]);
+      const el = appendToBody('<div style="color: rgba(51, 102, 153, .5); background-color: #123" />');
+      expect(contrast.textColour(el)).toEqual([34, 68, 102, 1]);
     });
 
     it('blends alpha with a parent background', () => {
-      const el = appendToBody('<div style="background-color: #123"><div style="color: #3366997f;" /></div>');
-      expect(contrast.textColour(el.firstChild)).toEqual([33, 68, 101, 1]);
+      const el = appendToBody('<div style="background-color: #123"><div style="color: rgba(51, 102, 153, .5);" /></div>');
+      expect(contrast.textColour(el.firstChild)).toEqual([34, 68, 102, 1]);
     });
 
     it('blends with the document default colour', () => {
-      const el = appendToBody('<div style="color: #3366997f;" />');
+      const el = appendToBody('<div style="color: rgba(51, 102, 153, .5);" />');
       expect(contrast.textColour(el)).toEqual([153, 179, 204, 1]);
     });
 
@@ -183,8 +183,8 @@ describe('#contrast', () => {
 
     it('stops looking up background-color after an opaque colour is found', () => {
       const spy = expect.spyOn(window, 'getComputedStyle').andCallThrough();
-      const el = appendToBody('<div style="color: #3366997f; background-color: #123" />');
-      expect(contrast.textColour(el)).toEqual([33, 68, 101, 1]);
+      const el = appendToBody('<div style="color: rgba(51, 102, 153, .5); background-color: #123" />');
+      expect(contrast.textColour(el)).toEqual([34, 68, 102, 1]);
       expect(spy.calls.length).toEqual(2);
     });
   });
@@ -198,12 +198,12 @@ describe('#contrast', () => {
     });
 
     it('blends alpha with a parent background', () => {
-      const el = appendToBody('<div style="background-color: #123"><div style="background-color: #3366997f;" /></div>');
-      expect(contrast.backgroundColour(el.firstChild)).toEqual([33, 68, 101, 1]);
+      const el = appendToBody('<div style="background-color: #123"><div style="background-color: rgba(51, 102, 153, .5);" /></div>');
+      expect(contrast.backgroundColour(el.firstChild)).toEqual([34, 68, 102, 1]);
     });
 
     it('blends with the document default colour', () => {
-      const el = appendToBody('<div style="background-color: #3366997f;" />');
+      const el = appendToBody('<div style="background-color: rgba(51, 102, 153, .5);" />');
       expect(contrast.backgroundColour(el)).toEqual([153, 179, 204, 1]);
     });
 
@@ -217,8 +217,8 @@ describe('#contrast', () => {
 
     it('stops looking up background-color after an opaque colour is found', () => {
       const spy = expect.spyOn(window, 'getComputedStyle').andCallThrough();
-      const el = appendToBody('<div style="background-color: #123"><div style="background-color: #3366997f;" /></div>');
-      expect(contrast.backgroundColour(el.firstChild)).toEqual([33, 68, 101, 1]);
+      const el = appendToBody('<div style="background-color: #123"><div style="background-color: rgba(51, 102, 153, .5);" /></div>');
+      expect(contrast.backgroundColour(el.firstChild)).toEqual([34, 68, 102, 1]);
       expect(spy.calls.length).toEqual(2);
     });
   });
@@ -246,9 +246,9 @@ describe('#contrast', () => {
       expect(contrast.textContrast(el).toFixed(2)).toEqual('9.04');
     });
 
-    it('returns 9.06 for #00000066 on #aaa (foreground with alpha)', () => {
-      const el = appendToBody('<div style="color: #000000cc; background-color: #ccc;"></div>');
-      expect(contrast.textContrast(el).toFixed(2)).toEqual('9.06');
+    it('returns 9.06 for #00000099 on #ccc (foreground with alpha)', () => {
+      const el = appendToBody('<div style="color: rgba(0, 0, 0, .6); background-color: #ccc;"></div>');
+      expect(contrast.textContrast(el).toFixed(2)).toEqual('4.87');
     });
 
     it('returns the correct value for a background color applied to a parent', () => {
@@ -267,7 +267,7 @@ describe('#contrast', () => {
     });
 
     it('returns the correct value for alpha transparencies on background', () => {
-      const el = appendToBody('<div style="color: #ff000099"><div style="color: #000" /></div>');
+      const el = appendToBody('<div style="color: rgba(255, 0, 0, .6);"><div style="color: #000" /></div>');
       expect(contrast.textContrast(el).toFixed(2)).toEqual('2.86');
     });
   });

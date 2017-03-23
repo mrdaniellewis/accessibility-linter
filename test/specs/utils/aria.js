@@ -1075,6 +1075,10 @@ describe('#aria', () => {
   });
 
   describe('#hasRole', () => {
+    it('returns false for null', () => {
+      expect(aria.hasRole(null, 'none')).toEqual(false);
+    });
+
     it('returns false for an element with no role', () => {
       const el = buildHtml('<div />');
       expect(aria.hasRole(el, 'none')).toEqual(false);
