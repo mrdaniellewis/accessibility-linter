@@ -26,7 +26,7 @@ describe('#aria', () => {
           implicit: ['link'],
           roles: [
             'button', 'checkbox', 'menuitem', 'menuitemcheckbox',
-            'menuitemradio', 'radio', 'tab', 'switch', 'treeitem',
+            'menuitemradio', 'option', 'radio', 'tab', 'switch', 'treeitem',
           ],
         });
       });
@@ -59,7 +59,7 @@ describe('#aria', () => {
         const el = buildHtml('<article />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['article'],
-          roles: ['presentation', 'document', 'application', 'main', 'region'],
+          roles: ['feed', 'presentation', 'document', 'application', 'main', 'region'],
         });
       });
 
@@ -67,7 +67,7 @@ describe('#aria', () => {
         const el = buildHtml('<aside />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['complementary'],
-          roles: ['note', 'region', 'search'],
+          roles: ['feed', 'note', 'region', 'search'],
         });
       });
 
@@ -231,19 +231,37 @@ describe('#aria', () => {
         });
       });
 
-      it('footer descendant of article or section', () => {
-        const el = buildHtml('<article><footer /></article>').querySelector('footer');
-        expect(aria.allowed(el)).toInclude({
-          implicit: [],
-          roles: ['group', 'presentation'],
-        });
-      });
-
       it('footer', () => {
         const el = buildHtml('<footer />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['contentinfo'],
           roles: ['group', 'presentation'],
+        });
+      });
+
+      ['article', 'aside', 'main', 'nav', 'section'].forEach((parent) => {
+        it(`footer descendant of ${parent}`, () => {
+          const el = appendToBody(`<${parent}><footer /></${parent}>`).querySelector('footer');
+          expect(aria.allowed(el)).toInclude({
+            implicit: [],
+            roles: ['group', 'presentation'],
+          });
+        });
+
+        it(`footer descendant of ${parent} in application`, () => {
+          const el = appendToBody(`<${parent}><div role="application"><footer /></div></${parent}>`).querySelector('footer');
+          expect(aria.allowed(el)).toInclude({
+            implicit: ['contentinfo'],
+            roles: ['group', 'presentation'],
+          });
+        });
+
+        it(`footer descendant of ${parent} in document`, () => {
+          const el = appendToBody(`<${parent}><div role="document"><footer /></div></${parent}>`).querySelector('footer');
+          expect(aria.allowed(el)).toInclude({
+            implicit: ['contentinfo'],
+            roles: ['group', 'presentation'],
+          });
         });
       });
 
@@ -335,19 +353,37 @@ describe('#aria', () => {
         });
       });
 
-      it('header descendant of article or section', () => {
-        const el = buildHtml('<article><header /></article>').querySelector('header');
-        expect(aria.allowed(el)).toInclude({
-          implicit: [],
-          roles: ['group', 'presentation'],
-        });
-      });
-
       it('header', () => {
         const el = buildHtml('<header />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['banner'],
           roles: ['group', 'presentation'],
+        });
+      });
+
+      ['article', 'aside', 'main', 'nav', 'section'].forEach((parent) => {
+        it(`header descendant of ${parent}`, () => {
+          const el = appendToBody(`<${parent}><header /></${parent}>`).querySelector('header');
+          expect(aria.allowed(el)).toInclude({
+            implicit: [],
+            roles: ['group', 'presentation'],
+          });
+        });
+
+        it(`header descendant of ${parent} in application`, () => {
+          const el = appendToBody(`<${parent}><div role="application"><header /></div></${parent}>`).querySelector('header');
+          expect(aria.allowed(el)).toInclude({
+            implicit: ['banner'],
+            roles: ['group', 'presentation'],
+          });
+        });
+
+        it(`header descendant of ${parent} in document`, () => {
+          const el = appendToBody(`<${parent}><div role="document"><header /></div></${parent}>`).querySelector('header');
+          expect(aria.allowed(el)).toInclude({
+            implicit: ['banner'],
+            roles: ['group', 'presentation'],
+          });
         });
       });
 
@@ -379,7 +415,7 @@ describe('#aria', () => {
         const el = buildHtml('<img alt="" />');
         expect(aria.allowed(el)).toInclude({
           implicit: [],
-          roles: ['presentation'],
+          roles: ['presentation', 'none'],
         });
       });
 
@@ -490,7 +526,7 @@ describe('#aria', () => {
       it('input type="password"', () => {
         const el = buildHtml('<input type="password" />');
         expect(aria.allowed(el)).toInclude({
-          implicit: ['textbox'],
+          implicit: [],
           roles: [],
         });
       });
@@ -771,7 +807,10 @@ describe('#aria', () => {
         const el = buildHtml('<ol />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['list'],
-          roles: ['directory', 'group', 'listbox', 'menu', 'menubar', 'presentation', 'radiogroup', 'tablist', 'toolbar', 'tree'],
+          roles: [
+            'directory', 'group', 'listbox', 'menu', 'menubar', 'presentation',
+            'radiogroup', 'tablist', 'toolbar', 'tree',
+          ],
         });
       });
 
@@ -861,7 +900,8 @@ describe('#aria', () => {
           implicit: ['region'],
           roles: [
             'alert', 'alertdialog', 'application', 'banner', 'complementary', 'contentinfo',
-            'dialog', 'document', 'log', 'main', 'marquee', 'navigation', 'search', 'status',
+            'dialog', 'document', 'feed', 'log', 'main', 'marquee', 'navigation', 'search',
+            'status', 'tabpanel',
           ],
         });
       });
@@ -870,7 +910,7 @@ describe('#aria', () => {
         const el = buildHtml('<select />');
         expect(aria.allowed(el)).toInclude({
           implicit: ['listbox'],
-          roles: [],
+          roles: ['menu'],
         });
       });
 
@@ -1021,8 +1061,8 @@ describe('#aria', () => {
         expect(aria.allowed(el)).toInclude({
           implicit: ['list'],
           roles: [
-            'directory', 'group', 'listbox', 'menu', 'menubar', 'tablist',
-            'toolbar', 'tree', 'presentation',
+            'directory', 'group', 'listbox', 'menu', 'menubar', 'radiogroup',
+            'tablist', 'toolbar', 'tree', 'presentation',
           ],
         });
       });
