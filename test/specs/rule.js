@@ -76,7 +76,7 @@ describe('Rule', () => {
       appendToBody('<thumb />');
       const test = new Test();
       const spy = expect.spyOn(test, 'test');
-      test.run(null, () => true, utils);
+      test.run(document, () => true, utils);
 
       expect(spy).toHaveHadCalls([foo, utils], [bar, utils]);
     });
@@ -122,7 +122,7 @@ describe('Rule', () => {
         test.test = function () {
           return null;
         };
-        expect(test.run(null, () => true, utils)).toEqual([]);
+        expect(test.run(document, () => true, utils)).toEqual([]);
       });
 
       it('can return an empty array to produce no error messages', () => {
@@ -131,7 +131,7 @@ describe('Rule', () => {
         test.test = function () {
           return [];
         };
-        expect(test.run(null, () => true, utils)).toEqual([]);
+        expect(test.run(document, () => true, utils)).toEqual([]);
       });
 
       it('can return a string to produce one error message', () => {
@@ -140,7 +140,7 @@ describe('Rule', () => {
         test.test = function () {
           return 'error';
         };
-        expect(test.run(null, () => true, utils)).toEqual([{ el, message: 'error', type: 'error' }]);
+        expect(test.run(document, () => true, utils)).toEqual([{ el, message: 'error' }]);
       });
 
       it('can return an array of strings to produce multiple error messages', () => {
@@ -150,21 +150,12 @@ describe('Rule', () => {
         test.test = function () {
           return ['error', 'error2'];
         };
-        expect(test.run(null, () => true, utils)).toEqual([
-          { el: foo, message: 'error', type: 'error' },
-          { el: foo, message: 'error2', type: 'error' },
-          { el: bar, message: 'error', type: 'error' },
-          { el: bar, message: 'error2', type: 'error' },
+        expect(test.run(document, () => true, utils)).toEqual([
+          { el: foo, message: 'error' },
+          { el: foo, message: 'error2' },
+          { el: bar, message: 'error' },
+          { el: bar, message: 'error2' },
         ]);
-      });
-
-      it('custom types are returned with the errors', () => {
-        const foo = appendToBody('<foo />');
-        const test = new Test({ type: 'warn' });
-        test.test = function () {
-          return 'error';
-        };
-        expect(test.run(null, () => true, utils)).toEqual([{ el: foo, message: 'error', type: 'warn' }]);
       });
     });
   });

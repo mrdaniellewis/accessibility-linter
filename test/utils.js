@@ -69,6 +69,11 @@
         updateCallback = fn;
       },
 
+      clear() {
+        additions.splice(0);
+        updateCallback = null;
+      },
+
       clean() {
         additions.splice(0).forEach(el => el.remove());
         updateCallback = null;

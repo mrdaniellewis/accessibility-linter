@@ -28,13 +28,28 @@
   // -------------------------------------
   // Custom assertions
   // -------------------------------------
+
+  // Equality comparison with a strict equal on elements
+  // The standard beEqual does not not work correctly on elements
+  function arrayEqual(actual, expected) {
+    if (actual.length !== expected.length) {
+      return false;
+    }
+
+    return actual.every((item, index) => {
+      if (Array.isArray(item)) {
+        return arrayEqual(item, expected[index]);
+      }
+      return item === expected[index];
+    });
+  }
+
   expect.extend({
     // Test logger to have no entries
     toNotHaveEntries() {
       expect.assert(
         this.actual.errors.length === 0 && this.actual.warnings.length === 0,
         'expected %s to have no logged entries',
-        this.actual.errors
       );
       return this;
     },
@@ -49,7 +64,12 @@
         );
         return this;
       }
-      expect(this.actual.errors).toEqual(Array.from(arguments));
+      expect.assert(
+        arrayEqual(Array.from(arguments), this.actual.errors),
+        'expected %s to equal %s',
+        this.actual.errors,
+        Array.from(arguments)
+      );
       return this;
     },
 
@@ -63,7 +83,12 @@
         );
         return this;
       }
-      expect(this.actual.warnings).toEqual(Array.from(arguments));
+      expect.assert(
+        arrayEqual(Array.from(arguments), this.actual.warnings),
+        'expected %s to equal %s',
+        this.actual.warnings,
+        Array.from(arguments)
+      );
       return this;
     },
 
@@ -130,13 +155,14 @@
   // -------------------------------------
   window.whenDomUpdates = null;
   window.clean = (context = () => window) => {
-    let cleaner;
+    let cleaner, pause;
 
     beforeAll(() => {
       cleaner = context().domCleaner({ exclude: '#mocha *' });
     });
 
     beforeEach(() => {
+      pause = false;
       window.whenDomUpdates = function (fn) {
         return new Promise(resolve => cleaner.onUpdate(resolve))
           .then(fn);
@@ -145,12 +171,22 @@
 
     afterEach(() => {
       window.whenDomUpdates = null;
+      if (pause) {
+        cleaner.clear();
+        return undefined;
+      }
       return Promise.resolve().then(() => cleaner.clean());
     });
 
     afterAll(() => {
       cleaner.stop();
     });
+
+    return {
+      pause() {
+        pause = true;
+      },
+    };
   };
 
   // -------------------------------------
