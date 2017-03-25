@@ -50,6 +50,7 @@
       expect.assert(
         this.actual.errors.length === 0 && this.actual.warnings.length === 0,
         'expected %s to have no logged entries',
+        this.actual
       );
       return this;
     },
