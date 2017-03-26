@@ -40,6 +40,13 @@ describe('AccessibilityLinter', () => {
       expect(logger).toHaveErrors(['foo-bar', el]);
     });
 
+    it('passes `document` as the default context', () => {
+      const spy = expect.spyOn(Test.prototype, 'run').andCallThrough();
+      appendToBody('<foo />');
+      linter.run();
+      expect(spy.calls[0].arguments[0]).toEqual(document);
+    });
+
     context('limiting scope', () => {
       it('limits the rules to the provided scope', () => {
         const el = appendToBody('<div><foo></div><foo />');
@@ -317,8 +324,8 @@ describe('AccessibilityLinter', () => {
     });
 
     it('it uses custom rule settings', () => {
-      appendToBody('<foo class="rule-whitelist"/>');
-      const el = appendToBody('<foo class="new-whitelist"/>');
+      const el = appendToBody('<foo class="rule-whitelist"/>');
+      appendToBody('<foo class="new-whitelist"/>');
       linter.runRule('rule', { ruleSettings: { whitelist: '.new-whitelist' } });
       expect(logger).toHaveErrors(['foo-bar', el]);
     });

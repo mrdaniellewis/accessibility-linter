@@ -16,7 +16,7 @@ describe('rules', () => {
   });
 
   AccessibilityLinter[Symbol.for('accessibility-linter.rule-sources')].forEach((path) => {
-    let window, linter, Rule, rules, iframeError;
+    let window, linter, Rule, rules, iframeError, cleaner;
     const name = path.replace(/\//g, '-');
 
     // Make sure everything is setup using the iFrame versions
@@ -24,6 +24,7 @@ describe('rules', () => {
       beforeAll(() => {
         window = context.window = frame.contentWindow;
         context.document = window.document;
+        context.cleaner = cleaner;
         Rule = context.Rule = window.AccessibilityLinter.rules.get(name);
         rules = new Map([[name, Rule]]);
         if (!Rule) {
@@ -34,7 +35,7 @@ describe('rules', () => {
         };
       });
 
-      clean(() => window);
+      cleaner = clean(() => window);
 
       beforeEach(() => {
         iframeError = false;
@@ -59,10 +60,10 @@ describe('rules', () => {
       this.requireTests(`../lib/rules/${path}/spec.js`, (content) => {
         // eslint-disable-next-line no-new-func
         new Function(`
-          let Rule, logger, linter, window, document, $, appendToBody, location;
+          let Rule, logger, linter, window, document, $, appendToBody, location, cleaner;
 
           beforeAll(() => {
-            ({ window, document, window: { $, appendToBody, location } } = this);
+            ({ window, document, window: { $, appendToBody, location }, cleaner } = this);
           });
 
           beforeEach(() => {
