@@ -252,7 +252,44 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../../../rule":9}],"./rules/aria/no-focusable-hidden/rule.js":[function(_dereq_,module,exports){
+},{"../../../rule":9}],"./rules/aria/landmark/required/rule.js":[function(_dereq_,module,exports){
+"use strict";
+const Rule = _dereq_('../../../rule.js');
+
+function hasLandmark(nodeName, role, utils) {
+  return utils.$$(`${nodeName},[role~=${role}]`, document.body)
+    .filter(el => !utils.hidden(el))
+    .filter(el => utils.aria.hasRole(el, role))
+    .filter(el => utils.aria.closestRole(el, ['document', 'application']) === document.body)
+    .filter(el => el.innerText)
+    .length > 0;
+}
+
+module.exports = class extends Rule {
+  selector() {
+    return 'body';
+  }
+
+  test(el, utils) {
+    const errors = [];
+
+    if (!hasLandmark('main', 'main', utils)) {
+      errors.push('document should have a <main>');
+    }
+
+    if (!hasLandmark('header', 'banner', utils)) {
+      errors.push('document should have a <header>');
+    }
+
+    if (!hasLandmark('footer', 'contentinfo', utils)) {
+      errors.push('document should have a <footer>');
+    }
+
+    return errors;
+  }
+};
+
+},{"../../../rule.js":9}],"./rules/aria/no-focusable-hidden/rule.js":[function(_dereq_,module,exports){
 "use strict";
 const Rule = _dereq_('../../rule');
 
@@ -394,7 +431,6 @@ module.exports = class extends Rule {
   }
 
   run(context, filter = () => true, utils) {
-    context = context || document;
     return this.iterate(context, utils, false)
       .filter(filter)
       .map(el => this.findAncestor(el, utils))
@@ -479,7 +515,7 @@ module.exports = class extends Rule {
   }
 
   message(el, ratio) {
-    return { el, message: `contrast is too low ${parseFloat(ratio.toFixed(2))}:1`, type: this.type };
+    return { el, message: `contrast is too low ${parseFloat(ratio.toFixed(2))}:1` };
   }
 };
 
@@ -1266,7 +1302,95 @@ module.exports = class extends Rule {
   }
 };
 
-},{"../rule":9}],"./rules/title/rule.js":[function(_dereq_,module,exports){
+},{"../rule":9}],"./rules/security/charset/rule.js":[function(_dereq_,module,exports){
+"use strict";
+const Rule = _dereq_('../../rule');
+
+module.exports = class extends Rule {
+  run(context, filter = () => true, utils) {
+    const errors = [];
+
+    if (!context.contains(document.documentElement)) {
+      return [];
+    }
+
+    if (document.characterSet !== 'UTF-8') {
+      errors.push({ el: document.documentElement, message: 'all HTML documents should be authored in UTF-8' });
+    }
+
+    const meta = utils.$$('meta[charset],meta[http-equiv="content-type" i]');
+
+    if (meta.length > 1) {
+      meta.forEach(el => errors.push({ el, message: 'more than one meta charset tag found' }));
+    }
+
+    if (!meta.length) {
+      errors.push({ el: document.head, message: 'missing `<meta charset="UTF-8">`' });
+    }
+
+    meta
+      .filter(el => el.httpEquiv)
+      .forEach(el => errors.push({ el, message: 'use the form `<meta charset="UTF-8">`' }));
+
+    meta
+      .filter(el => document.head.firstElementChild !== el)
+      .forEach(el => errors.push({ el, message: 'meta charset should be the first child of <head>' }));
+
+    return errors.filter(({ el }) => filter(el));
+  }
+};
+
+},{"../../rule":9}],"./rules/security/target/rule.js":[function(_dereq_,module,exports){
+"use strict";
+const Rule = _dereq_('../../rule');
+const constants = _dereq_('../../../support/constants');
+
+module.exports = class extends Rule {
+  selector() {
+    return 'a[href][target],area[href][target],form[target],base[target],form button[type=submit][formtarget],form input[type=submit][formtarget],form input[type=image][formtarget]';
+  }
+
+  test(el, utils) {
+    if (el.target === '_self' || el.formTarget === '_self') {
+      return null;
+    }
+    const nodeName = el.nodeName.toLowerCase();
+    if (nodeName !== 'base' && nodeName !== 'area' && utils.hidden(el)) {
+      return null;
+    }
+
+    const rel = el.rel && el.rel.split(constants.rSpace);
+    if (rel && rel.includes('noopener') && rel.includes('noreferrer')) {
+      return null;
+    }
+
+    let url = el.href;
+    if (nodeName === 'form') {
+      url = el.action;
+    } else if (nodeName === 'button' || nodeName === 'input') {
+      // Chrome returns the page url for el.formaction
+      url = el.getAttribute('formaction') || el.form.action;
+    }
+
+    try {
+      url = new URL(url, location.href);
+    } catch (_) {
+      url = null;
+    }
+
+    if (url && url.host === location.host) {
+      return null;
+    }
+
+    let message = 'target attribute has opener vulnerability';
+    if (nodeName === 'a' || nodeName === 'area') {
+      message += '. Add `rel="noopener noreferrer"`';
+    }
+    return message;
+  }
+};
+
+},{"../../../support/constants":11,"../../rule":9}],"./rules/title/rule.js":[function(_dereq_,module,exports){
 "use strict";
 const Rule = _dereq_('../rule');
 
@@ -1285,10 +1409,10 @@ module.exports = class extends Rule {
 
 },{"../rule":9}],"./rules":[function(_dereq_,module,exports){
 "use strict";
-module.exports = ["aria/attribute-values","aria/deprecated-attributes","aria/immutable-role","aria/invalid-attributes","aria/landmark/one-banner","aria/landmark/one-contentinfo","aria/landmark/one-main","aria/landmark/prefer-main","aria/no-focusable-hidden","aria/no-focusable-role-none","aria/no-none-without-presentation","aria/one-role","aria/roles","colour-contrast/aa","colour-contrast/aaa","data-attributes","details-and-summary","elements/obsolete","elements/unknown","fieldset-and-legend","headings","ids/form-attribute","ids/imagemap-ids","ids/labels-have-inputs","ids/list-id","ids/no-duplicate-anchor-names","ids/unique-id","labels/area","labels/aria-command","labels/controls","labels/group","labels/headings","labels/img","labels/links","labels/tabindex","lang","multiple-in-group","no-button-without-type","no-consecutive-brs","no-empty-select","no-links-as-buttons","no-links-to-missing-fragments","no-multiple-select","no-outside-controls","no-reset","no-unassociated-labels","title"];
+module.exports = ["aria/attribute-values","aria/deprecated-attributes","aria/immutable-role","aria/invalid-attributes","aria/landmark/one-banner","aria/landmark/one-contentinfo","aria/landmark/one-main","aria/landmark/prefer-main","aria/landmark/required","aria/no-focusable-hidden","aria/no-focusable-role-none","aria/no-none-without-presentation","aria/one-role","aria/roles","colour-contrast/aa","colour-contrast/aaa","data-attributes","details-and-summary","elements/obsolete","elements/unknown","fieldset-and-legend","headings","ids/form-attribute","ids/imagemap-ids","ids/labels-have-inputs","ids/list-id","ids/no-duplicate-anchor-names","ids/unique-id","labels/area","labels/aria-command","labels/controls","labels/group","labels/headings","labels/img","labels/links","labels/tabindex","lang","multiple-in-group","no-button-without-type","no-consecutive-brs","no-empty-select","no-links-as-buttons","no-links-to-missing-fragments","no-multiple-select","no-outside-controls","no-reset","no-unassociated-labels","security/charset","security/target","title"];
 },{}],"./version":[function(_dereq_,module,exports){
 "use strict";
-module.exports = "1.10.0"
+module.exports = "1.11.0"
 },{}],1:[function(_dereq_,module,exports){
 "use strict";
 /**
@@ -1296,6 +1420,8 @@ module.exports = "1.10.0"
  *
  * https://w3c.github.io/html-aria/
  */
+const aria = _dereq_('../utils/aria.js');
+const { $$ } = _dereq_('../utils/selectors.js');
 
 /**
  * Describes what roles and aria attributes all allowed on an element
@@ -1334,7 +1460,7 @@ module.exports = {
       implicit: 'link',
       roles: [
         'button', 'checkbox', 'menuitem', 'menuitemcheckbox',
-        'menuitemradio', 'radio', 'tab', 'switch', 'treeitem',
+        'menuitemradio', 'option', 'radio', 'tab', 'switch', 'treeitem',
       ],
     }),
     rule({
@@ -1353,11 +1479,11 @@ module.exports = {
   ],
   article: rule({
     implicit: 'article',
-    roles: ['presentation', 'document', 'application', 'main', 'region'],
+    roles: ['feed', 'presentation', 'document', 'application', 'main', 'region'],
   }),
   aside: rule({
     implicit: 'complementary',
-    roles: ['note', 'region', 'search'],
+    roles: ['feed', 'note', 'region', 'search'],
   }),
   audio: rule({
     roles: ['application'],
@@ -1421,7 +1547,11 @@ module.exports = {
   }),
   footer: [
     rule({
-      selector: 'article footer,section footer',
+      selector(el) {
+        const selector = ['article', 'aside', 'main', 'nav', 'section'].map(name => `:scope ${name} footer`).join(',');
+        return $$(selector, aria.closestRole(el, ['application', 'document'], { exact: true }))
+          .includes(el);
+      },
       roles: ['group', 'presentation'],
     }),
     rule({
@@ -1463,7 +1593,11 @@ module.exports = {
   head: noRoleOrAria,
   header: [
     rule({
-      selector: 'article header,section header',
+      selector(el) {
+        const selector = ['article', 'aside', 'main', 'nav', 'section'].map(name => `:scope ${name} header`).join(',');
+        return $$(selector, aria.closestRole(el, ['application', 'document'], { exact: true }))
+          .includes(el);
+      },
       roles: ['group', 'presentation'],
     }),
     rule({
@@ -1482,7 +1616,7 @@ module.exports = {
   img: [
     rule({
       selector: '[alt=""]',
-      roles: ['presentation'],
+      roles: ['presentation', 'none'],
       aria: false,
     }),
     rule({
@@ -1511,7 +1645,7 @@ module.exports = {
       roles: ['button', 'menuitemcheckbox', 'switch'],
     }),
     rule({
-      selector: ':not([type]),[type=password],[type=tel],[type=text],[type=url]',
+      selector: ':not([type]),[type=tel],[type=text],[type=url]',
       implicit: 'textbox',
     }),
     rule({
@@ -1635,12 +1769,13 @@ module.exports = {
     implicit: 'region',
     roles: [
       'alert', 'alertdialog', 'application', 'banner', 'complementary',
-      'contentinfo', 'dialog', 'document', 'log', 'main', 'marquee',
-      'navigation', 'search', 'status',
+      'contentinfo', 'dialog', 'document', 'feed', 'log', 'main', 'marquee',
+      'navigation', 'search', 'status', 'tabpanel',
     ],
   }),
   select: rule({
     implicit: 'listbox',
+    roles: ['menu'],
   }),
   source: noRoleOrAria,
   span: anyRole,
@@ -1717,7 +1852,7 @@ module.exports = {
     implicit: 'list',
     roles: [
       'directory', 'group', 'listbox', 'menu', 'menubar',
-      'tablist', 'toolbar', 'tree', 'presentation',
+      'radiogroup', 'tablist', 'toolbar', 'tree', 'presentation',
     ],
   }),
   video: rule({
@@ -1725,7 +1860,7 @@ module.exports = {
   }),
 };
 
-},{}],2:[function(_dereq_,module,exports){
+},{"../utils/aria.js":15,"../utils/selectors.js":21}],2:[function(_dereq_,module,exports){
 "use strict";
 /**
  *  Aria properties
@@ -2701,7 +2836,7 @@ module.exports = class Rule {
         ExtendedArray.of(this.test(el, utils))
           .flatten()
           .compact()
-          .map(message => ({ el, message, type: this.type }))
+          .map(message => ({ el, message }))
       ))
       .flatten();
   }
@@ -2822,11 +2957,11 @@ module.exports = class Runner {
    * Run a single rule
    * @private
    */
-  runInternal(rule, context, filter) {
+  runInternal(rule, context = document, filter) {
     rule.run(context, el => filter(el, rule.name), this.utils)
       .forEach((issue) => {
         this.reported.set(issue.el, rule.name);
-        this.logger.log(Object.assign({ name: rule.name }, issue));
+        this.logger.log(Object.assign({ name: rule.name, type: rule.type }, issue));
       });
   }
 
@@ -3020,7 +3155,9 @@ exports.allowed = (el) => {
   const name = el.nodeName.toLowerCase();
   let found = config.allowedAria[name];
   if (Array.isArray(found)) {
-    found = found.find(item => item.selector === '*' || el.matches(item.selector));
+    found = found.find(item => (
+      item.selector === '*' || (typeof item.selector === 'function' ? item.selector(el) : el.matches(item.selector))
+    ));
   }
   return found || config.allowedAria._default;
 };
@@ -3049,9 +3186,10 @@ exports.getRole = (el) => {
  * Does an element have a role. This will test against abstract roles
  * @param {Element|String|null} target
  * @param {String|String[]} name
+ * @param {Boolean} [options.extact=false] Match against abstract roles
  * @returns {Boolean}
  */
-exports.hasRole = (target, name) => {
+exports.hasRole = (target, name, { exact = false } = {}) => {
   if (target === null) {
     return false;
   }
@@ -3063,7 +3201,7 @@ exports.hasRole = (target, name) => {
     if (checkRole === actualRole) {
       return true;
     }
-    return (config.roles[checkRole].subclass || []).some(hasRole);
+    return !exact && (config.roles[checkRole].subclass || []).some(hasRole);
   });
 };
 
@@ -3071,14 +3209,15 @@ exports.hasRole = (target, name) => {
  * Find the closest element with the specified role(s)
  * @param {Element} el
  * @param {String|String[]} role
+ * @param {Boolean} [options.exact=false]
  * @returns {Boolean}
  */
-exports.closestRole = (el, role) => {
+exports.closestRole = (el, role, { exact = false } = {}) => {
   const roles = [].concat(role);
   let cursor = el;
   while ((cursor = cursor.parentNode) && cursor.nodeType === Node.ELEMENT_NODE) {
     // eslint-disable-next-line no-loop-func
-    if (roles.some(name => exports.hasRole(cursor, name))) {
+    if (roles.some(name => exports.hasRole(cursor, name, { exact }))) {
       return cursor;
     }
   }
@@ -3627,6 +3766,6 @@ module.exports = class Style extends ElementCache {
   }
 };
 
-},{"../support/element-cache":12}]},{},["./rules/aria/attribute-values/rule.js","./rules/aria/deprecated-attributes/rule.js","./rules/aria/immutable-role/rule.js","./rules/aria/invalid-attributes/rule.js","./rules/aria/landmark/one-banner/rule.js","./rules/aria/landmark/one-contentinfo/rule.js","./rules/aria/landmark/one-main/rule.js","./rules/aria/landmark/prefer-main/rule.js","./rules/aria/no-focusable-hidden/rule.js","./rules/aria/no-focusable-role-none/rule.js","./rules/aria/no-none-without-presentation/rule.js","./rules/aria/one-role/rule.js","./rules/aria/roles/rule.js","./rules/colour-contrast/aa/rule.js","./rules/colour-contrast/aaa/rule.js","./rules/data-attributes/rule.js","./rules/details-and-summary/rule.js","./rules/elements/obsolete/rule.js","./rules/elements/unknown/rule.js","./rules/fieldset-and-legend/rule.js","./rules/headings/rule.js","./rules/ids/form-attribute/rule.js","./rules/ids/imagemap-ids/rule.js","./rules/ids/labels-have-inputs/rule.js","./rules/ids/list-id/rule.js","./rules/ids/no-duplicate-anchor-names/rule.js","./rules/ids/unique-id/rule.js","./rules/labels/area/rule.js","./rules/labels/aria-command/rule.js","./rules/labels/controls/rule.js","./rules/labels/group/rule.js","./rules/labels/headings/rule.js","./rules/labels/img/rule.js","./rules/labels/links/rule.js","./rules/labels/tabindex/rule.js","./rules/lang/rule.js","./rules/multiple-in-group/rule.js","./rules/no-button-without-type/rule.js","./rules/no-consecutive-brs/rule.js","./rules/no-empty-select/rule.js","./rules/no-links-as-buttons/rule.js","./rules/no-links-to-missing-fragments/rule.js","./rules/no-multiple-select/rule.js","./rules/no-outside-controls/rule.js","./rules/no-reset/rule.js","./rules/no-unassociated-labels/rule.js","./rules/title/rule.js","./rules","./version",7,6])(7)
+},{"../support/element-cache":12}]},{},["./rules/aria/attribute-values/rule.js","./rules/aria/deprecated-attributes/rule.js","./rules/aria/immutable-role/rule.js","./rules/aria/invalid-attributes/rule.js","./rules/aria/landmark/one-banner/rule.js","./rules/aria/landmark/one-contentinfo/rule.js","./rules/aria/landmark/one-main/rule.js","./rules/aria/landmark/prefer-main/rule.js","./rules/aria/landmark/required/rule.js","./rules/aria/no-focusable-hidden/rule.js","./rules/aria/no-focusable-role-none/rule.js","./rules/aria/no-none-without-presentation/rule.js","./rules/aria/one-role/rule.js","./rules/aria/roles/rule.js","./rules/colour-contrast/aa/rule.js","./rules/colour-contrast/aaa/rule.js","./rules/data-attributes/rule.js","./rules/details-and-summary/rule.js","./rules/elements/obsolete/rule.js","./rules/elements/unknown/rule.js","./rules/fieldset-and-legend/rule.js","./rules/headings/rule.js","./rules/ids/form-attribute/rule.js","./rules/ids/imagemap-ids/rule.js","./rules/ids/labels-have-inputs/rule.js","./rules/ids/list-id/rule.js","./rules/ids/no-duplicate-anchor-names/rule.js","./rules/ids/unique-id/rule.js","./rules/labels/area/rule.js","./rules/labels/aria-command/rule.js","./rules/labels/controls/rule.js","./rules/labels/group/rule.js","./rules/labels/headings/rule.js","./rules/labels/img/rule.js","./rules/labels/links/rule.js","./rules/labels/tabindex/rule.js","./rules/lang/rule.js","./rules/multiple-in-group/rule.js","./rules/no-button-without-type/rule.js","./rules/no-consecutive-brs/rule.js","./rules/no-empty-select/rule.js","./rules/no-links-as-buttons/rule.js","./rules/no-links-to-missing-fragments/rule.js","./rules/no-multiple-select/rule.js","./rules/no-outside-controls/rule.js","./rules/no-reset/rule.js","./rules/no-unassociated-labels/rule.js","./rules/security/charset/rule.js","./rules/security/target/rule.js","./rules/title/rule.js","./rules","./version",7,6])(7)
 });
 //# sourceMappingURL=linter.js.map
