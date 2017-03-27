@@ -1,4 +1,10 @@
 describe('#elements', () => {
+  const unsupported = [
+    'dialog',
+    'details',
+    'summary',
+  ].sort();
+
   let elements;
   beforeEach(() => {
     elements = new AccessibilityLinter.Config().elements;
@@ -32,6 +38,11 @@ describe('#elements', () => {
   it('contains all obsolete elements', () => {
     expect(Object.keys(elements).filter(name => elements[name].obsolete).sort())
       .toMatchArray(testData.obsoleteElements);
+  });
+
+  it('contains unsupported elements', () => {
+    expect(Object.keys(elements).filter(name => elements[name].supported === false).sort())
+      .toMatchArray(unsupported);
   });
 
   describe('native text alternatives', () => {
