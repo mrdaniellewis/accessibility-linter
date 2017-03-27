@@ -8,6 +8,11 @@
   window.after = () => { throw new Error('use `afterAll`'); };
 
   // -------------------------------------
+  // Somewhere to dump data shared between tests
+  // -------------------------------------
+  window.testData = {};
+
+  // -------------------------------------
   // A test logger that just saves the log messages
   // -------------------------------------
   window.TestLogger = class {
@@ -188,29 +193,6 @@
         pause = true;
       },
     };
-  };
-
-  // -------------------------------------
-  // Swap an object property for the duration of a test
-  //
-  // proxy(fn => fn(object, propertyName, newValue));
-  //
-  // -------------------------------------
-  window.proxy = function (fn) {
-    let ob, prop, originalValue;
-
-    beforeEach(() => {
-      fn((_ob, _prop, newValue) => {
-        ob = _ob;
-        prop = _prop;
-        originalValue = ob[prop];
-        ob[prop] = newValue;
-      });
-    });
-
-    afterEach(() => {
-      ob[prop] = originalValue;
-    });
   };
 
   // -------------------------------------

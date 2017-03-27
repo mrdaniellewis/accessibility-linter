@@ -3,7 +3,7 @@ describe('#aria', () => {
   clean();
 
   beforeAll(() => {
-    aria = new AccessibilityLinter.Utils().aria;
+    aria = new AccessibilityLinter.Utils(new AccessibilityLinter.Config()).aria;
   });
 
   it('is a property of utils', () => {

@@ -18,6 +18,7 @@
     "requireScript": false,
     "requireTests": false,
     "ruleSpecs": false,
+    "testData": true,
     "TestLogger": false,
     "uniqueId": false,
     "whenDomUpdates": false
