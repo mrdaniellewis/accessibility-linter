@@ -3,6 +3,8 @@ describe('#elements', () => {
     'dialog',
     'details',
     'summary',
+    'menu',
+    'menuitem',
   ].sort();
 
   let elements;
@@ -41,7 +43,7 @@ describe('#elements', () => {
   });
 
   it('contains unsupported elements', () => {
-    expect(Object.keys(elements).filter(name => elements[name].supported === false).sort())
+    expect(Object.keys(elements).filter(name => elements[name].unsupported === true).sort())
       .toMatchArray(unsupported);
   });
 
