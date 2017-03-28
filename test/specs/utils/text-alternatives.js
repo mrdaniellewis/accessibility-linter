@@ -2,35 +2,36 @@ describe('text alternatives', () => {
   let utils;
 
   beforeEach(() => {
-    utils = new AccessibilityLinter.Utils();
+    const config = new AccessibilityLinter.Config();
+    config.elements = {
+      'native-text': {
+        nativeLabel(el) {
+          return el.getAttribute('data-alt') || null;
+        },
+
+        nativeDescription(el) {
+          return el.getAttribute('data-description') || null;
+        },
+      },
+      'native-elements': {
+        nativeLabel(el) {
+          return (el.getAttribute('data-alt') || '')
+            .split(/\s+/)
+            .map(id => document.getElementById(id));
+        },
+
+        nativeDescription(el) {
+          return (el.getAttribute('data-description') || '')
+            .split(/\s+/)
+            .map(id => document.getElementById(id));
+        },
+      },
+    };
+
+    utils = new AccessibilityLinter.Utils(config);
   });
 
   clean();
-
-  proxy(fn => fn(AccessibilityLinter.config, 'elements', {
-    'native-text': {
-      nativeLabel(el) {
-        return el.getAttribute('data-alt') || null;
-      },
-
-      nativeDescription(el) {
-        return el.getAttribute('data-description') || null;
-      },
-    },
-    'native-elements': {
-      nativeLabel(el) {
-        return (el.getAttribute('data-alt') || '')
-          .split(/\s+/)
-          .map(id => document.getElementById(id));
-      },
-
-      nativeDescription(el) {
-        return (el.getAttribute('data-description') || '')
-          .split(/\s+/)
-          .map(id => document.getElementById(id));
-      },
-    },
-  }));
 
   describe('#accessibleName', () => {
     it('returns an empty string for hidden elements', () => {
@@ -105,7 +106,7 @@ describe('text alternatives', () => {
       });
 
       it('passes the element and utils to the native label function', () => {
-        const spy = expect.spyOn(AccessibilityLinter.config.elements['native-text'], 'nativeLabel').andCallThrough();
+        const spy = expect.spyOn(utils.config.elements['native-text'], 'nativeLabel').andCallThrough();
         const el = appendToBody('<native-text data-alt="alt" />');
         utils.accessibleName(el);
         expect(spy.calls.length).toEqual(1);
