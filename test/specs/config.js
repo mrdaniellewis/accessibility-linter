@@ -189,4 +189,5 @@ describe('Config', function () {
   this.requireTests('specs/config/elements.js');
   this.requireTests('specs/config/allowed-aria.js');
   this.requireTests('specs/config/roles.js');
+  this.requireTests('specs/config/attributes.js');
 });
