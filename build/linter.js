@@ -1,4 +1,107 @@
-(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.AccessibilityLinter = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"./rules/aria/attribute-values/rule.js":[function(_dereq_,module,exports){
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.AccessibilityLinter = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"./rules/aria/allowed-attributes/rule.js":[function(_dereq_,module,exports){
+"use strict";
+const Rule = _dereq_('../../rule.js');
+
+const disableable = ['input', 'button', 'select', 'optgroup', 'textarea', 'fieldset']; // option does not need to be included
+const placeholderable = ['input', 'textarea'];
+const requireable = ['input', 'select', 'textarea'];
+const readonlyable = ['text', 'url', 'email'];
+
+function hasContentEditable(el) {
+  return el.contentEditable === 'true' || (((el.closest('[contenteditable]') || {}).contentEditable === 'true'));
+}
+
+module.exports = class extends Rule {
+  selector() {
+    return '*';
+  }
+
+  test(el, utils) {
+    let ariaAttributes = Array.from(el.attributes)
+      .filter(({ name }) => name.startsWith('aria-'))
+      .map(({ name }) => name.slice(5));
+
+    if (!ariaAttributes.length) {
+      return null;
+    }
+
+    const allowed = utils.aria.allowed(el);
+    const errors = [];
+
+    ariaAttributes = ariaAttributes.filter((name) => {
+      if (!utils.config.ariaAttributes[name]) {
+        errors.push(`aria-${name} is not a known aria attribute`);
+        return false;
+      }
+      return true;
+    });
+
+    if (allowed.noAria) {
+      errors.push(`no aria attributes are allowed on element. Found ${ariaAttributes.map(name => `aria-${name}`).join(', ')}`);
+      return errors;
+    }
+
+    const role = utils.aria.getRole(el, allowed);
+
+    if (['none', 'presentation'].includes(role)) {
+      errors.push(`no aria attributes should be added for a role of ${role}. Found ${ariaAttributes.map(name => `aria-${name}`).join(', ')}`);
+      return errors;
+    }
+
+    const nodeName = el.nodeName.toLowerCase();
+
+    if (ariaAttributes.includes('disabled') && disableable.includes(nodeName)) {
+      errors.push('do not include aria-disabled on elements with a native disabled attribute');
+    }
+
+    if (ariaAttributes.includes('hidden') && el.hidden) {
+      errors.push('do not include aria-hidden on elements with a hidden attribute');
+    }
+
+    // filter global
+    ariaAttributes = ariaAttributes
+      .filter(name => !(utils.config.ariaAttributes[name] || {}).global);
+
+    // filter disallowed
+    const allowsRoleAttributes = allowed.roles === '*'
+      || allowed.roles.includes(role)
+      || (allowed.ariaForImplicit && allowed.implicit.includes(role));
+    const roleConfig = utils.config.roles[role];
+    ariaAttributes = ariaAttributes
+      .filter((name) => {
+        if (allowsRoleAttributes && roleConfig && roleConfig.allowed.includes(name)) {
+          return true;
+        }
+        errors.push(`aria-${name} is not allowed on this element`);
+        return false;
+      });
+
+    if (ariaAttributes.includes('readonly')) {
+      if (el.getAttribute('aria-readonly') === 'true' && hasContentEditable(el)) {
+        errors.push('do not include aria-readonly="true" on elements with contenteditable');
+      }
+
+      if (nodeName === 'textarea' || (nodeName === 'input' && readonlyable.includes(el.type))) {
+        errors.push('do not include aria-readonly on elements with a native readonly attribute');
+      }
+    }
+
+    if (ariaAttributes.includes('placeholder') && placeholderable.includes(nodeName)) {
+      errors.push('do not include aria-placeholder on elements with a native placeholder attribute');
+    }
+
+    if (ariaAttributes.includes('required')
+      && requireable.includes(nodeName)
+      && el.required
+      && el.getAttribute('aria-required') === 'false') {
+      errors.push('do not set aria-required to false if the required attribute is set');
+    }
+
+    return errors;
+  }
+};
+
+},{"../../rule.js":10}],"./rules/aria/attribute-values/rule.js":[function(_dereq_,module,exports){
 "use strict";
 const Rule = _dereq_('../../rule');
 const ExtendedArray = _dereq_('../../../support/extended-array');
@@ -135,30 +238,6 @@ module.exports = class extends Rule {
     } else {
       this.history.set(el, role);
     }
-    return null;
-  }
-};
-
-},{"../../rule":10}],"./rules/aria/invalid-attributes/rule.js":[function(_dereq_,module,exports){
-"use strict";
-const Rule = _dereq_('../../rule');
-
-module.exports = class extends Rule {
-  selector() {
-    return '*';
-  }
-
-  test(el, utils) {
-    const invalid = Array.from(el.attributes)
-      .map(attr => attr.name)
-      .filter(name => name.indexOf('aria-') === 0)
-      .map(name => name.slice(5))
-      .filter(name => !Object.keys(utils.config.ariaAttributes).includes(name));
-
-    if (invalid.length) {
-      return `element has unknown aria attribute${invalid.length > 1 ? 's' : ''}: ${invalid.map(name => `aria-${name}`).join(', ')}`;
-    }
-
     return null;
   }
 };
@@ -1485,7 +1564,7 @@ module.exports = class extends Rule {
 
 },{"../rule":10}],"./rules":[function(_dereq_,module,exports){
 "use strict";
-module.exports = ["aria/attribute-values","aria/deprecated-attributes","aria/immutable-role","aria/invalid-attributes","aria/landmark/one-banner","aria/landmark/one-contentinfo","aria/landmark/one-main","aria/landmark/prefer-main","aria/landmark/required","aria/no-focusable-hidden","aria/no-focusable-role-none","aria/no-none-without-presentation","aria/one-role","aria/roles","aria/unsupported-elements","attributes/data","attributes/no-javascript-handlers","attributes/no-positive-tab-index","colour-contrast/aa","colour-contrast/aaa","details-and-summary","elements/obsolete","elements/unknown","fieldset-and-legend","headings","ids/form-attribute","ids/imagemap-ids","ids/labels-have-inputs","ids/list-id","ids/no-duplicate-anchor-names","ids/unique-id","labels/area","labels/aria-command","labels/controls","labels/group","labels/headings","labels/img","labels/links","labels/tabindex","lang","multiple-in-group","no-button-without-type","no-consecutive-brs","no-empty-select","no-links-as-buttons","no-links-to-missing-fragments","no-multiple-select","no-outside-controls","no-placeholder-links","no-reset","no-unassociated-labels","security/charset","security/target","title"];
+module.exports = ["aria/allowed-attributes","aria/attribute-values","aria/deprecated-attributes","aria/immutable-role","aria/landmark/one-banner","aria/landmark/one-contentinfo","aria/landmark/one-main","aria/landmark/prefer-main","aria/landmark/required","aria/no-focusable-hidden","aria/no-focusable-role-none","aria/no-none-without-presentation","aria/one-role","aria/roles","aria/unsupported-elements","attributes/data","attributes/no-javascript-handlers","attributes/no-positive-tab-index","colour-contrast/aa","colour-contrast/aaa","details-and-summary","elements/obsolete","elements/unknown","fieldset-and-legend","headings","ids/form-attribute","ids/imagemap-ids","ids/labels-have-inputs","ids/list-id","ids/no-duplicate-anchor-names","ids/unique-id","labels/area","labels/aria-command","labels/controls","labels/group","labels/headings","labels/img","labels/links","labels/tabindex","lang","multiple-in-group","no-button-without-type","no-consecutive-brs","no-empty-select","no-links-as-buttons","no-links-to-missing-fragments","no-multiple-select","no-outside-controls","no-placeholder-links","no-reset","no-unassociated-labels","security/charset","security/target","title"];
 },{}],"./version":[function(_dereq_,module,exports){
 "use strict";
 module.exports = "1.12.0"
@@ -1512,17 +1591,19 @@ const { $$ } = _dereq_('../utils/selectors.js');
  * Generate a rule
  * @returns {allowedAria}
  */
-function rule({ selector = '*', implicit = [], roles = [], anyRole = false }) {
+function rule({ selector = '*', implicit = [], roles = [], anyRole = false, ariaForImplicit = false, noAria = false }) {
   return {
     selector,
     implicit: [].concat(implicit),
     roles: anyRole ? '*' : roles,
+    noAria,
+    ariaForImplicit,
   };
 }
 
 // Common rules
 // TODO: include aria attribute rules
-const noRoleOrAria = rule({});
+const noRoleOrAria = rule({ noAria: true });
 const noRole = rule({});
 const anyRole = rule({ anyRole: true });
 
@@ -1537,19 +1618,19 @@ module.exports = {
         'button', 'checkbox', 'menuitem', 'menuitemcheckbox',
         'menuitemradio', 'option', 'radio', 'tab', 'switch', 'treeitem',
       ],
+      ariaForImplicit: true,
     }),
     rule({
       selector: ':not([href])',
       anyRole: true,
     }),
   ],
-  address: rule({
-    implicit: ['contentinfo'],
-  }),
+  address: anyRole,
   area: [
     rule({
       selector: '[href]',
       implicit: 'link',
+      ariaForImplicit: true,
     }),
   ],
   article: rule({
@@ -1566,6 +1647,7 @@ module.exports = {
   base: noRoleOrAria,
   body: rule({
     implicit: ['document'],
+    ariaForImplicit: true,
   }),
   button: [
     rule({
@@ -1588,16 +1670,20 @@ module.exports = {
   data: anyRole,
   datalist: rule({
     implicit: 'listbox',
+    ariaForImplicit: true,
   }),
   dd: rule({
     implicit: 'definition',
+    ariaForImplicit: true,
   }),
   details: rule({
     implicit: 'group',
+    ariaForImplicit: true,
   }),
   dialog: rule({
     implicit: 'dialog',
     roles: ['alertdialog'],
+    ariaForImplicit: true,
   }),
   div: anyRole,
   dl: rule({
@@ -1606,6 +1692,7 @@ module.exports = {
   }),
   dt: rule({
     implicit: 'listitem',
+    ariaForImplicit: true,
   }),
   embed: rule({
     roles: ['application', 'document', 'presentation', 'img'],
@@ -1683,6 +1770,7 @@ module.exports = {
   hr: rule({
     implicit: 'separator',
     roles: ['presentation'],
+    ariaForImplicit: true,
   }),
   html: noRoleOrAria,
   iframe: rule({
@@ -1703,6 +1791,7 @@ module.exports = {
     rule({
       selector: '[list]:not([type]),[list][type=text],[list][type=search],[list][type=tel],[list][type=url],[list][type=email]',
       implicit: 'combobox',
+      ariaForImplicit: true,
     }),
     rule({
       selector: '[type=button]',
@@ -1722,10 +1811,12 @@ module.exports = {
     rule({
       selector: ':not([type]),[type=tel],[type=text],[type=url]',
       implicit: 'textbox',
+      ariaForImplicit: true,
     }),
     rule({
       selector: '[type=email]',
       implicit: 'textbox',
+      ariaForImplicit: true,
     }),
     rule({
       selector: '[type=hidden]',
@@ -1734,6 +1825,7 @@ module.exports = {
     rule({
       selector: '[type=number]',
       implicit: 'spinbutton',
+      ariaForImplicit: true,
     }),
     rule({
       selector: '[type=radio]',
@@ -1743,14 +1835,17 @@ module.exports = {
     rule({
       selector: '[type=range]',
       implicit: 'slider',
+      ariaForImplicit: true,
     }),
     rule({
       selector: '[type=reset],[type=submit]',
       implicit: 'button',
+      ariaForImplicit: true,
     }),
     rule({
       selector: '[type=search]',
       implicit: 'searchbox',
+      ariaForImplicit: true,
     }),
     noRole,
   ],
@@ -1777,29 +1872,35 @@ module.exports = {
   ],
   main: rule({
     implicit: 'main',
+    ariaForImplicit: true,
   }),
   map: noRoleOrAria,
   math: rule({
     implicit: 'math',
+    ariaForImplicit: true,
   }),
   menu: [
     rule({
-      selector: '[type=toolbar]',
-      implicit: 'toolbar',
+      selector: '[type=context]',
+      implicit: 'menu',
+      ariaForImplicit: true,
     }),
   ],
   menuitem: [
     rule({
       selector: '[type=command]',
       implicit: 'menuitem',
+      ariaForImplicit: true,
     }),
     rule({
       selector: '[type=checkbox]',
       implicit: 'menuitemcheckbox',
+      ariaForImplicit: true,
     }),
     rule({
       selector: '[type=radio]',
       implicit: 'menuitemradio',
+      ariaForImplicit: true,
     }),
   ],
   meta: noRoleOrAria,
@@ -1808,6 +1909,7 @@ module.exports = {
   }),
   nav: rule({
     implicit: 'navigation',
+    ariaForImplicit: true,
   }),
   noscript: noRoleOrAria,
   object: rule({
@@ -1822,11 +1924,13 @@ module.exports = {
   }),
   optgroup: rule({
     implicit: 'group',
+    ariaForImplicit: true,
   }),
   option: [
     rule({
       selector: 'select>option,select>optgroup>option,datalist>option',
       implicit: 'option',
+      ariaForImplicit: true,
     }),
     noRoleOrAria,
   ],
@@ -1838,6 +1942,7 @@ module.exports = {
   picture: noRoleOrAria,
   progress: rule({
     implicit: 'progressbar',
+    ariaForImplicit: true,
   }),
   script: noRoleOrAria,
   section: rule({
@@ -1851,6 +1956,7 @@ module.exports = {
   select: rule({
     implicit: 'listbox',
     roles: ['menu'],
+    ariaForImplicit: true,
   }),
   source: noRoleOrAria,
   span: anyRole,
@@ -1860,6 +1966,7 @@ module.exports = {
   }),
   summary: rule({
     implicit: 'button',
+    ariaForImplicit: true,
   }),
   table: rule({
     implicit: 'table',
@@ -1868,6 +1975,7 @@ module.exports = {
   template: noRoleOrAria,
   textarea: rule({
     implicit: 'textbox',
+    ariaForImplicit: true,
   }),
   tbody: rule({
     implicit: 'rowgroup',
@@ -2552,21 +2660,23 @@ module.exports = {
     nameFromContent: true,
   },
   cell: {
+    allowed: ['colindex', 'colspan', 'expanded', 'rowindex', 'rowspan'],
     nameFromContent: true,
     subclass: ['columnheader', 'gridcell', 'rowheader'],
   },
   checkbox: {
+    allowed: ['readonly'],
     required: ['checked'],
     nameFromContent: true,
     subclass: ['menuitemcheckbox', 'switch'],
   },
   columnheader: {
-    allowed: ['sort', 'readonly', 'required', 'selected', 'expanded'],
+    allowed: ['colindex', 'colspan', 'expanded', 'readonly', 'required', 'rowindex', 'rowspan', 'selected', 'sort'],
     nameFromContent: true,
   },
   combobox: {
-    required: ['expanded'],
-    allowed: ['autocomplete', 'required', 'activedescendant'],
+    required: ['controls', 'expanded'],
+    allowed: ['activedescendant', 'autocomplete', 'orientation', 'required'],
   },
   command: {
     abstract: true,
@@ -2586,7 +2696,7 @@ module.exports = {
     allowed: ['expanded'],
   },
   dialog: {
-    allowed: ['expanded'],
+    allowed: ['expanded', 'modal'],
     subclass: ['alertdialog'],
   },
   directory: {
@@ -2597,7 +2707,7 @@ module.exports = {
     subclass: ['article'],
   },
   feed: {
-    allowed: ['setsize', 'expanded'],
+    allowed: ['expanded'],
   },
   figure: {
     allowed: ['expanded'],
@@ -2606,11 +2716,11 @@ module.exports = {
     allowed: ['expanded'],
   },
   grid: {
-    allowed: ['level', 'multiselectable', 'readonly', 'activedescendant', 'expanded'],
+    allowed: ['activedescendant', 'colcount', 'expanded', 'level', 'multiselectable', 'readonly', 'rowcount'],
     subclass: ['treegrid'],
   },
   gridcell: {
-    allowed: ['readonly', 'required', 'selected', 'expanded'],
+    allowed: ['colindex', 'colspan', 'expanded', 'readonly', 'required', 'rowindex', 'rowspan', 'selected'],
     nameFromContent: true,
     subclass: ['columnheader', 'rowheader'],
   },
@@ -2619,7 +2729,7 @@ module.exports = {
     subclass: ['row', 'select', 'toolbar'],
   },
   heading: {
-    allowed: ['level', 'expanded'],
+    allowed: ['expanded', 'level'],
     nameFromContent: true,
   },
   img: {
@@ -2642,10 +2752,10 @@ module.exports = {
     subclass: ['directory', 'feed'],
   },
   listbox: {
-    allowed: ['multiselectable', 'required', 'expanded', 'activedescendant', 'expanded'],
+    allowed: ['activedescendant', 'expanded', 'multiselectable', 'orientation', 'required'],
   },
   listitem: {
-    allowed: ['level', 'posinset', 'setsize', 'expanded'],
+    allowed: ['expanded', 'level', 'posinset', 'setsize'],
     subclass: ['treeitem'],
   },
   log: {
@@ -2661,13 +2771,14 @@ module.exports = {
     allowed: ['expanded'],
   },
   menu: {
-    allowed: ['activedescendant', 'expanded'],
+    allowed: ['activedescendant', 'expanded', 'orientation'],
     subclass: ['menubar'],
   },
   menubar: {
-    allowed: ['activedescendant'],
+    allowed: ['activedescendant', 'expanded', 'orientation'],
   },
   menuitem: {
+    allowed: ['posinset', 'setsize'],
     nameFromContent: true,
     subclass: ['menuitemcheckbox'],
   },
@@ -2699,12 +2810,12 @@ module.exports = {
   },
   radio: {
     required: ['checked'],
-    allowed: ['posinset', 'selected', 'setsize'],
+    allowed: ['posinset', 'setsize'],
     nameFromContent: true,
     subclass: ['menuitemradio'],
   },
   radiogroup: {
-    allowed: ['required', 'activedescendant', 'expanded'],
+    allowed: ['activedescendant', 'expanded', 'required', 'orientation'],
   },
   range: {
     abstract: true,
@@ -2718,26 +2829,21 @@ module.exports = {
     subclass: ['structure', 'widget', 'window'],
   },
   row: {
-    allowed: [
-      'colindex', 'level', 'rowindex', 'selected', 'level', 'selected',
-      'activedescendant', 'expanded',
-    ],
+    allowed: ['activedescendant', 'colindex', 'expanded', 'level', 'rowindex', 'selected'],
     nameFromContent: true,
   },
   rowgroup: {
-    allowed: ['activedescendant', 'expanded'],
     nameFromContent: true,
   },
   rowheader: {
-    allowed: ['sort', 'readonly', 'required', 'selected', 'expanded'],
+    allowed: ['colindex', 'colspan', 'expanded', 'rowindex', 'rowspan', 'readonly', 'required', 'selected', 'sort'],
     nameFromContent: true,
   },
   scrollbar: {
     required: ['controls', 'orientation', 'valuemax', 'valuemin', 'valuenow'],
-    allowed: ['expanded'],
   },
   search: {
-    allowed: ['expanded', 'orientation'],
+    allowed: ['expanded'],
   },
   searchbox: {
     allowed: ['activedescendant', 'autocomplete', 'multiline', 'placeholder', 'readonly', 'required'],
@@ -2755,15 +2861,16 @@ module.exports = {
     subclass: ['combobox', 'listbox', 'menu', 'radiogroup', 'tree'],
   },
   separator: {
-    allowed: ['valuetext'],
-  },
-  slider: {
     required: ['valuemax', 'valuemin', 'valuenow'],
     allowed: ['orientation', 'valuetext'],
   },
+  slider: {
+    required: ['valuemax', 'valuemin', 'valuenow'],
+    allowed: ['orientation', 'readonly', 'valuetext'],
+  },
   spinbutton: {
     required: ['valuemax', 'valuemin', 'valuenow'],
-    allowed: ['required', 'valuetext'],
+    allowed: ['required', 'readonly', 'valuetext'],
   },
   status: {
     allowed: ['expanded'],
@@ -2778,15 +2885,15 @@ module.exports = {
     nameFromContent: true,
   },
   tab: {
-    allowed: ['selected', 'expanded'],
+    allowed: ['expanded', 'posinset', 'selected', 'setsize'],
     nameFromContent: true,
   },
   table: {
-    allowed: ['colcount', 'rowcount'],
+    allowed: ['colcount', 'expanded', 'rowcount'],
     subclass: ['grid'],
   },
   tablist: {
-    allowed: ['level', 'activedescendant', 'expanded'],
+    allowed: ['activedescendant', 'level', 'multiselectable', 'orientation'],
   },
   tabpanel: {
     allowed: ['expanded'],
@@ -2802,22 +2909,23 @@ module.exports = {
     allowed: ['expanded'],
   },
   toolbar: {
-    allowed: ['activedescendant', 'expanded'],
-    nameFromContent: true,
+    allowed: ['activedescendant', 'expanded', 'orientation'],
   },
   tooltip: {
     allowed: ['expanded'],
+    nameFromContent: true,
   },
   tree: {
-    allowed: ['multiselectable', 'required', 'activedescendant', 'expanded'],
+    allowed: ['activedescendant', 'expanded', 'multiselectable', 'orientation', 'required'],
     nameFromContent: true,
     subclass: ['treegrid'],
   },
   treegrid: {
-    allowed: ['level', 'multiselecteable', 'readonly', 'activedescendant', 'expanded', 'required'],
+    allowed: ['activedescendant', 'colcount', 'expanded', 'level', 'multiselectable', 'orientation', 'readonly', 'required', 'rowcount'],
   },
   treeitem: {
-    allowed: ['level', 'posinset', 'setsize', 'expanded', 'checked', 'selected'],
+    allowed: ['expanded', 'checked', 'level', 'posinset', 'selected', 'setsize'],
+    nameFromContent: true,
   },
   widget: {
     abstract: true,
@@ -3349,7 +3457,7 @@ module.exports = class Aria {
    * @param {Element} el
    * @returns {String|null}
    */
-  getRole(el) {
+  getRole(el, allowed) {
     let role = null;
     // Should be the first non-abstract role in the list
     if ((el.getAttribute('role') || '').split(/\s+/).filter(Boolean).some((name) => {
@@ -3361,7 +3469,8 @@ module.exports = class Aria {
     })) {
       return role;
     }
-    return this.allowed(el).implicit[0] || null;
+    allowed = allowed || this.allowed(el);
+    return allowed.implicit[0] || null;
   }
 
   /**
@@ -3946,6 +4055,6 @@ module.exports = class Style extends ElementCache {
   }
 };
 
-},{"../support/element-cache":13}]},{},["./rules/aria/attribute-values/rule.js","./rules/aria/deprecated-attributes/rule.js","./rules/aria/immutable-role/rule.js","./rules/aria/invalid-attributes/rule.js","./rules/aria/landmark/one-banner/rule.js","./rules/aria/landmark/one-contentinfo/rule.js","./rules/aria/landmark/one-main/rule.js","./rules/aria/landmark/prefer-main/rule.js","./rules/aria/landmark/required/rule.js","./rules/aria/no-focusable-hidden/rule.js","./rules/aria/no-focusable-role-none/rule.js","./rules/aria/no-none-without-presentation/rule.js","./rules/aria/one-role/rule.js","./rules/aria/roles/rule.js","./rules/aria/unsupported-elements/rule.js","./rules/attributes/data/rule.js","./rules/attributes/no-javascript-handlers/rule.js","./rules/attributes/no-positive-tab-index/rule.js","./rules/colour-contrast/aa/rule.js","./rules/colour-contrast/aaa/rule.js","./rules/details-and-summary/rule.js","./rules/elements/obsolete/rule.js","./rules/elements/unknown/rule.js","./rules/fieldset-and-legend/rule.js","./rules/headings/rule.js","./rules/ids/form-attribute/rule.js","./rules/ids/imagemap-ids/rule.js","./rules/ids/labels-have-inputs/rule.js","./rules/ids/list-id/rule.js","./rules/ids/no-duplicate-anchor-names/rule.js","./rules/ids/unique-id/rule.js","./rules/labels/area/rule.js","./rules/labels/aria-command/rule.js","./rules/labels/controls/rule.js","./rules/labels/group/rule.js","./rules/labels/headings/rule.js","./rules/labels/img/rule.js","./rules/labels/links/rule.js","./rules/labels/tabindex/rule.js","./rules/lang/rule.js","./rules/multiple-in-group/rule.js","./rules/no-button-without-type/rule.js","./rules/no-consecutive-brs/rule.js","./rules/no-empty-select/rule.js","./rules/no-links-as-buttons/rule.js","./rules/no-links-to-missing-fragments/rule.js","./rules/no-multiple-select/rule.js","./rules/no-outside-controls/rule.js","./rules/no-placeholder-links/rule.js","./rules/no-reset/rule.js","./rules/no-unassociated-labels/rule.js","./rules/security/charset/rule.js","./rules/security/target/rule.js","./rules/title/rule.js","./rules","./version",8,7])(8)
+},{"../support/element-cache":13}]},{},["./rules/aria/allowed-attributes/rule.js","./rules/aria/attribute-values/rule.js","./rules/aria/deprecated-attributes/rule.js","./rules/aria/immutable-role/rule.js","./rules/aria/landmark/one-banner/rule.js","./rules/aria/landmark/one-contentinfo/rule.js","./rules/aria/landmark/one-main/rule.js","./rules/aria/landmark/prefer-main/rule.js","./rules/aria/landmark/required/rule.js","./rules/aria/no-focusable-hidden/rule.js","./rules/aria/no-focusable-role-none/rule.js","./rules/aria/no-none-without-presentation/rule.js","./rules/aria/one-role/rule.js","./rules/aria/roles/rule.js","./rules/aria/unsupported-elements/rule.js","./rules/attributes/data/rule.js","./rules/attributes/no-javascript-handlers/rule.js","./rules/attributes/no-positive-tab-index/rule.js","./rules/colour-contrast/aa/rule.js","./rules/colour-contrast/aaa/rule.js","./rules/details-and-summary/rule.js","./rules/elements/obsolete/rule.js","./rules/elements/unknown/rule.js","./rules/fieldset-and-legend/rule.js","./rules/headings/rule.js","./rules/ids/form-attribute/rule.js","./rules/ids/imagemap-ids/rule.js","./rules/ids/labels-have-inputs/rule.js","./rules/ids/list-id/rule.js","./rules/ids/no-duplicate-anchor-names/rule.js","./rules/ids/unique-id/rule.js","./rules/labels/area/rule.js","./rules/labels/aria-command/rule.js","./rules/labels/controls/rule.js","./rules/labels/group/rule.js","./rules/labels/headings/rule.js","./rules/labels/img/rule.js","./rules/labels/links/rule.js","./rules/labels/tabindex/rule.js","./rules/lang/rule.js","./rules/multiple-in-group/rule.js","./rules/no-button-without-type/rule.js","./rules/no-consecutive-brs/rule.js","./rules/no-empty-select/rule.js","./rules/no-links-as-buttons/rule.js","./rules/no-links-to-missing-fragments/rule.js","./rules/no-multiple-select/rule.js","./rules/no-outside-controls/rule.js","./rules/no-placeholder-links/rule.js","./rules/no-reset/rule.js","./rules/no-unassociated-labels/rule.js","./rules/security/charset/rule.js","./rules/security/target/rule.js","./rules/title/rule.js","./rules","./version",8,7])(8)
 });
 //# sourceMappingURL=linter.js.map
