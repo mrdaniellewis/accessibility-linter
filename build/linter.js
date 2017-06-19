@@ -1567,7 +1567,7 @@ module.exports = class extends Rule {
 module.exports = ["aria/allowed-attributes","aria/attribute-values","aria/deprecated-attributes","aria/immutable-role","aria/landmark/one-banner","aria/landmark/one-contentinfo","aria/landmark/one-main","aria/landmark/prefer-main","aria/landmark/required","aria/no-focusable-hidden","aria/no-focusable-role-none","aria/no-none-without-presentation","aria/one-role","aria/roles","aria/unsupported-elements","attributes/data","attributes/no-javascript-handlers","attributes/no-positive-tab-index","colour-contrast/aa","colour-contrast/aaa","details-and-summary","elements/obsolete","elements/unknown","fieldset-and-legend","headings","ids/form-attribute","ids/imagemap-ids","ids/labels-have-inputs","ids/list-id","ids/no-duplicate-anchor-names","ids/unique-id","labels/area","labels/aria-command","labels/controls","labels/group","labels/headings","labels/img","labels/links","labels/tabindex","lang","multiple-in-group","no-button-without-type","no-consecutive-brs","no-empty-select","no-links-as-buttons","no-links-to-missing-fragments","no-multiple-select","no-outside-controls","no-placeholder-links","no-reset","no-unassociated-labels","security/charset","security/target","title"];
 },{}],"./version":[function(_dereq_,module,exports){
 "use strict";
-module.exports = "1.12.0"
+module.exports = "1.13.0"
 },{}],1:[function(_dereq_,module,exports){
 "use strict";
 /**
