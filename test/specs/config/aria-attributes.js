@@ -88,12 +88,12 @@ describe('#ariaAttributes', () => {
     expect(Object.keys(ariaAttributes)).toMatchArray(allAttributes);
   });
 
-  it('has the correct roles marked as deprecated', () => {
+  it('has the correct attributes marked as deprecated', () => {
     expect(Object.keys(ariaAttributes).filter(name => ariaAttributes[name].deprecated))
       .toMatchArray(deprecatedAttributes);
   });
 
-  it('has the correct roles marked as global', () => {
+  it('has the correct attributes marked as global', () => {
     expect(Object.keys(ariaAttributes).filter(name => ariaAttributes[name].global))
       .toMatchArray(globalAttributes);
   });

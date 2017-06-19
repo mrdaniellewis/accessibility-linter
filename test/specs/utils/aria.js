@@ -42,8 +42,8 @@ describe('#aria', () => {
       it('address', () => {
         const el = buildHtml('<address />');
         expect(aria.allowed(el)).toInclude({
-          implicit: ['contentinfo'],
-          roles: [],
+          implicit: [],
+          roles: '*',
         });
       });
 
@@ -731,10 +731,10 @@ describe('#aria', () => {
         });
       });
 
-      it('menu type="toolbar"', () => {
-        const el = buildHtml('<menu type="toolbar" />');
+      it('menu type="context"', () => {
+        const el = buildHtml('<menu type="context" />');
         expect(aria.allowed(el)).toInclude({
-          implicit: ['toolbar'],
+          implicit: ['menu'],
           roles: [],
         });
       });
@@ -1111,6 +1111,13 @@ describe('#aria', () => {
     it('does not return abstract roles', () => {
       const el = buildHtml('<input role="widget alert" />');
       expect(aria.getRole(el)).toEqual('alert');
+    });
+
+    it('accepts a second argument of an allowed object', () => {
+      const el = buildHtml('<input />');
+      const spy = expect.spyOn(aria, 'allowed');
+      expect(aria.getRole(el, { implicit: ['alert'] })).toEqual('alert');
+      expect(spy).toNotHaveBeenCalled();
     });
   });
 

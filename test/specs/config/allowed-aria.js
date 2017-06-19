@@ -8,4 +8,6 @@ describe('#allowedAria', () => {
     const elements = testData.allElements.filter(name => !testData.obsoleteElements.includes(name));
     expect(Object.keys(allowedAria).filter(name => name !== '_default')).toMatchArray(elements);
   });
+
+  // This is tested in utils#allowed
 });
