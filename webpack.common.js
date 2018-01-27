@@ -1,17 +1,23 @@
+const merge = require('webpack-merge');
 const path = require('path');
-// const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
-module.exports = {
-  entry: {
-    standalone: './lib/index.js',
-    umd: './lib/linter.js',
-  },
+const common = {
   output: {
     filename: '[name].js',
     path: path.resolve(__dirname, 'build'),
   },
   devtool: 'eval-source-map',
-  devServer: {
-    publicPath: '/build',
-  },
 };
+
+exports.standalone = merge(
+  { entry: { standalone: './lib/index.js' } },
+  common,
+);
+
+exports.umd = merge(
+  {
+    entry: { umd: './lib/index.js' },
+    output: { library: 'AccessibilityLinter', libraryTarget: 'umd' },
+  },
+  common,
+);

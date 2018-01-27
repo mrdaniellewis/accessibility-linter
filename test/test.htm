@@ -9,7 +9,10 @@
   <script src="../node_modules/mocha/mocha.js"></script>
   <script src="../node_modules/mocha-browser-helpers/build/index.js"></script>
   <script src="setup.js"></script>
-  <script src="../build/umd.js"></script>
+  <script src="../build/standalone.js"></script>
+  <script src="../build/spec.js"></script>
+  <script src="spec/linter.js"></script>
+  <script src="spec/rules.js"></script>
   <script>
     mocha.checkLeaks();
     mocha.run();

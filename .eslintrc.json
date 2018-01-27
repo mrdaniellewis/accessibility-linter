@@ -18,9 +18,13 @@
         "mocha": true
       },
       "globals": {
+        "afterAll": false,
+        "AccessibilityLinter": false,
+        "beforeAll": false,
         "domUtils": false,
         "expect": false,
-        "mock": false
+        "mock": false,
+        "ruleSpecs": false
       }
     },
     {

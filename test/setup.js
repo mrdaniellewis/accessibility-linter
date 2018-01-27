@@ -3,6 +3,8 @@ mocha.setup('bdd');
 // Helpful shortcut
 window.appendToBody = domUtils.appendToBody;
 window.uniqueId = domUtils.uniqueId;
+window.beforeAll = before;
+window.afterAll = after;
 
 // Remove any created DOM nodes
 domUtils.cleanDom();
