@@ -1,4 +1,4 @@
 **/*.min.js
-test/specs/_rules.js
 node_modules
 build/**
+_old/**

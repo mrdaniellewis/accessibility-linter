@@ -3,43 +3,31 @@
     "airbnb-base"
   ],
   "env": {
-    "browser": true,
-    "node": true
+    "browser": true
   },
   "rules": {
-    "strict": 0,
-    "no-param-reassign": 0,
-    "prefer-rest-params": 0,
-    "prefer-spread": 0,
     "no-cond-assign": ["error", "except-parens"],
-    "no-plusplus": 0,
-    "no-underscore-dangle": 0,
-    "no-multi-assign": 0,
-    "indent": ["error", 2, {
-      "SwitchCase": 1,
-      "VariableDeclarator": 1,
-      "outerIIFEBody": 1,
-      "FunctionDeclaration": {
-        "parameters": "first"
+    "no-return-assign": ["error", "except-parens"],
+    "no-plusplus": "off",
+    "no-console": ["error", { "allow": ["error"] }]
+  },
+  "overrides": [
+    {
+      "files": ["test/**/*.js", "lib/**/spec.js"],
+      "env": {
+        "mocha": true
       },
-      "FunctionExpression": {
-        "parameters": "first"
-      },
-      "CallExpression": {
-        "parameters": "first"
+      "globals": {
+        "domUtils": false,
+        "expect": false,
+        "mock": false
       }
-    }],
-    "comma-dangle": ["error", {
-      "arrays": "always-multiline",
-      "objects": "always-multiline",
-      "functions": "never"
-    }],
-    "max-len": ["error", 100, 2, {
-      "ignoreUrls": true,
-      "ignoreComments": true,
-      "ignoreRegExpLiterals": true,
-      "ignoreStrings": true,
-      "ignoreTemplateLiterals": true
-    }]
-  }
+    },
+    {
+      "files": ["webpack.*.js"],
+      "rules": {
+        "import/no-extraneous-dependencies": "off"
+      }
+    }
+  ]
 }
