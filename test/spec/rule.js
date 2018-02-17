@@ -1,0 +1,147 @@
+describe('Rule', () => {
+  const { Rule } = AccessibilityLinter;
+
+  describe('#name', () => {
+    it('is set from options', () => {
+      expect(new Rule({ name: 'foo' }).name).toEqual('foo');
+    });
+
+    it('is set from the constructor', () => {
+      class Foo extends Rule {}
+      expect(new Foo({ name: 'bar' }).name).toEqual('Foo');
+    });
+
+    it('throws without a name', () => {
+      expect(() => new Rule()).toThrow('rule must have a name');
+    });
+  });
+
+  describe('#type', () => {
+    it('defaults to error', () => {
+      expect(new Rule({ name: 'foo' }).type).toEqual('error');
+    });
+
+    it('is set from options', () => {
+      expect(new Rule({ type: 'off', name: 'foo' }).type).toEqual('off');
+    });
+  });
+
+  describe('#whitelist', () => {
+    it('defaults to falsey', () => {
+      expect(new Rule({ name: 'foo' }).whitelist).toBeFalsy();
+    });
+
+    it('is set from options', () => {
+      expect(new Rule({ whitelist: 'foo', name: 'foo' }).whitelist).toEqual('foo');
+    });
+  });
+
+  describe('#selector', () => {
+    it('is set from options', () => {
+      expect(new Rule({ selector: '*', name: 'foo' }).selector).toEqual('*');
+    });
+
+    it('will not be set if there is an existing implementation', () => {
+      class Foo extends Rule {
+        get selector() {
+          return 'foo';
+        }
+      }
+      expect(new Foo({ selector: '*' }).selector).toEqual('foo');
+    });
+  });
+
+  describe('#test', () => {
+    it('is set from options', () => {
+      const test = () => {};
+      expect(new Rule({ test, name: 'foo' }).test).toEqual(test);
+    });
+
+    it('will not be set if there is an existing implementation', () => {
+      class Foo extends Rule {
+        test() {}
+      }
+      expect(new Foo({ test: () => {} }).test).toEqual(Foo.prototype.test);
+    });
+  });
+
+  describe('#message', () => {
+    it('is set from options', () => {
+      expect(new Rule({ message: 'foo', name: 'foo' }).message).toEqual('foo');
+    });
+
+    it('will not be set if there is an existing implementation', () => {
+      class Foo extends Rule {
+        get message() {
+          return 'bar';
+        }
+      }
+      expect(new Foo({ message: 'foo' }).message).toEqual('bar');
+    });
+  });
+
+  describe('#run', () => {
+    it('returns an ExtendedArray for no errors', () => {
+      const errors = new Rule({ selector: 'foo', message: 'bar', name: 'foo' }).run(document, () => true);
+      expect(errors).toEqual([]);
+      expect(errors.constructor.name).toEqual('ExtendedArray');
+    });
+
+    it('finds elements in a context and returns a message', () => {
+      const foo = appendToBody('<foo><bar /></foo>');
+      const bar = foo.querySelector('bar');
+      appendToBody('<foo />');
+
+      const errors = new Rule({ selector: 'foo,bar', message: 'bar', name: 'foo' }).run(foo, () => true);
+      expect(errors).toEqual([{ element: foo, message: 'bar' }, { element: bar, message: 'bar' }]);
+    });
+
+    it('uses filter to filter found elements', () => {
+      const foo = appendToBody('<foo><bar /></foo>');
+      const bar = foo.querySelector('bar');
+
+      const errors = new Rule({ selector: 'foo,bar', message: 'bar', name: 'foo' }).run(foo, el => el !== bar);
+      expect(errors).toEqual([{ element: foo, message: 'bar' }]);
+    });
+
+    describe('test', () => {
+      it('test can filter all found elements', () => {
+        appendToBody('<foo><bar /></foo>');
+
+        const errors = new Rule({ selector: 'foo,bar', test: () => null, name: 'foo' }).run(document, () => true);
+        expect(errors).toEqual([]);
+      });
+
+      it('test can set the error messages', () => {
+        const foo = appendToBody('<foo><bar /></foo>');
+        const bar = foo.querySelector('bar');
+
+        const errors = new Rule({ selector: 'foo,bar', test: el => el.nodeName, name: 'foo' }).run(document, () => true);
+        expect(errors).toEqual([{ element: foo, message: 'FOO' }, { element: bar, message: 'BAR' }]);
+      });
+
+      it('test can return multiple errors', () => {
+        const foo = appendToBody('<foo><bar /></foo>');
+        const bar = foo.querySelector('bar');
+
+        const errors = new Rule({ selector: 'foo,bar', test: el => [el.nodeName, 'foo'], name: 'foo' })
+          .run(document, () => true);
+
+        expect(errors).toEqual([
+          { element: foo, message: 'FOO' },
+          { element: foo, message: 'foo' },
+          { element: bar, message: 'BAR' },
+          { element: bar, message: 'foo' },
+        ]);
+      });
+
+      it('does not call test if filter returns false', () => {
+        const spy = mock.fn();
+        appendToBody('<foo />');
+
+        new Rule({ selector: 'foo', test: spy, name: 'foo' }).run(document, () => false);
+        expect(spy).not.toHaveBeenCalled();
+      });
+    });
+  });
+});

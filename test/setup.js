@@ -12,3 +12,5 @@ domUtils.cleanDom();
 expect.hasAssertions();
 // Clean up spies
 afterEach(() => mock.clearAllMocks());
+
+window.nextTick = (wait = 0) => new Promise(resolve => setTimeout(resolve, wait));

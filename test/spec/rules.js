@@ -1,6 +1,5 @@
 // Rules are run in an iframe so mocha display does not interfere
 describe('rules', () => {
-  const context = {};
   let frame;
 
   beforeAll((done) => {
@@ -15,8 +14,9 @@ describe('rules', () => {
     frame.remove();
   });
 
-  AccessibilityLinter.rules.forEach((rule, name) => {
-    describe(name, () => {
+  AccessibilityLinter.rules.forEach((Rule) => {
+    describe(Rule.name, () => {
+      const context = {};
       let iframeError;
 
       beforeAll(() => {
@@ -29,17 +29,20 @@ describe('rules', () => {
 
       beforeEach(() => {
         iframeError = false;
-        // start linter
+        context.Rule = Rule;
+        // start linter and add to context
       });
 
       // Execute in a promise so it runs next tick after any dom mutations
       afterEach(() => Promise.resolve().then(() => {
-        // Stop linter
+        // Stop linter and clear context
         if (iframeError) {
           throw new Error('script error in iframe - see browser log');
         }
       }));
 
+      // The spec needs to be run in a context where DOM globals point to the iframe
+      // rather than those of the current window.
       // eslint-disable-next-line no-new-func
       new Function(`
         let Rule, window, document;
@@ -56,8 +59,7 @@ describe('rules', () => {
           Rule = null;
         });
 
-        ${ruleSpecs.default.get(name) || "it('has a spec', () => { throw new Error('missing spec'); });"}
-
+        ${ruleSpecs.default.get(Rule.name) || "it('has a spec', () => { throw new Error('missing spec'); });"}
       `).call(context);
     });
   });

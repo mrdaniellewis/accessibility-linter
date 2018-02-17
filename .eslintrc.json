@@ -6,10 +6,14 @@
     "browser": true
   },
   "rules": {
+    "class-methods-use-this": "off",
+    "import/prefer-default-export": "off",
     "no-cond-assign": ["error", "except-parens"],
     "no-return-assign": ["error", "except-parens"],
     "no-plusplus": "off",
-    "no-console": ["error", { "allow": ["error"] }]
+    "no-console": ["error", { "allow": ["error"] }],
+    "object-curly-newline": ["error", { "consistent": true, "multiline": true }],
+    "require-await": "error"
   },
   "overrides": [
     {
@@ -19,12 +23,16 @@
       },
       "globals": {
         "afterAll": false,
+        "appendToBody": false,
         "AccessibilityLinter": false,
         "beforeAll": false,
         "domUtils": false,
         "expect": false,
+        "internals": false,
         "mock": false,
-        "ruleSpecs": false
+        "nextTick": false,
+        "ruleSpecs": false,
+        "uniqueId": false
       }
     },
     {

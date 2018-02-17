@@ -29,4 +29,15 @@ module.exports = [
     },
     commonDev,
   ),
+  merge(
+    {
+      entry: { internals: './lib/internals.js' },
+      output: {
+        filename: '[name].js',
+        path: path.resolve(__dirname, './build'),
+        library: 'internals',
+      },
+    },
+    commonDev,
+  ),
 ];
