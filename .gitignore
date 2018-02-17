@@ -1,6 +1,7 @@
 node_modules
 build/**
 !build/.gitignore
+.temp
 *.log
 _old
 todo.md
