@@ -1,14 +1,21 @@
 describe('AccessibilityLinter', () => {
   const { Rule } = AccessibilityLinter;
+  const packageJson = fetch('../package.json').then(response => response.json());
+
 
   it('is a property of window', () => {
     expect(AccessibilityLinter).toBeInstanceOf(Function);
   });
 
   describe('.version', () => {
-    it('it matches the npm package version number', async () => {
-      const packageJson = await fetch('../package.json').then(response => response.json());
-      expect(AccessibilityLinter.version).toEqual(packageJson.version);
+    it('it matches the npm package value', async () => {
+      expect(AccessibilityLinter.version).toEqual((await packageJson).version);
+    });
+  });
+
+  describe('.license', () => {
+    it('it matches the npm package value', async () => {
+      expect(AccessibilityLinter.license).toEqual((await packageJson).license);
     });
   });
 
