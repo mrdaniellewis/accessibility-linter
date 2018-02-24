@@ -17,7 +17,7 @@
     "eslint-config-airbnb-base": "^12.1.0",
     "eslint-plugin-import": "^2.8.0",
     "mocha": "^5.0.1",
-    "mocha-browser-helpers": "github:mrdaniellewis/mocha-browser-helpers",
+    "mocha-browser-helpers": "mrdaniellewis/mocha-browser-helpers#v1.4.0",
     "mustache": "^2.3.0",
     "raw-loader": "^0.5.1",
     "uglifyjs-webpack-plugin": "^1.2.0",
