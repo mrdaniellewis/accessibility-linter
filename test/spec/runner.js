@@ -1,5 +1,5 @@
 describe('Runner', () => {
-  const { Runner } = internals;
+  const { Runner, ariaExtensions } = internals;
   const { Rule } = AccessibilityLinter;
 
   let noFoo;
@@ -20,6 +20,17 @@ describe('Runner', () => {
         { message: 'noBar', element: bar, rule: noBar },
       ]);
     });
+
+    it('runs rules against multiple contexts', () => {
+      const foo = appendToBody('<foo />');
+      const bar = appendToBody('<bar />');
+      const runner = new Runner({ rules: new Set([noFoo, noBar]) });
+      expect(runner.run(foo, bar)).toEqual([
+        { message: 'noFoo', element: foo, rule: noFoo },
+        { message: 'noBar', element: bar, rule: noBar },
+      ]);
+    });
+
 
     it('does not run rules that are off', () => {
       const foo = appendToBody('<foo><bar /></foo>');
@@ -139,6 +150,25 @@ describe('Runner', () => {
         expect(runner.run(document).length).toEqual(0);
         foo.removeAttribute('ignore');
         expect(runner.run(document).length).toEqual(1);
+      });
+    });
+
+    describe('aria-extensions', () => {
+      it('caches values while running', () => {
+        const foo = appendToBody('<foo />');
+        const rule = new Rule({
+          name: 'test-caching',
+          selector: 'foo',
+          test(element) {
+            expect(element[ariaExtensions.symbols.visible]).toEqual(true);
+            element.hidden = true;
+            expect(element[ariaExtensions.symbols.visible]).toEqual(true);
+            return 'error';
+          },
+        });
+        const errors = new Runner({ rules: [rule] }).run(document);
+        expect(errors).toHaveLength(1);
+        expect(foo[ariaExtensions.symbols.visible]).toEqual(false);
       });
     });
   });

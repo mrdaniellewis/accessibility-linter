@@ -145,3 +145,35 @@ describe('Rule', () => {
     });
   });
 });
+
+describe('XPathRule', () => {
+  const { XPathRule } = AccessibilityLinter;
+
+  it('finds elements with a document context', () => {
+    const foo = appendToBody('<foo data-foo />');
+
+    const errors = new XPathRule({ selector: 'foo[@data-foo]', name: 'foo', message: 'no foo' })
+      .run(document, () => true);
+
+    expect(errors).toEqual([{ element: foo, message: 'no foo' }]);
+  });
+
+  it('finds elements with a non-document context', () => {
+    const foo = appendToBody('<foo data-foo />');
+    appendToBody('<foo data-foo />');
+
+    const errors = new XPathRule({ selector: 'foo[@data-foo]', name: 'foo', message: 'no foo' })
+      .run(foo, () => true);
+
+    expect(errors).toEqual([{ element: foo, message: 'no foo' }]);
+  });
+
+  it('selects the parentNode of a text node', () => {
+    const foo = appendToBody('<foo>foo</foo>');
+
+    const errors = new XPathRule({ selector: "text()[.='foo']", name: 'foo', message: 'no foo' })
+      .run(document, () => true);
+
+    expect(errors).toEqual([{ element: foo, message: 'no foo' }]);
+  });
+});

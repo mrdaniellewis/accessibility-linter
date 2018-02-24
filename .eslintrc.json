@@ -33,6 +33,9 @@
         "nextTick": false,
         "ruleSpecs": false,
         "uniqueId": false
+      },
+      "rules": {
+        "no-param-reassign": "off"
       }
     },
     {
