@@ -1,0 +1,31 @@
+body::after {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  content: "Loading...";
+  font: 2em/1.5 sans-serif;
+}
+
+body.mocha-start::after {
+  content: "Running..." attr(data-mocha-percent) "%";
+}
+
+body.mocha-finish-pass::after {
+  content: "✓ Finished - Success - " attr(data-mocha-passed) " passed";
+  color: green;
+}
+
+body.mocha-finish-fail::after {
+  content: "✖ Finished - Fail - " attr(data-mocha-failed) " failed";
+  color: red;
+}
+
+body.mocha-finish-nothing::after {
+  content: "! No specs found";
+  color: orange;
+}

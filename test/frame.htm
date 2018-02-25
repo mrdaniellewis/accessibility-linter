@@ -3,7 +3,9 @@
   <meta charset="utf-8">
   <script src="../node_modules/mocha-browser-helpers/build/dom-utils.js"></script>
   <script src="../build/umd.js"></script>
-  <script>window.onerror = function(message, url, lineNo, columnNo, error) {
-    console.log(`error: ${message} at ${url} line ${lineNo}: ${JSON.stringify(error)}`)
-  };</script>
+  <script>
+    window.onerror = function(message, url, lineNo, columnNo, error) {
+      console.log(`error: ${message} at ${url} line ${lineNo}: ${JSON.stringify(error)}`)
+    };
+  </script>
 </head>

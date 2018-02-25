@@ -2,14 +2,12 @@
 <head>
   <meta charset="utf-8">
   <title>Tests</title>
-  <link href="../node_modules/mocha/mocha.css" rel="stylesheet" />
-</head>
-<body>
-  <div id="mocha"></div>
+  <link href="test.css" rel="stylesheet" />
   <script src="../node_modules/mocha/mocha.js"></script>
   <script src="../node_modules/mocha-browser-helpers/build/index.js"></script>
+  <script src="reporter.js"></script>
   <script src="setup.js"></script>
-  <script src="../build/standalone.js"></script>
+  <script src="../build/umd.js"></script>
   <script src="../build/spec.js"></script>
   <script src="../build/internals.js"></script>
   <script src="spec/symbol.js"></script>
@@ -24,8 +22,7 @@
   <script src="spec/runner.js"></script>
   <script src="spec/accessibility-linter.js"></script>
   <script src="spec/rules.js"></script>
-  <script>
-    mocha.checkLeaks();
-    mocha.run();
-  </script>
+</head>
+<body>
+  <div id="mocha"></div>
 </body>

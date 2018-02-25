@@ -20,6 +20,7 @@ module.exports = [
         filename: '[name].js',
         path: path.resolve(__dirname, './build'),
         library: 'ruleSpecs',
+        libraryExport: 'default',
       },
       module: {
         rules: [

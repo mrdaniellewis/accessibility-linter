@@ -16,8 +16,8 @@ exports.standalone = merge(
 
 exports.umd = merge(
   {
-    entry: { umd: './lib/index.js' },
-    output: { library: 'AccessibilityLinter', libraryTarget: 'umd' },
+    entry: { umd: './lib/accessibility-linter.js' },
+    output: { library: 'AccessibilityLinter', libraryExport: 'default', libraryTarget: 'umd' },
   },
   common,
 );
