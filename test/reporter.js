@@ -42,7 +42,7 @@ window.ConsoleReporter = function ConsoleReporter(runner) {
 
   runner.on('pending', (test) => {
     pending.push(test);
-    console.warn(`pending - ${testName(test)}`);
+    console.warn(`pending: ${testName(test)}`);
     table.push(tableRow(test));
     updateCount();
   });
@@ -76,7 +76,9 @@ window.ConsoleReporter = function ConsoleReporter(runner) {
     if (failures.length) {
       document.body.classList.add('mocha-finish-fail');
       console.log(`✓ ${passes.length} specs passed`);
-      console.warn(`! ${pending.length} specs pending`);
+      if (pending.length) {
+        console.warn(`! ${pending.length} specs pending`);
+      }
       console.error(`✖ ${failures.length} specs failed`);
       return;
     }

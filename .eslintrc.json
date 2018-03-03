@@ -26,6 +26,7 @@
         "appendToBody": false,
         "AccessibilityLinter": false,
         "beforeAll": false,
+        "createDomWaiter": false,
         "domUtils": false,
         "expect": false,
         "internals": false,
@@ -36,6 +37,16 @@
       },
       "rules": {
         "no-param-reassign": "off"
+      }
+    },
+    {
+      "files": ["lib/**/spec.js"],
+      "globals": {
+        "domChange": false,
+        "linter": false,
+        "reporter": false,
+        "Rule": false,
+        "ruleName": false
       }
     },
     {
