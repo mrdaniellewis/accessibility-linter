@@ -30,14 +30,18 @@ expect.extend({
       expect(logged).toEqual([]);
       return { pass: false };
     }
-    expect(logged).toEqual(expected);
+    if (expected.length === 0) {
+      expect(logged.length).toBeGreaterThan(0);
+    } else {
+      expect(logged).toEqual(expected);
+    }
     return { pass: true };
   },
 });
 
 window.createDomWaiter = function createDomWaiter() {
   let stop;
-  const promise = new Promise((resolve, reject) => {
+  const promise = new Promise((resolve) => {
     const observer = new MutationObserver(() => resolve());
     observer.observe(
       document,
@@ -45,7 +49,6 @@ window.createDomWaiter = function createDomWaiter() {
     );
     stop = () => {
       observer.disconnect();
-      reject();
     };
   });
 

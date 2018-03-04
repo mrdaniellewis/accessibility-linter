@@ -1,6 +1,6 @@
-Do not allow multiple consequitive non-breaking spaces.
+Do not allow multiple consecutive non-breaking spaces.
 
-Multiple non-breaking spaces implies the author is trying to create a minimum element
+Multiple non-breaking spaces implies the author is trying to create a minimum element width
 with using text.  Page layout is better done using CSS.  This usage will create inflexible layouts
 that may not work on different screen sizes.
 
