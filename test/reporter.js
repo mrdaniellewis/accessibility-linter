@@ -67,6 +67,11 @@ window.ConsoleReporter = function ConsoleReporter(runner) {
 
     console.table(table);
 
+    if (window.ConsoleReporter.windowError) {
+      document.body.classList.add('mocha-finish-error');
+      return;
+    }
+
     if (!runner.total) {
       document.body.classList.add('mocha-finish-nothing');
       console.warn('0 specs run');
@@ -91,3 +96,4 @@ window.ConsoleReporter = function ConsoleReporter(runner) {
   });
 };
 
+window.addEventListener('error', () => (window.ConsoleReporter.windowError = true));

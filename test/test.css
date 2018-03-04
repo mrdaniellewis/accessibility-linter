@@ -29,3 +29,8 @@ body.mocha-finish-nothing::after {
   content: "! No specs found";
   color: orange;
 }
+
+body.mocha-finish-error::after {
+  content: "✖ Finished - JavaScript errors have occurred";
+  color: red;
+}
