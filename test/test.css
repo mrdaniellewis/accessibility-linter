@@ -31,6 +31,6 @@ body.mocha-finish-nothing::after {
 }
 
 body.mocha-finish-error::after {
-  content: "✖ Finished - JavaScript errors have occurred";
+  content: "✖ JavaScript errors have occurred";
   color: red;
 }

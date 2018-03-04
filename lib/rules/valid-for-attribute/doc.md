@@ -1,20 +1,17 @@
-Form controls using the form attribute should point to valid forms.
-
-This checks the form attribute is valid and points to an existing form.
+Checks the for attribute of a `<label>` element is valid.
 
 Incorrect code for this rule:
 ```html
-  <input form="" />                         <!-- Missing attribute value -->
-  <select form="foo bar" />                 <!-- Id contains spaces -->
-  <textarea form="foo" /><div id="foo" />   <!-- Target is not a form -->
+  <label for="" />                      <!-- Missing attribute value -->
+  <label for="foo bar" />               <!-- Id contains spaces -->
+  <label for="foo" /><div id="foo" />   <!-- Target is not a labelable element -->
 ```
 
 Correct code for this rule:
 ```html
-  <form id="foo"></form>
-  <input form="foo" />
+  <input id="foo" /><label for="foo" />
 ```
 
 Related specifications:
 
-* https://www.w3.org/TR/html52/sec-forms.html#association-of-controls-and-forms
+* https://www.w3.org/TR/html52/sec-forms.html#the-label-element

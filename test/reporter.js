@@ -34,13 +34,24 @@ window.ConsoleReporter = function ConsoleReporter(runner) {
     };
   }
 
+  function checkForDuplicateTestName(test) {
+    const name = testName(test);
+    if (tests.some(item => testName(item) === name)) {
+      console.warn('Duplicate test name', name);
+    }
+  }
+
   runner.on('start', () => {
     document.body.classList.add('mocha-start');
   });
 
-  runner.on('test', test => tests.push(test));
+  runner.on('test', (test) => {
+    checkForDuplicateTestName(test);
+    tests.push(test);
+  });
 
   runner.on('pending', (test) => {
+    checkForDuplicateTestName(test);
     pending.push(test);
     console.warn(`pending: ${testName(test)}`);
     table.push(tableRow(test));
