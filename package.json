@@ -4,6 +4,7 @@
   "description": "Accessibility test a web page or web application",
   "main": "lib/index.js",
   "scripts": {
+    "create-rule": "cp -r lib/rules/example",
     "lint": "eslint . --ext .js",
     "build-docs": "webpack --config webpack.docs.js && node .temp/generate > build/rules.md",
     "build": "npm run lint && webpack && npm run build-docs",
