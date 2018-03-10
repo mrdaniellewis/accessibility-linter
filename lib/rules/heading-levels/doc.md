@@ -16,4 +16,4 @@ Correct code for this rule:
 
 * https://www.w3.org/TR/html52/sections.html#the-h1-h2-h3-h4-h5-and-h6-elements
 * https://www.w3.org/TR/html52/sections.html#creating-an-outline
-
+* https://www.w3.org/TR/wai-aria-1.1/#heading
