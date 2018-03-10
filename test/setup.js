@@ -8,6 +8,7 @@ window.addEventListener('load', () => {
 
 // Helpful shortcut
 window.appendToBody = domUtils.appendToBody;
+window.buildHtml = domUtils.buildHtml;
 window.uniqueId = domUtils.uniqueId;
 window.beforeAll = before;
 window.afterAll = after;

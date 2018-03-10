@@ -177,3 +177,32 @@ describe('XPathRule', () => {
     expect(errors).toEqual([{ element: foo, message: 'no foo' }]);
   });
 });
+
+describe('AriaRule', () => {
+  const { AriaRule } = AccessibilityLinter;
+
+  it('finds elements with a document context', () => {
+    const h1 = appendToBody('<h1 />');
+    const heading = appendToBody('<div role="heading" />');
+
+    const errors = new AriaRule({ selector: ['heading'], name: 'heading', message: 'no heading' })
+      .run(document, () => true);
+
+    expect(errors).toEqual([
+      { element: h1, message: 'no heading' },
+      { element: heading, message: 'no heading' },
+    ]);
+  });
+
+  it('finds elements with a non-document context', () => {
+    appendToBody('<h1 />');
+    const heading = appendToBody('<div role="heading" />');
+
+    const errors = new AriaRule({ selector: ['heading'], name: 'heading', message: 'no heading' })
+      .run(heading, () => true);
+
+    expect(errors).toEqual([
+      { element: heading, message: 'no heading' },
+    ]);
+  });
+});

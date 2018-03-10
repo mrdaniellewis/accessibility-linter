@@ -26,6 +26,7 @@
         "appendToBody": false,
         "AccessibilityLinter": false,
         "beforeAll": false,
+        "buildHtml": false,
         "createDomWaiter": false,
         "domUtils": false,
         "expect": false,

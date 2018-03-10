@@ -16,6 +16,6 @@ Correct code for this rule:
   <a name="foo bar" />              <!-- Names can be any value -->
 ```
 
-Related specifications:
+### Related specifications:
 
 * https://www.w3.org/TR/html52/obsolete.html#obsolete-but-conforming-features

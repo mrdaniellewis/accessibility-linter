@@ -41,6 +41,23 @@ describe('Runner', () => {
       ]);
     });
 
+    describe('errors against the document', () => {
+      it('reports the error', () => {
+        const documentRule = new class documentRule extends Rule {
+          run(context, filter) {
+            if (filter(document)) {
+              return [{ element: document, message: 'no document' }];
+            }
+            return null;
+          }
+        }({ type: 'error' });
+        const runner = new Runner({ rules: [documentRule] });
+        expect(runner.run(document)).toEqual([
+          { message: 'no document', element: document, rule: documentRule },
+        ]);
+      });
+    });
+
     describe('global whitelist', () => {
       it('filters elements matching the global whitelist', () => {
         const foo = appendToBody('<foo><bar /></foo>');
@@ -117,10 +134,24 @@ describe('Runner', () => {
         expect(runner.run(document).length).toEqual(1);
         expect(runner.run(document)).toEqual([]);
       });
+
+      it('filters document with a previous error', () => {
+        const documentRule = new class documentRule extends Rule {
+          run(context, filter) {
+            if (filter(document)) {
+              return [{ element: document, message: 'no document' }];
+            }
+            return [];
+          }
+        }({ type: 'error' });
+        const runner = new Runner({ rules: [documentRule] });
+        expect(runner.run(document).length).toEqual(1);
+        expect(runner.run(document)).toEqual([]);
+      });
     });
 
     describe('cache is false', () => {
-      it('does not filter elements with a pervious error', () => {
+      it('does not filter elements with a previous error', () => {
         appendToBody('<foo />');
         const runner = new Runner({ rules: new Set([noFoo]), cache: false });
         expect(runner.run(document).length).toEqual(1);
