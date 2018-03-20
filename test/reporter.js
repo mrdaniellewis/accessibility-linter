@@ -65,7 +65,7 @@ window.ConsoleReporter = function ConsoleReporter(runner) {
   });
 
   runner.on('fail', (test, e) => {
-    console.error(testName(test), e);
+    console.error(testName(test), e, new URL(`?grep=${testName(test, ' ')}`, window.location.href).href);
     failures.push(test);
     table.push(tableRow(test));
     updateCount();
