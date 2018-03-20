@@ -70,5 +70,13 @@ describe('utils', () => {
         expect(tapped).toEqual(['a', 'b']);
       });
     });
+
+    describe('#unique', () => {
+      it('it returns only unique elements', () => {
+        const ob = {};
+        const array = ExtendedArray.from([NaN, 'a', undefined, ob, 1, NaN, 'a', undefined, ob, 1, 'foo']);
+        expect(array.unique()).toEqual([NaN, 'a', undefined, ob, 1, 'foo']);
+      });
+    });
   });
 });

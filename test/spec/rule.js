@@ -104,7 +104,57 @@ describe('Rule', () => {
       expect(errors).toEqual([{ element: foo, message: 'bar' }]);
     });
 
-    describe('test', () => {
+    describe('#visibleOnly', () => {
+      describe('when false', () => {
+        it('does not filter', () => {
+          const foo = appendToBody('<foo hidden />');
+          const errors = new Rule({ selector: 'foo', message: 'bar', name: 'foo' }).run(foo, () => true);
+          expect(errors).toEqual([{ element: foo, message: 'bar' }]);
+        });
+      });
+
+      describe('when true', () => {
+        it('does not filter visible elements', () => {
+          const foo = appendToBody('<foo />');
+          const errors = new Rule({ selector: 'foo', message: 'bar', name: 'foo', visibleOnly: true }).run(foo, () => true);
+          expect(errors).toEqual([{ element: foo, message: 'bar' }]);
+        });
+
+        it('does not filter aria-hidden elements', () => {
+          const foo = appendToBody('<foo aria-hidden="true" />');
+          const errors = new Rule({ selector: 'foo', message: 'bar', name: 'foo', visibleOnly: true }).run(foo, () => true);
+          expect(errors).toEqual([{ element: foo, message: 'bar' }]);
+        });
+
+        it('filters hidden elements', () => {
+          const foo = appendToBody('<foo hidden />');
+          const errors = new Rule({ selector: 'foo', message: 'bar', name: 'foo', visibleOnly: true }).run(foo, () => true);
+          expect(errors).toEqual([]);
+        });
+      });
+
+      describe('when "aria"', () => {
+        it('does not filter visible elements', () => {
+          const foo = appendToBody('<foo />');
+          const errors = new Rule({ selector: 'foo', message: 'bar', name: 'foo', visibleOnly: 'aria' }).run(foo, () => true);
+          expect(errors).toEqual([{ element: foo, message: 'bar' }]);
+        });
+
+        it('filters aria-hidden elements', () => {
+          const foo = appendToBody('<foo aria-hidden="true" />');
+          const errors = new Rule({ selector: 'foo', message: 'bar', name: 'foo', visibleOnly: 'aria' }).run(foo, () => true);
+          expect(errors).toEqual([]);
+        });
+
+        it('filters hidden elements', () => {
+          const foo = appendToBody('<foo hidden />');
+          const errors = new Rule({ selector: 'foo', message: 'bar', name: 'foo', visibleOnly: 'aria' }).run(foo, () => true);
+          expect(errors).toEqual([]);
+        });
+      });
+    });
+
+    describe('#test', () => {
       it('test can filter all found elements', () => {
         appendToBody('<foo><bar /></foo>');
 

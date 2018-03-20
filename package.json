@@ -27,8 +27,8 @@
     "webpack-merge": "^4.1.1"
   },
   "dependencies": {
-    "aria-config": "github:mrdaniellewis/aria-config#v1.1.0",
-    "aria-extensions": "github:mrdaniellewis/aria-extensions"
+    "aria-config": "mrdaniellewis/aria-config#v1.2.0",
+    "aria-extensions": "mrdaniellewis/aria-extensions#v1.2.0"
   },
   "docUrl": "https://mrdaniellewis.github.io/accessibility-linter/rules.md"
 }
