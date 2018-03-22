@@ -202,5 +202,44 @@ describe('Runner', () => {
         expect(foo[ariaExtensions.symbols.visible]).toEqual(false);
       });
     });
+
+    describe('setup and teardown', () => {
+      it('calls setup and teardown in order', () => {
+        let test = '';
+        class LifecycleRule extends Rule {
+          setup() {
+            test += 's';
+          }
+          run() {
+            test += 'r';
+            return [];
+          }
+          teardown() {
+            test += 't';
+          }
+        }
+        const runner = new Runner({ rules: [new LifecycleRule(), new LifecycleRule()] });
+        runner.run(document);
+        expect(test).toEqual('ssrrtt');
+      });
+
+      it('calls setup and teardown with a run identifier', () => {
+        const ids = [];
+        class LifecycleRule extends Rule {
+          setup(run) {
+            ids.push(run);
+          }
+          teardown(run) {
+            ids.push(run);
+          }
+        }
+        const runner = new Runner({ rules: [new LifecycleRule(), new LifecycleRule()] });
+        runner.run(document);
+        runner.run(document);
+        ids.slice(1, 4).forEach(id => expect(id).toBe(ids[0]));
+        ids.slice(4, 8).forEach(id => expect(id).toBe(ids[4]));
+        expect(ids[0]).not.toBe(ids[4]);
+      });
+    });
   });
 });
