@@ -78,5 +78,12 @@ describe('utils', () => {
         expect(array.unique()).toEqual([NaN, 'a', undefined, ob, 1, 'foo']);
       });
     });
+
+    describe('#groupBy', () => {
+      it('groups values', () => {
+        const array = ExtendedArray.from([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+        expect(array.groupBy(x => x % 3)).toEqual([[1, 4, 7, 10], [2, 5, 8], [3, 6, 9]]);
+      });
+    });
   });
 });

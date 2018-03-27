@@ -29,7 +29,7 @@
   },
   "dependencies": {
     "aria-config": "mrdaniellewis/aria-config#v1.2.0",
-    "aria-extensions": "mrdaniellewis/aria-extensions#v1.2.0"
+    "aria-extensions": "mrdaniellewis/aria-extensions#v1.3.0"
   },
   "docUrl": "https://mrdaniellewis.github.io/accessibility-linter/rules.md"
 }
