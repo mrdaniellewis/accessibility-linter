@@ -43,6 +43,24 @@ describe('utils', () => {
       expect(ExtendedArray.from([])).toBeInstanceOf(ExtendedArray);
     });
 
+    describe('#compact', () => {
+      it('compacts the array', () => {
+        const compacted = ExtendedArray.from([true, 1, 0, false, '', null, NaN]).compact();
+
+        expect(compacted).toEqual([true, 1]);
+        expect(compacted).toBeInstanceOf(ExtendedArray);
+      });
+    });
+
+    describe('#each', () => {
+      it('runs forEach and returns the array', () => {
+        const array = ExtendedArray.from([[], [], []]);
+        const processed = array.each(item => item.push('x'));
+        expect(array).toBe(processed);
+        expect(array).toEqual([['x'], ['x'], ['x']]);
+      });
+    });
+
     describe('#flatten', () => {
       it('flattens the array', () => {
         const flattened = ExtendedArray.from([1, 2, [3, [4]]]).flatten();
@@ -52,12 +70,10 @@ describe('utils', () => {
       });
     });
 
-    describe('#compact', () => {
-      it('compacts the array', () => {
-        const compacted = ExtendedArray.from([true, 1, 0, false, '', null, NaN]).compact();
-
-        expect(compacted).toEqual([true, 1]);
-        expect(compacted).toBeInstanceOf(ExtendedArray);
+    describe('#groupBy', () => {
+      it('groups values', () => {
+        const array = ExtendedArray.from([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+        expect(array.groupBy(x => x % 3)).toEqual([[1, 4, 7, 10], [2, 5, 8], [3, 6, 9]]);
       });
     });
 
@@ -76,13 +92,6 @@ describe('utils', () => {
         const ob = {};
         const array = ExtendedArray.from([NaN, 'a', undefined, ob, 1, NaN, 'a', undefined, ob, 1, 'foo']);
         expect(array.unique()).toEqual([NaN, 'a', undefined, ob, 1, 'foo']);
-      });
-    });
-
-    describe('#groupBy', () => {
-      it('groups values', () => {
-        const array = ExtendedArray.from([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
-        expect(array.groupBy(x => x % 3)).toEqual([[1, 4, 7, 10], [2, 5, 8], [3, 6, 9]]);
       });
     });
   });
