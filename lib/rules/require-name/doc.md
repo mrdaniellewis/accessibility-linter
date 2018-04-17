@@ -9,7 +9,7 @@ Elements that require a name include:
 * `<details>`
 * `<iframe>`
 * Anything that is focusable
-* Anything with a role that is defined as requiring an accessible name
+* Anything with a role that is defined as requiring an accessible name in the aria specification.
 
 Types of elements can be excluded from this check using the `whitelist` option.
 
